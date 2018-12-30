@@ -1,9 +1,19 @@
-import javax.xml.transform.Result;
+import benchmark.DatabaseInfo;
+import benchmark.DatabaseLocation;
+
+import javax.xml.crypto.Data;
 import java.sql.*;
 
 public class Benchmark {
 
     public static void main(String[] args) {
+
+        final String PASSED_HOST_MOCK = "localhost";
+        final String PASSED_PORT_MOCK = "5431";
+
+        DatabaseLocation databaseLocation = new DatabaseLocation(PASSED_HOST_MOCK, PASSED_PORT_MOCK);
+        DatabaseInfo databaseInfo = new DatabaseInfo(databaseLocation);
+
         try {
 
             try {
@@ -18,7 +28,7 @@ public class Benchmark {
             PreparedStatement preparedStatement = con.prepareStatement("select * from link");
             ResultSet resultSet = preparedStatement.executeQuery();
 
-            // NOTE: Adding new columns 
+            // NOTE: Adding new columns
             Statement statement = con.createStatement();
             final String keyColumnName = "key";
             String insetKeySql = "ALTER TABLE link ADD " + keyColumnName + " VARCHAR(10)";
