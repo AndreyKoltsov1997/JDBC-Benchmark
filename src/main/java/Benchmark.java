@@ -1,3 +1,4 @@
+import benchmark.DatabaseCredentials;
 import benchmark.DatabaseInfo;
 import benchmark.DatabaseLocation;
 
@@ -6,12 +7,26 @@ import java.sql.*;
 
 public class Benchmark {
 
+
     public static void main(String[] args) {
+
 
         final String PASSED_HOST_MOCK = "localhost";
         final String PASSED_PORT_MOCK = "5431";
 
         DatabaseLocation databaseLocation = new DatabaseLocation(PASSED_HOST_MOCK, PASSED_PORT_MOCK);
+
+        final String USERNAME_MOCK = "Andrey";
+        final String USER_PASSWORD_MOCK = "qwerty";
+        DatabaseCredentials databaseCredentials = null;
+        try {
+            databaseCredentials = new DatabaseCredentials(USERNAME_MOCK, USER_PASSWORD_MOCK);
+        } catch (IllegalArgumentException error) {
+            System.err.println("An error has occured while parsing user credentials: " + error.getMessage());
+            System.exit(Constants.STATUS_INVALID_ARGUMENT);
+        }
+
+
         DatabaseInfo databaseInfo = new DatabaseInfo(databaseLocation);
 
         try {
