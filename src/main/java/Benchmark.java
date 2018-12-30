@@ -1,8 +1,5 @@
 import javax.xml.transform.Result;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import java.sql.*;
 
 public class Benchmark {
 
@@ -20,6 +17,19 @@ public class Benchmark {
             Connection con = DriverManager.getConnection("jdbc:postgresql://localhost:5431/", "Andrey", "qwerty");
             PreparedStatement preparedStatement = con.prepareStatement("select * from link");
             ResultSet resultSet = preparedStatement.executeQuery();
+
+            // NOTE: Adding new columns 
+            Statement statement = con.createStatement();
+            final String keyColumnName = "key";
+            String insetKeySql = "ALTER TABLE link ADD " + keyColumnName + " VARCHAR(10)";
+            statement.execute(insetKeySql);
+            System.out.println(keyColumnName + " column has been inserted.");
+
+            final String valueColumnName = "value";
+            String insertValueSql = "ALTER TABLE link ADD " + valueColumnName + " VARCHAR(10)";
+            statement.execute(insertValueSql);
+            System.out.println(valueColumnName + " column has been inserted.");
+
 
             // NOTE: Getting info
             while (resultSet.next()) {
