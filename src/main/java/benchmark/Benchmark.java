@@ -34,7 +34,8 @@ public class Benchmark {
 
         final int AMOUNT_OF_THREADS_MOCK = 4;
         final int PAYLOAD_MOCK = 2;
-        DatabaseBenchmark databaseBenchmark = new DatabaseBenchmark(PAYLOAD_MOCK, AMOUNT_OF_THREADS_MOCK, databaseInfo);
+        final int AMOUNT_OF_INSERTIONS_MOCK = 2;
+        DatabaseBenchmark databaseBenchmark = new DatabaseBenchmark(PAYLOAD_MOCK, AMOUNT_OF_THREADS_MOCK, AMOUNT_OF_INSERTIONS_MOCK, databaseInfo);
 
         databaseBenchmark.performBenchmark();
 
