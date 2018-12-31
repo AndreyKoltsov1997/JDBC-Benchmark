@@ -1,4 +1,4 @@
-package benchmark;
+package benchmark.database.components;
 
 public class DatabaseCredentials {
 
@@ -6,7 +6,6 @@ public class DatabaseCredentials {
     private final String password;
 
     // MARK: - Getters and Setters
-
 
     public String getUsername() {
         return username;
@@ -17,6 +16,7 @@ public class DatabaseCredentials {
     }
 
     // MARK: - Constructor
+
     public DatabaseCredentials(String username, String password) throws IllegalArgumentException {
         if (!this.isUserLoginParameterValid(username) || !this.isUserLoginParameterValid(password)) {
             final String misleadingMessage = "User must have username and password set.";

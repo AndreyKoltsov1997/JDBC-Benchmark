@@ -1,4 +1,4 @@
-package benchmark;
+package benchmark.database.components;
 
 public class DatabaseLocation {
 
@@ -20,6 +20,11 @@ public class DatabaseLocation {
     }
 
     // MARK: - Constructor
+    public DatabaseLocation() {
+        this.host = this.DEFAULT_HOST;
+        this.port = this.DEFAULT_PORT;
+    }
+
     public DatabaseLocation(String host, String port) {
         if (!isLocationParameterValid(host)) {
             host = this.DEFAULT_HOST;

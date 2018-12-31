@@ -1,11 +1,13 @@
-import benchmark.DatabaseCredentials;
-import benchmark.DatabaseInfo;
-import benchmark.DatabaseLocation;
+package benchmark;
 
-import javax.xml.crypto.Data;
+import benchmark.database.components.DatabaseCredentials;
+import benchmark.database.DatabaseInfo;
+import benchmark.database.components.DatabaseLocation;
+
 import java.sql.*;
 
 public class Benchmark {
+
 
 
     public static void main(String[] args) {
@@ -26,8 +28,15 @@ public class Benchmark {
             System.exit(Constants.STATUS_INVALID_ARGUMENT);
         }
 
+        final String DATABASE_NAME_MOCK = "test";
 
-        DatabaseInfo databaseInfo = new DatabaseInfo(databaseLocation);
+        DatabaseInfo databaseInfo = new DatabaseInfo(databaseLocation, databaseCredentials, DATABASE_NAME_MOCK);
+
+        final int AMOUNT_OF_THREADS_MOCK = 4;
+        final int PAYLOAD_MOCK = 2;
+        DatabaseBenchmark databaseBenchmark = new DatabaseBenchmark(PAYLOAD_MOCK, AMOUNT_OF_THREADS_MOCK, databaseInfo);
+
+        databaseBenchmark.performBenchmark();
 
         try {
 
@@ -63,6 +72,6 @@ public class Benchmark {
         } catch (Exception error) {
             System.err.println("An error has occured: " + error.getMessage());
         }
-        System.out.println("Benchmark has been created.");
+        System.out.println("benchmark.Benchmark has been created.");
     }
 }
