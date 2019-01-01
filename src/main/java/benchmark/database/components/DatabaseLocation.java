@@ -42,4 +42,11 @@ public class DatabaseLocation {
         final String emptyString = "";
         return ((parameter != null) && (!parameter.equals(emptyString)));
     }
+
+
+    @Override
+    public String toString() {
+        final String localtionDelimiter = ":";
+        return this.host + localtionDelimiter + this.port;
+    }
 }

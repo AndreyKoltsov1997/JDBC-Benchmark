@@ -2,6 +2,7 @@ package benchmark;
 
 import benchmark.common.RandomAsciiStringGenerator;
 import benchmark.database.DatabaseInfo;
+import benchmark.jdbc.JdbcRowInserter;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -54,6 +55,7 @@ public class DatabaseBenchmark {
     }
 
     public void performBenchmark() {
+        JdbcRowInserter jdbcRowInserter = new JdbcRowInserter(this.databaseInfo);
         Runnable insertTask = () -> {
             while (this.shouldContinueInserting()) {
                 RandomAsciiStringGenerator randomAsciiStringGenerator = new RandomAsciiStringGenerator(this.payload);
@@ -87,7 +89,5 @@ public class DatabaseBenchmark {
         final int insertionsLeft = this.amountOfInsertions.get();
         return insertionsLeft;
     }
-
-
 
 }

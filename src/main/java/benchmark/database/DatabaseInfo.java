@@ -30,6 +30,22 @@ public class DatabaseInfo {
         this.name = this.DEFAULT_NAME;
     }
 
+    public final String getDatabaseURL() {
+        // jdbc:postgresql://localhost:5431/
+        final String jdbcNotation = "jdbc";
+        final String DATABASE_NOTATION_MOCK = "postgresql";
+        // TODO: Look up better ways of formatting
+        return String.format("%s:%s://%s/", jdbcNotation, DATABASE_NOTATION_MOCK, this.location.toString());
+    }
+
+    public final String getUsername() {
+        return this.credentials.getUsername();
+    }
+
+    public final String getPassword() {
+        return this.credentials.getPassword();
+    }
+
     // MARK: - Private
     // TODO: Potential copy-paste of parameters (see Database Location - fix that
     private Boolean isParameterValid(String parameter) {

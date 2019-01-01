@@ -32,6 +32,7 @@ public class Benchmark {
 
         DatabaseInfo databaseInfo = new DatabaseInfo(databaseLocation, databaseCredentials, DATABASE_NAME_MOCK);
 
+        System.out.println("Database URL: " + databaseInfo.getDatabaseURL());
         final int AMOUNT_OF_THREADS_MOCK = 4;
         final int PAYLOAD_MOCK = 2;
         final int AMOUNT_OF_INSERTIONS_MOCK = 2;
@@ -39,40 +40,40 @@ public class Benchmark {
 
         databaseBenchmark.performBenchmark();
 
-        try {
-
-            try {
-                Class.forName( "org.postgresql.Driver" );
-            } catch( ClassNotFoundException e ) {
-                //my class isn't there!
-                System.out.println("Driver hasn't been found");
-            }
-
-
-            Connection con = DriverManager.getConnection("jdbc:postgresql://localhost:5431/", "Andrey", "qwerty");
-            PreparedStatement preparedStatement = con.prepareStatement("select * from link");
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            // NOTE: Adding new columns
-            Statement statement = con.createStatement();
-            final String keyColumnName = "key";
-            String insetKeySql = "ALTER TABLE link ADD " + keyColumnName + " VARCHAR(10)";
-            statement.execute(insetKeySql);
-            System.out.println(keyColumnName + " column has been inserted.");
-
-            final String valueColumnName = "value";
-            String insertValueSql = "ALTER TABLE link ADD " + valueColumnName + " VARCHAR(10)";
-            statement.execute(insertValueSql);
-            System.out.println(valueColumnName + " column has been inserted.");
-
-
-            // NOTE: Getting info
-            while (resultSet.next()) {
-                System.out.println(resultSet.getString(2));
-            }
-        } catch (Exception error) {
-            System.err.println("An error has occured: " + error.getMessage());
-        }
-        System.out.println("benchmark.Benchmark has been created.");
+//        try {
+//
+//            try {
+//                Class.forName( "org.postgresql.Driver" );
+//            } catch( ClassNotFoundException e ) {
+//                //my class isn't there!
+//                System.out.println("Driver hasn't been found");
+//            }
+//
+//
+//            Connection con = DriverManager.getConnection("jdbc:postgresql://localhost:5431/", "Andrey", "qwerty");
+//            PreparedStatement preparedStatement = con.prepareStatement("select * from link");
+//            ResultSet resultSet = preparedStatement.executeQuery();
+//
+//            // NOTE: Adding new columns
+//            Statement statement = con.createStatement();
+//            final String keyColumnName = "key";
+//            String insetKeySql = "ALTER TABLE link ADD " + keyColumnName + " VARCHAR(10)";
+//            statement.execute(insetKeySql);
+//            System.out.println(keyColumnName + " column has been inserted.");
+//
+//            final String valueColumnName = "value";
+//            String insertValueSql = "ALTER TABLE link ADD " + valueColumnName + " VARCHAR(10)";
+//            statement.execute(insertValueSql);
+//            System.out.println(valueColumnName + " column has been inserted.");
+//
+//
+//            // NOTE: Getting info
+//            while (resultSet.next()) {
+//                System.out.println(resultSet.getString(2));
+//            }
+//        } catch (Exception error) {
+//            System.err.println("An error has occured: " + error.getMessage());
+//        }
+//        System.out.println("benchmark.Benchmark has been created.");
     }
 }
