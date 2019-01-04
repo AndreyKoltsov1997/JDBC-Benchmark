@@ -2,8 +2,11 @@ package benchmark;
 
 import benchmark.common.RandomAsciiStringGenerator;
 import benchmark.database.DatabaseInfo;
+import benchmark.files.IInsertionsFileLogger;
+import benchmark.files.InsertionFileLogger;
 import benchmark.jdbc.JdbcRowInserter;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -59,6 +62,7 @@ public class DatabaseBenchmark {
     }
 
     public void performBenchmark() {
+
         JdbcRowInserter jdbcRowInserter = new JdbcRowInserter(this.databaseInfo);
         final String DB_NAME_MOCK = "test";
         final String TABLE_NAME_MOCK = "link";
@@ -73,7 +77,12 @@ public class DatabaseBenchmark {
             System.out.println("Unable to create required column. Reason: " + error.getMessage());
         }
 
-        this.performInsertionTest(jdbcRowInserter);
+        try {
+            this.performInsertionTest(jdbcRowInserter);
+        } catch (IOException error) {
+            final String misleadingMsg = "An error hsa occured while working with file: " + error.getMessage();
+            System.err.println(misleadingMsg);
+        }
 
 
 
@@ -81,7 +90,11 @@ public class DatabaseBenchmark {
 
     // NOTE: Testing INSERT operations via JDBC connector into the specified database.
     // ... JdbcRowInserter is an object which perform insert operations
-    private void performInsertionTest(JdbcRowInserter jdbcRowInserter) {
+    private void performInsertionTest(JdbcRowInserter jdbcRowInserter) throws IOException {
+        IInsertionsFileLogger insertionFileLogger = new InsertionFileLogger(this.outputFileName);
+//        if (this.isFileOutputRequired()) {
+//            insertionFileLogger = new InsertionFileLogger(this.outputFileName);
+//        }
         Runnable insertTask = () -> {
             while (this.shouldContinueInserting()) {
                 RandomAsciiStringGenerator randomAsciiStringGenerator = new RandomAsciiStringGenerator(this.payload);
@@ -97,6 +110,10 @@ public class DatabaseBenchmark {
                     jdbcRowInserter.insertValueIntoColumn(COLUMN_KEY_NAME_MOCK, randomString);
                     Long currentInsertionTime = System.nanoTime() - insertionStartTime;
                     System.out.println("Total insertion time time: " + this.convertNanoSecondToMicroseconds(currentInsertionTime) + " microseconds.");
+                    if (insertionFileLogger != null) {
+                        insertionFileLogger.logOperation(this.databaseInfo.getTargetDatabaseName(), this.databaseInfo.getTargetTable(), randomString, String.valueOf(currentInsertionTime));
+
+                    }
 
                 } catch (Exception error) {
                     final String misleadingMsg = "An error has occured while inserting new value into column: " + error.getMessage();
@@ -114,6 +131,7 @@ public class DatabaseBenchmark {
         try {
             boolean finshed = es.awaitTermination(1, TimeUnit.MINUTES);
             if (finshed) {
+                ((InsertionFileLogger) insertionFileLogger).stopWriting();
                 System.out.println("Insertion has been finished");
             }
         } catch (Exception error) {
