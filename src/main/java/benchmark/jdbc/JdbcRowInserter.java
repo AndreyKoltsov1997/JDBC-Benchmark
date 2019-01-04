@@ -11,8 +11,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 // TODO: Add necessary connection closing
 public class JdbcRowInserter {
+
     private final DatabaseInfo databaseInfo;
     private Connection connection;
+    private List<String> processingTableColumnNames;
 
     // MARK: - Constructor
     public JdbcRowInserter(DatabaseInfo databaseInfo) {
@@ -22,10 +24,8 @@ public class JdbcRowInserter {
             final String SCHEMA_MOCK = "public";
             final String TABLE_NAME = this.databaseInfo.getTargetTable();
             System.out.println("Table name: " + TABLE_NAME);
-            List<String> columnNames = this.getColumnNames(TABLE_NAME, SCHEMA_MOCK);
-            for (String name : columnNames) {
-                System.out.println("Column exist: " + name);
-            }
+            this.processingTableColumnNames = this.getColumnNames(TABLE_NAME, SCHEMA_MOCK);
+
         } catch (SQLException error) {
             System.out.println("Unable to establish conection with database.");
             System.exit(Constants.CONNECTION_ERROR);
@@ -47,6 +47,8 @@ public class JdbcRowInserter {
 
     }
 
+
+    // TODO: Move it onto a separate object may be?
     private List<String> getColumnNames (String tableName, String schemaName) throws SQLException {
 
         ResultSet resultSet = null;
@@ -73,7 +75,7 @@ public class JdbcRowInserter {
                 } catch (SQLException error) {
                     throw error;
                 }
-            if(preparedStatement != null)
+            if (preparedStatement != null)
                 try {
                     preparedStatement.close();
                 } catch (SQLException error) {
@@ -140,20 +142,32 @@ public class JdbcRowInserter {
             final String misleadingMsg = "Connection to required database hasn't been extablishes.";
             throw new IllegalArgumentException(misleadingMsg);
         }
-        // NOTE: Adding new columns
-        Statement statement = this.connection.createStatement();
-        final String keyColumnName = "key";
-        String insetKeySql = "ALTER TABLE link ADD " + keyColumnName + " VARCHAR(10)";
-        statement.execute(insetKeySql);
-        System.out.println(keyColumnName + " column has been inserted.");
+        if (!isColumnExistInCurrentDB(column)) {
+            final String misleadingMsg = "Column " + column + " doesn't exist in database " + this.databaseInfo.getTargetDatabaseName();
+            throw new IllegalArgumentException(misleadingMsg);
+        }
 
-        final String valueColumnName = "value";
-        String insertValueSql = "ALTER TABLE link ADD " + valueColumnName + " VARCHAR(10)";
-        statement.execute(insertValueSql);
-        System.out.println(valueColumnName + " column has been inserted.");
+        final String targetTable = this.databaseInfo.getTargetTable();
+        // TODO: Repalce to string formatter
+//        String insertSQLstatement = "INSERT INTO " + targetTable + " VALUES (" + value + ")";
+
+
+        String insertSQLstatement = "INSERT INTO public." + targetTable + "(" + column + ") VALUES ('" + value + "')";
+        System.out.println("insertSQLstatement: " + insertSQLstatement);
+        try {
+            PreparedStatement preparedStatement = this.connection.prepareStatement(insertSQLstatement);
+            preparedStatement.execute();
+        } catch (SQLException error) {
+            final String misleadingMsg = "Unable to insert " + value + " into " + column + ". Reason: " + error.getMessage();
+            System.err.println(misleadingMsg);
+        }
 
     }
 
+
+    private Boolean isColumnExistInCurrentDB(final String column) {
+        return this.processingTableColumnNames.contains(column);
+    }
 
 
 
