@@ -36,6 +36,7 @@ public class InsertionFileLogger implements IInsertionsFileLogger {
         System.out.println("Logged");
 
         this.bufferedWriter.write(targetDatabase + "," + targetTable + "," + insertedKey + "," + operationDuration + "\n");
+//        this.stopWriting();
     }
 
     public void stopWriting() throws IOException {

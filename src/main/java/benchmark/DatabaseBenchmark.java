@@ -92,9 +92,7 @@ public class DatabaseBenchmark {
     // ... JdbcRowInserter is an object which perform insert operations
     private void performInsertionTest(JdbcRowInserter jdbcRowInserter) throws IOException {
         IInsertionsFileLogger insertionFileLogger = new InsertionFileLogger(this.outputFileName);
-//        if (this.isFileOutputRequired()) {
-//            insertionFileLogger = new InsertionFileLogger(this.outputFileName);
-//        }
+
         Runnable insertTask = () -> {
             while (this.shouldContinueInserting()) {
                 RandomAsciiStringGenerator randomAsciiStringGenerator = new RandomAsciiStringGenerator(this.payload);
@@ -102,10 +100,11 @@ public class DatabaseBenchmark {
                 final String COLUMN_KEY_NAME_MOCK = "key";
                 final String COLUMN_VALUE_NAME_MOCK = "value";
 
+                final String randomString = randomAsciiStringGenerator.getRandomString();
+                // NOTE: Not using JDBC Batch since we're trying to get average insertion time, ...
+                // ... thus we should calculate each insertion operation.
+
                 try {
-                    final String randomString = randomAsciiStringGenerator.getRandomString();
-                    // NOTE: Not using JDBC Batch since we're trying to get average insertion time, ...
-                    // ... thus we should calculate each insertion operation.
                     Long insertionStartTime = System.nanoTime();
                     jdbcRowInserter.insertValueIntoColumn(COLUMN_KEY_NAME_MOCK, randomString);
                     Long currentInsertionTime = System.nanoTime() - insertionStartTime;
@@ -115,10 +114,14 @@ public class DatabaseBenchmark {
 
                     }
 
+                } catch (SQLException error) {
+                    this.logFailedOperation(this.databaseInfo.getTargetDatabaseName(), this.databaseInfo.getTargetTable(), randomString, error.getMessage());
+
                 } catch (Exception error) {
                     final String misleadingMsg = "An error has occured while inserting new value into column: " + error.getMessage();
                     System.out.println(misleadingMsg);
                 }
+
             }
         };
 
@@ -131,11 +134,12 @@ public class DatabaseBenchmark {
         try {
             boolean finshed = es.awaitTermination(1, TimeUnit.MINUTES);
             if (finshed) {
+                // TODO: Create a better way to stop writing. Maybe try-with-resources?
                 ((InsertionFileLogger) insertionFileLogger).stopWriting();
                 System.out.println("Insertion has been finished");
             }
         } catch (Exception error) {
-            System.out.println("unable to finish excecutor service");
+            System.out.println("Unable to finish excecutor service: " + error.getLocalizedMessage());
         }
 
     }
@@ -143,6 +147,11 @@ public class DatabaseBenchmark {
 
     // MARK: - Private methods
 
+
+    // NOTE: For each failed insert operation write the error message to the standard output (console) with DB name, destination table name, key and failure cause.
+    private void logFailedOperation(final String dbName, final String targetTable, final String insertingKey, final String failureCause) {
+        System.err.println("Failure: " + dbName + "," + targetTable + "," + insertingKey + "," + failureCause);
+    }
 
     private Long convertNanoSecondToMicroseconds(Long nanoseconds) {
         final Integer MICRO_FROM_NANO_OFFSET = 1000;

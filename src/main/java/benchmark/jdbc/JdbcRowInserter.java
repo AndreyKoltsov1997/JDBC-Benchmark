@@ -151,15 +151,16 @@ public class JdbcRowInserter {
         // TODO: Repalce to string formatter
         
         String insertSQLstatement = "INSERT INTO public." + targetTable + "(" + column + ") VALUES ('" + value + "')";
-        System.out.println("insertSQLstatement: " + insertSQLstatement);
-        try {
-            PreparedStatement preparedStatement = this.connection.prepareStatement(insertSQLstatement);
-            preparedStatement.execute();
-        } catch (SQLException error) {
-            final String misleadingMsg = "Unable to insert " + value + " into " + column + ". Reason: " + error.getMessage();
-            System.err.println(misleadingMsg);
-        }
+        PreparedStatement preparedStatement = this.connection.prepareStatement(insertSQLstatement);
+        // NOTE: (JavaDoc) either (1) the row count for SQL Data Manipulation Language (DML) statements or ...
+        // ... (2) 0 for SQL statements that return nothing.
+        preparedStatement.executeUpdate();
 
+
+    }
+
+    private boolean isStatementExcecutionCorrect(int amountOfOperations) {
+        return (amountOfOperations > 0);
     }
 
 
