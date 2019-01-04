@@ -149,9 +149,7 @@ public class JdbcRowInserter {
 
         final String targetTable = this.databaseInfo.getTargetTable();
         // TODO: Repalce to string formatter
-//        String insertSQLstatement = "INSERT INTO " + targetTable + " VALUES (" + value + ")";
-
-
+        
         String insertSQLstatement = "INSERT INTO public." + targetTable + "(" + column + ") VALUES ('" + value + "')";
         System.out.println("insertSQLstatement: " + insertSQLstatement);
         try {

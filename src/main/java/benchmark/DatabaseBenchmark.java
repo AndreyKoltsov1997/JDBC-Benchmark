@@ -73,13 +73,15 @@ public class DatabaseBenchmark {
             System.out.println("Unable to create required column. Reason: " + error.getMessage());
         }
 
-        this.performInsertion(jdbcRowInserter);
+        this.performInsertionTest(jdbcRowInserter);
 
 
 
     }
 
-    private void performInsertion(JdbcRowInserter jdbcRowInserter) {
+    // NOTE: Testing INSERT operations via JDBC connector into the specified database.
+    // ... JdbcRowInserter is an object which perform insert operations
+    private void performInsertionTest(JdbcRowInserter jdbcRowInserter) {
         Runnable insertTask = () -> {
             while (this.shouldContinueInserting()) {
                 RandomAsciiStringGenerator randomAsciiStringGenerator = new RandomAsciiStringGenerator(this.payload);
@@ -89,12 +91,17 @@ public class DatabaseBenchmark {
 
                 try {
                     final String randomString = randomAsciiStringGenerator.getRandomString();
+                    // NOTE: Not using JDBC Batch since we're trying to get average insertion time, ...
+                    // ... thus we should calculate each insertion operation.
+                    Long insertionStartTime = System.nanoTime();
                     jdbcRowInserter.insertValueIntoColumn(COLUMN_KEY_NAME_MOCK, randomString);
+                    Long currentInsertionTime = System.nanoTime() - insertionStartTime;
+                    System.out.println("Total insertion time time: " + this.convertNanoSecondToMicroseconds(currentInsertionTime) + " microseconds.");
+
                 } catch (Exception error) {
                     final String misleadingMsg = "An error has occured while inserting new value into column: " + error.getMessage();
                     System.out.println(misleadingMsg);
                 }
-
             }
         };
 
@@ -113,15 +120,16 @@ public class DatabaseBenchmark {
             System.out.println("unable to finish excecutor service");
         }
 
-
-
-
     }
 
 
     // MARK: - Private methods
 
 
+    private Long convertNanoSecondToMicroseconds(Long nanoseconds) {
+        final Integer MICRO_FROM_NANO_OFFSET = 1000;
+        return (nanoseconds / MICRO_FROM_NANO_OFFSET);
+    }
 
     private Boolean shouldContinueInserting() {
         final int insertionsLeft = this.decrementInsertions();
