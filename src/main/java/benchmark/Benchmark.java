@@ -16,13 +16,6 @@ public class Benchmark {
 
 
         final String FILE_NAME_MOCK = "results.csv";
-//        try {
-//            InsertionFileLogger insertionFileLogger = new InsertionFileLogger(FILE_NAME_MOCK);
-//        } catch (IOException error) {
-//            final String misleadingMsg = "An error has occured while working with file " + FILE_NAME_MOCK +
-//                    ". Reason: " + error.getMessage();
-//            System.err.println(misleadingMsg);
-//        }
 
         final String PASSED_HOST_MOCK = "localhost";
         final String PASSED_PORT_MOCK = "5431";
@@ -45,7 +38,7 @@ public class Benchmark {
 
         System.out.println("Database URL: " + databaseInfo.getDatabaseURL());
         final int AMOUNT_OF_THREADS_MOCK = 5;
-        final int PAYLOAD_MOCK = 2;
+        final int PAYLOAD_MOCK = 10;
         final int AMOUNT_OF_INSERTIONS_MOCK = 100;
         DatabaseBenchmark databaseBenchmark = new DatabaseBenchmark(PAYLOAD_MOCK, AMOUNT_OF_THREADS_MOCK, AMOUNT_OF_INSERTIONS_MOCK, databaseInfo, FILE_NAME_MOCK);
 

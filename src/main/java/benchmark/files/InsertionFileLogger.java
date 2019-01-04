@@ -9,6 +9,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class InsertionFileLogger implements IInsertionsFileLogger {
+
     private Path pathToFile;
     private BufferedWriter bufferedWriter;
 
@@ -32,11 +33,8 @@ public class InsertionFileLogger implements IInsertionsFileLogger {
 
     @Override
     public void logOperation(String targetDatabase, String targetTable, String insertedKey, String operationDuration) throws IOException {
-        // TODO: Impliment method
         System.out.println("Logged");
-
         this.bufferedWriter.write(targetDatabase + "," + targetTable + "," + insertedKey + "," + operationDuration + "\n");
-//        this.stopWriting();
     }
 
     public void stopWriting() throws IOException {
