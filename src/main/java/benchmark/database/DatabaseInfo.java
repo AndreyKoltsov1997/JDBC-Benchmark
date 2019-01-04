@@ -5,7 +5,7 @@ import benchmark.database.components.DatabaseLocation;
 
 public class DatabaseInfo {
 
-    // NOTE: Default database name
+    // NOTE: Default database targetDatabaseName
     private final String DEFAULT_NAME = "test";
 
     // NOTE: Locations
@@ -13,25 +13,25 @@ public class DatabaseInfo {
     private final DatabaseCredentials credentials;
 
 
-    private final String name;
+    private final String targetDatabaseName;
     private String targetTable;
 
     // MARK: - Constructor
-    public DatabaseInfo(DatabaseLocation location, DatabaseCredentials credentials, String name) {
+    public DatabaseInfo(DatabaseLocation location, DatabaseCredentials credentials, String targetDatabaseName) {
         this.location = location;
         this.credentials = credentials;
 
-        if (this.isParameterValid(name)) {
-            name = this.DEFAULT_NAME;
+        if (this.isParameterValid(targetDatabaseName)) {
+            targetDatabaseName = this.DEFAULT_NAME;
         }
-        this.name = name;
+        this.targetDatabaseName = targetDatabaseName;
         this.targetTable = "link";
     }
 
     public DatabaseInfo(DatabaseLocation location, DatabaseCredentials credentials) {
         this.location = location;
         this.credentials = credentials;
-        this.name = this.DEFAULT_NAME;
+        this.targetDatabaseName = this.DEFAULT_NAME;
     }
 
     public final String getDatabaseURL() {
@@ -55,8 +55,8 @@ public class DatabaseInfo {
     }
 
 
-    public String getName() {
-        return name;
+    public String getTargetDatabaseName() {
+        return targetDatabaseName;
     }
 
     // MARK: - Private
