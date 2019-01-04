@@ -3,7 +3,9 @@ package benchmark;
 import benchmark.database.components.DatabaseCredentials;
 import benchmark.database.DatabaseInfo;
 import benchmark.database.components.DatabaseLocation;
+import benchmark.files.InsertionFileLogger;
 
+import java.io.IOException;
 import java.sql.*;
 
 public class Benchmark {
@@ -12,6 +14,15 @@ public class Benchmark {
 
     public static void main(String[] args) {
 
+
+        final String FILE_NAME_MOCK = "results.csv";
+        try {
+            InsertionFileLogger insertionFileLogger = new InsertionFileLogger(FILE_NAME_MOCK);
+        } catch (IOException error) {
+            final String misleadingMsg = "An error has occured while working with file " + FILE_NAME_MOCK +
+                    ". Reason: " + error.getMessage();
+            System.err.println(misleadingMsg);
+        }
 
         final String PASSED_HOST_MOCK = "localhost";
         final String PASSED_PORT_MOCK = "5431";
