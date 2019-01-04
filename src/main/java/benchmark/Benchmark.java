@@ -33,13 +33,13 @@ public class Benchmark {
         DatabaseInfo databaseInfo = new DatabaseInfo(databaseLocation, databaseCredentials, DATABASE_NAME_MOCK);
 
         System.out.println("Database URL: " + databaseInfo.getDatabaseURL());
-        final int AMOUNT_OF_THREADS_MOCK = 4;
+        final int AMOUNT_OF_THREADS_MOCK = 5;
         final int PAYLOAD_MOCK = 2;
-        final int AMOUNT_OF_INSERTIONS_MOCK = 2;
+        final int AMOUNT_OF_INSERTIONS_MOCK = 100;
         DatabaseBenchmark databaseBenchmark = new DatabaseBenchmark(PAYLOAD_MOCK, AMOUNT_OF_THREADS_MOCK, AMOUNT_OF_INSERTIONS_MOCK, databaseInfo);
 
         databaseBenchmark.performBenchmark();
-
+//
 //        try {
 //
 //            try {
@@ -54,26 +54,29 @@ public class Benchmark {
 //            PreparedStatement preparedStatement = con.prepareStatement("select * from link");
 //            ResultSet resultSet = preparedStatement.executeQuery();
 //
-//            // NOTE: Adding new columns
-//            Statement statement = con.createStatement();
-//            final String keyColumnName = "key";
-//            String insetKeySql = "ALTER TABLE link ADD " + keyColumnName + " VARCHAR(10)";
-//            statement.execute(insetKeySql);
-//            System.out.println(keyColumnName + " column has been inserted.");
-//
-//            final String valueColumnName = "value";
-//            String insertValueSql = "ALTER TABLE link ADD " + valueColumnName + " VARCHAR(10)";
-//            statement.execute(insertValueSql);
-//            System.out.println(valueColumnName + " column has been inserted.");
+////            // NOTE: Adding new columns
+////            Statement statement = con.createStatement();
+////            final String keyColumnName = "key";
+////            String insetKeySql = "ALTER TABLE link ADD " + keyColumnName + " VARCHAR(10)";
+////            statement.execute(insetKeySql);
+////            System.out.println(keyColumnName + " column has been inserted.");
+////
+////            final String valueColumnName = "value";
+////            String insertValueSql = "ALTER TABLE link ADD " + valueColumnName + " VARCHAR(10)";
+////            statement.execute(insertValueSql);
+////            System.out.println(valueColumnName + " column has been inserted.");
 //
 //
 //            // NOTE: Getting info
 //            while (resultSet.next()) {
-//                System.out.println(resultSet.getString(2));
+////                System.out.println("next row");
+//                System.out.println("Key:" + resultSet.getString("key"));
+//                System.out.println("value:" + resultSet.getString("value"));
+//
 //            }
 //        } catch (Exception error) {
 //            System.err.println("An error has occured: " + error.getMessage());
 //        }
-//        System.out.println("benchmark.Benchmark has been created.");
+        System.out.println("benchmark.Benchmark has been created.");
     }
 }

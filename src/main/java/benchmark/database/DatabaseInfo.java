@@ -11,7 +11,10 @@ public class DatabaseInfo {
     // NOTE: Locations
     private final DatabaseLocation location;
     private final DatabaseCredentials credentials;
+
+
     private final String name;
+    private String targetTable;
 
     // MARK: - Constructor
     public DatabaseInfo(DatabaseLocation location, DatabaseCredentials credentials, String name) {
@@ -22,6 +25,7 @@ public class DatabaseInfo {
             name = this.DEFAULT_NAME;
         }
         this.name = name;
+        this.targetTable = "link";
     }
 
     public DatabaseInfo(DatabaseLocation location, DatabaseCredentials credentials) {
@@ -46,12 +50,22 @@ public class DatabaseInfo {
         return this.credentials.getPassword();
     }
 
+    public String getTargetTable() {
+        return targetTable;
+    }
+
+
+    public String getName() {
+        return name;
+    }
+
     // MARK: - Private
     // TODO: Potential copy-paste of parameters (see Database Location - fix that
     private Boolean isParameterValid(String parameter) {
         final String emptyString = "";
         return ((parameter != null) && (!parameter.equals(emptyString)));
     }
+
 
 
 }

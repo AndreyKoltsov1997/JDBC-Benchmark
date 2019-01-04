@@ -4,6 +4,9 @@ import benchmark.common.RandomAsciiStringGenerator;
 import benchmark.database.DatabaseInfo;
 import benchmark.jdbc.JdbcRowInserter;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class DatabaseBenchmark {
@@ -66,9 +69,21 @@ public class DatabaseBenchmark {
         };
 
         final int amountOfThreads = this.amountOfThreads;
+        ExecutorService es = Executors.newCachedThreadPool();
         for (int i = 0; i < amountOfThreads; ++i) {
-            Thread thread = new Thread(insertTask);
-            thread.start();
+            es.execute(insertTask);
+//            Thread thread = new Thread(insertTask);
+//            thread.start();
+        }
+        es.shutdown();
+        try {
+            boolean finshed = es.awaitTermination(1, TimeUnit.MINUTES);
+            if (finshed) {
+                System.out.println("Insertion has been finished");
+            }
+        } catch (Exception error) {
+            System.out.println("unable to finish excecutor service");
+
         }
 
     }
