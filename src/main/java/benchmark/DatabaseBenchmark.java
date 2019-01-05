@@ -188,6 +188,7 @@ public class DatabaseBenchmark {
 
 
     private void updateMetrics(final int insertedPayload, final Long macrosecondsSpentOnInsertion) {
+        System.out.println("updating metrics..");
         benchmarkMetricsCalculator.addBytesInserted(insertedPayload);
         benchmarkMetricsCalculator.addMacrosecondsSpentOnInsertion(macrosecondsSpentOnInsertion);
         benchmarkMetricsCalculator.incrementSuccessfulInsertions();

@@ -50,6 +50,10 @@ public class BenchmarkMetricsCalculator {
 
     // NOTE: Calculation of insert operations per second
     public double getAverageThroughtput() {
+        if (!this.hasSuccessfulOperations()) {
+            final double zeroThroughput = 0.0;
+            return zeroThroughput;
+        }
         final double secondsSpentOnInsertion = this.getSecondsSpentOnInsertion();
         final double result = insertedOperations.get() / secondsSpentOnInsertion;
         return result;
@@ -57,7 +61,13 @@ public class BenchmarkMetricsCalculator {
 
     // NOTE: Calculation of payload bytes inserted per second
     public double getBandwidth() {
+        if (!this.hasSuccessfulOperations()) {
+            final double zeroBandwidth = 0.0;
+            return zeroBandwidth;
+        }
         final double secondsSpentOnInsertion = this.getSecondsSpentOnInsertion();
+        System.out.println("[bandwidth] secondsSpentOnInsertion:" + secondsSpentOnInsertion);
+
         final double result = bytesInserted.get() / secondsSpentOnInsertion;
         return result;
     }
@@ -66,6 +76,7 @@ public class BenchmarkMetricsCalculator {
     private double getSecondsSpentOnInsertion() {
         final int secondsToMacrosecondsPower = -6;
         final int convertionBase = 10;
+        System.out.println("this.macrosecondsSpendOnInsertions.get(): " + this.macrosecondsSpendOnInsertions.get());
         final double secondsToMacrosecondsMultiplicator = Math.pow(convertionBase, secondsToMacrosecondsPower);
         final double result = this.macrosecondsSpendOnInsertions.get() * secondsToMacrosecondsMultiplicator;
         return result;
@@ -79,5 +90,8 @@ public class BenchmarkMetricsCalculator {
         return (int) value;
     }
 
-
+    private boolean hasSuccessfulOperations() {
+        return ((this.bytesInserted.get() != 0) && (this.insertedOperations.get() != 0) && (this.macrosecondsSpendOnInsertions.get() != 0));
+    }
+    
 }
