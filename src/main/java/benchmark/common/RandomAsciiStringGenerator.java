@@ -25,4 +25,10 @@ public class RandomAsciiStringGenerator {
         return stringBuilder.toString();
     }
 
+
+    public int getPayloadOfUTF8String(final String string) {
+        // NOTE: UTF-8 string has 1 byte per symbol
+        return string.length();
+    }
+
 }

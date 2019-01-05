@@ -1,5 +1,6 @@
 package benchmark;
 
+import benchmark.common.AtomicFloat;
 import benchmark.common.RandomAsciiStringGenerator;
 import benchmark.database.DatabaseInfo;
 import benchmark.files.IInsertionsFileLogger;
@@ -27,6 +28,11 @@ public class DatabaseBenchmark {
     private final AtomicInteger amountOfInsertions;
     private final String outputFileName;
     private final int minimalPayloadPerInsertion;
+    private BenchmarkMetricsCalculator benchmarkMetricsCalculator = new BenchmarkMetricsCalculator();
+
+    // AtomicFloat is used to calculate benchmark's throughput dynamicly without storing ...
+    // ... benchmark results in memory.
+//    private AtomicFloat averageThroughput = new AtomicFloat((float) 0.0);
 
     // MARK: - Constructors
 
@@ -108,11 +114,11 @@ public class DatabaseBenchmark {
                 String randomString = "";
 
                 final int payloadLeft = this.decrementPayload();
-                System.out.println("========");
-                System.out.println("Payload left: " + payloadLeft + "modifying from Thread: " + Thread.currentThread().getName());
-                System.out.println("Total payload: " + this.totalPayload.get());
-                System.out.println("Minimal payload: " + this.minimalPayloadPerInsertion);
-                System.out.println("========");
+//                System.out.println("========");
+//                System.out.println("Payload left: " + payloadLeft + "modifying from Thread: " + Thread.currentThread().getName());
+//                System.out.println("Total payload: " + this.totalPayload.get());
+//                System.out.println("Minimal payload: " + this.minimalPayloadPerInsertion);
+//                System.out.println("========");
 
                 if (payloadLeft < this.minimalPayloadPerInsertion) {
                     // NOTE: If the payload left is smaller than the required minimum (e.g.: when ..
@@ -140,6 +146,12 @@ public class DatabaseBenchmark {
                         insertionFileLogger.logOperation(this.databaseInfo.getTargetDatabaseName(), this.databaseInfo.getTargetTable(), randomString, String.valueOf(currentInsertionTime));
                     }
 
+                    // NOTE: Updating metrics in case of successful insertion
+                    // TODO: Add payload for BOTH key and value
+                    final int payloadInserted = randomAsciiStringGenerator.getPayloadOfUTF8String(randomString);
+                    this.updateMetrics(payloadInserted, currentInsertionTime);
+
+
                 } catch (SQLException error) {
                     this.logFailedOperation(this.databaseInfo.getTargetDatabaseName(), this.databaseInfo.getTargetTable(), randomString, error.getMessage());
 
@@ -163,6 +175,7 @@ public class DatabaseBenchmark {
                 // TODO: Create a better way to stop writing. Maybe try-with-resources?
                 ((InsertionFileLogger) insertionFileLogger).stopWriting();
                 System.out.println("Insertion has been finished");
+                this.printBenchmarkResults();
             }
         } catch (Exception error) {
             System.out.println("Unable to finish excecutor service: " + error.getLocalizedMessage());
@@ -172,6 +185,19 @@ public class DatabaseBenchmark {
 
 
     // MARK: - Private methods
+
+
+    private void updateMetrics(final int insertedPayload, final Long macrosecondsSpentOnInsertion) {
+        benchmarkMetricsCalculator.addBytesInserted(insertedPayload);
+        benchmarkMetricsCalculator.addMacrosecondsSpentOnInsertion(macrosecondsSpentOnInsertion);
+        benchmarkMetricsCalculator.incrementSuccessfulInsertions();
+    }
+
+    private void printBenchmarkResults() {
+        final double averageThroughtput = benchmarkMetricsCalculator.getAverageThroughtput();
+        final double bandWidth = benchmarkMetricsCalculator.getBandwidth();
+        System.out.println("Average thoughtput: " + averageThroughtput + ", bendwidth: " + bandWidth);
+    }
 
 
     // NOTE: For each failed insert operation write the error message to the standard output (console) with DB name, destination table name, key and failure cause.
