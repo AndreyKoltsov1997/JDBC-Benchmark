@@ -93,5 +93,5 @@ public class BenchmarkMetricsCalculator {
     private boolean hasSuccessfulOperations() {
         return ((this.bytesInserted.get() != 0) && (this.insertedOperations.get() != 0) && (this.macrosecondsSpendOnInsertions.get() != 0));
     }
-    
+
 }
