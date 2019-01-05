@@ -1,5 +1,6 @@
 package benchmark;
 
+import benchmark.cli.CommandLineArgsParser;
 import benchmark.database.components.DatabaseCredentials;
 import benchmark.database.DatabaseInfo;
 import benchmark.database.components.DatabaseLocation;
@@ -13,6 +14,17 @@ public class Benchmark {
 
 
     public static void main(String[] args) {
+
+
+
+        final CommandLineArgsParser commandLineArgsParser = new CommandLineArgsParser();
+
+        try {
+            commandLineArgsParser.parseArguments(args);
+        } catch (IllegalArgumentException error) {
+            System.err.println(error.getMessage());
+            System.exit(Constants.STATUS_INVALID_ARGUMENT);
+        }
 
 
         final String FILE_NAME_MOCK = "results.csv";
