@@ -19,6 +19,7 @@ public class DatabaseBenchmark {
     private final int DEFAULT_PAYLOAD = 0;
     private final int DEFAULT_AMOUNT_OF_THREDS = 1;
     private final String NO_OUTPUT_FILE_REQUIRED_FILENAME = "";
+    // TODO: Replace this valud with value from Constants class
     private final int INFINITE_AMOUNT_OF_INSERTIONS = -9;
 
 

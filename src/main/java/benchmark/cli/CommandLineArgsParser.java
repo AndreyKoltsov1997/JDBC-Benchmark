@@ -77,4 +77,45 @@ public class CommandLineArgsParser {
     }
 
 
+
+    public String getHost() {
+        return this.optionalCommandLineArguments.getOptionByTag("host");
+    }
+
+    public String getPort() {
+        return this.optionalCommandLineArguments.getOptionByTag("port");
+    }
+
+    public String getTableName() {
+        return this.optionalCommandLineArguments.getOptionByTag("table");
+    }
+
+    public String getName() {
+        return this.optionalCommandLineArguments.getOptionByTag("name");
+
+    }
+
+    public int getAmountOfThreads() {
+        final String amountOfThreads = this.optionalCommandLineArguments.getOptionByTag("threads");
+        return Integer.valueOf(amountOfThreads);
+    }
+
+    public int getPayload() {
+        final String payload = this.optionalCommandLineArguments.getOptionByTag("payload");
+        return Integer.valueOf(payload);
+    }
+
+    public String getFileNameForLogs() {
+        return this.optionalCommandLineArguments.getOptionByTag("file");
+    }
+
+    public int getAmountOfInsertions() {
+        final String insertionAmount = this.optionalCommandLineArguments.getOptionByTag("insertions");
+        return Integer.valueOf(insertionAmount);
+    }
+//
+//    public String getPort() {
+//        return this.optionalCommandLineArguments.getPort();
+//    }
+
 }

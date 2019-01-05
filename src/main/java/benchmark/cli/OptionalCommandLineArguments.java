@@ -2,6 +2,7 @@ package benchmark.cli;
 
 import benchmark.Constants;
 
+import java.sql.Timestamp;
 import java.util.*;
 
 // NOTE: Package-private class
@@ -9,7 +10,6 @@ class OptionalCommandLineArguments {
 
     private final String ARGUMENT_NOT_PROVIDED_VALUE = "";
     private final char ARGUMENT_EQUALS_SIGN = '=';
-    private final String HOST_TAG = "host";
     private final char ARGUMENT_PREFIX_ELEMENT = '-';
 
     private Map<String, String> options;
@@ -17,9 +17,20 @@ class OptionalCommandLineArguments {
     // NOTE: Option duplicates are not allowed, order is not important
     private Set<String> avaliableOptions;
 
-    // NOTE: Database location
-    private String DB_HOST_TAG = "host";
-    private String DB_NAME_TAG = "name";
+
+
+    // NOTE: Optional CLI arguments tags. WARNING: MAKE SURE to modify initializing of avaliable options container ...
+    // ... in case of adding a new one.
+    private final String DB_HOST_TAG = "host";
+    private final String DB_PORT_TAG = "port";
+    private final String DB_NAME_TAG = "name";
+    private final String DB_TABLE_TAG = "table";
+
+    private final String PAYLOAD_TAG = "payload";
+    private final String INSERT_AMMOUNT_TAG = "insertions";
+
+    private final String OUTPUT_FILE_TAG = "file";
+    private final String AMOUNT_OF_THREADS_TAG = "threads";
 
 
     // NOTE: Empty constructor
@@ -33,6 +44,13 @@ class OptionalCommandLineArguments {
     private void initAvaliableOptions() {
         this.avaliableOptions.add(DB_HOST_TAG);
         this.avaliableOptions.add(DB_NAME_TAG);
+        this.avaliableOptions.add(DB_PORT_TAG);
+        this.avaliableOptions.add(DB_TABLE_TAG);
+        this.avaliableOptions.add(PAYLOAD_TAG);
+        this.avaliableOptions.add(INSERT_AMMOUNT_TAG);
+        this.avaliableOptions.add(OUTPUT_FILE_TAG);
+        this.avaliableOptions.add(AMOUNT_OF_THREADS_TAG);
+
     }
 
     public void parseOptionalArguments(String[] args) throws IllegalArgumentException {
@@ -94,4 +112,99 @@ class OptionalCommandLineArguments {
         return name;
     }
 
+
+    // NOTE: Returning localhost if host hasn't been specified
+
+    public String getOptionByTag(final String tag) throws IllegalArgumentException {
+        if (!isArgumentExist(tag)) {
+            throw new IllegalArgumentException("Option \"" + tag + "\" doesn't exist.");
+        }
+
+        switch(tag) {
+            case DB_NAME_TAG:
+                String processingTag = DB_NAME_TAG;
+                if (!isArgumentSet(processingTag)) {
+                    return this.generateDatabaseName();
+                }
+                return this.options.get(processingTag);
+
+            case DB_HOST_TAG:
+                processingTag = DB_HOST_TAG;
+
+                if (!isArgumentSet(processingTag)) {
+                    final String defaultHost = "localhost";
+                    return defaultHost;
+                }
+                return this.options.get(processingTag);
+
+            case DB_PORT_TAG:
+                processingTag = DB_PORT_TAG;
+                if (!isArgumentSet(processingTag)) {
+                    final String defaultPort = "8080";
+                    return defaultPort;
+                }
+                return this.options.get(processingTag);
+
+            case DB_TABLE_TAG:
+                processingTag = DB_TABLE_TAG;
+                if (!isArgumentSet(processingTag)) {
+                    return this.generateTableName();
+                }
+                return this.options.get(processingTag);
+            case PAYLOAD_TAG:
+                processingTag = PAYLOAD_TAG;
+                if (!isArgumentSet(processingTag)) {
+                    final String defaultPayload = "0";
+                    return defaultPayload;
+                }
+                return this.options.get(processingTag);
+            case INSERT_AMMOUNT_TAG:
+                processingTag = INSERT_AMMOUNT_TAG;
+                if (!isArgumentSet(INSERT_AMMOUNT_TAG)) {
+                    return String.valueOf(Constants.INFINITE_AMOUNT_OF_INSERTIONS);
+                }
+                return this.options.get(processingTag);
+            case OUTPUT_FILE_TAG:
+                processingTag = OUTPUT_FILE_TAG;
+                if (!isArgumentSet(processingTag)) {
+                    return this.ARGUMENT_NOT_PROVIDED_VALUE;
+                }
+                return this.options.get(processingTag);
+            case AMOUNT_OF_THREADS_TAG:
+                processingTag = AMOUNT_OF_THREADS_TAG;
+                if (!isArgumentSet(processingTag)) {
+                    return String.valueOf(Constants.DEFAULT_AMOUNT_OF_THREADS);
+                }
+                return this.options.get(processingTag);
+            default:
+                throw new IllegalArgumentException("Option \"" + tag + "\" doesn't exist.");
+        }
+    }
+
+    private boolean isArgumentSet(String argumentTag) {
+        return this.options.containsKey(argumentTag);
+    }
+
+    public String getHost() {
+        final String requiredTag = this.DB_HOST_TAG;
+        if (this.options.containsKey(requiredTag)) {
+            return this.options.get(requiredTag);
+        }
+        final String defaultHost = "localhost";
+        return defaultHost;
+    }
+
+
+    private String generateDatabaseName() {
+        Timestamp timeStamp = new Timestamp(System.currentTimeMillis());
+        final String defaultName = "benchmark" + timeStamp.toString();
+        return defaultName;
+    }
+
+
+    // NOTE: If table name is not set, generating it with timestamp
+    private String generateTableName() {
+        Timestamp timeStamp = new Timestamp(System.currentTimeMillis());
+        return timeStamp.toString();
+    }
 }

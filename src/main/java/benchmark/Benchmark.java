@@ -8,14 +8,14 @@ import benchmark.files.InsertionFileLogger;
 
 import java.io.IOException;
 import java.sql.*;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Benchmark {
 
 
 
     public static void main(String[] args) {
-
-
 
 
         final CommandLineArgsParser commandLineArgsParser = new CommandLineArgsParser();
@@ -27,36 +27,38 @@ public class Benchmark {
             System.exit(Constants.STATUS_INVALID_ARGUMENT);
         }
 
-//
-//        final String FILE_NAME_MOCK = "results.csv";
-//
-//        final String PASSED_HOST_MOCK = "localhost";
-//        final String PASSED_PORT_MOCK = "5431";
-//
-//        DatabaseLocation databaseLocation = new DatabaseLocation(PASSED_HOST_MOCK, PASSED_PORT_MOCK);
-//
-//        final String USERNAME_MOCK = "Andrey";
-//        final String USER_PASSWORD_MOCK = "qwerty";
-//        DatabaseCredentials databaseCredentials = null;
-//        try {
-//            databaseCredentials = new DatabaseCredentials(USERNAME_MOCK, USER_PASSWORD_MOCK);
-//        } catch (IllegalArgumentException error) {
-//            System.err.println("An error has occured while parsing user credentials: " + error.getMessage());
-//            System.exit(Constants.STATUS_INVALID_ARGUMENT);
-//        }
-//
-//        final String DATABASE_NAME_MOCK = "test";
-//
-//        DatabaseInfo databaseInfo = new DatabaseInfo(databaseLocation, databaseCredentials, DATABASE_NAME_MOCK);
-//
-//        System.out.println("Database URL: " + databaseInfo.getDatabaseURL());
-//        final int AMOUNT_OF_THREADS_MOCK = 5;
-//        final int PAYLOAD_MOCK = 2;
-//        final int AMOUNT_OF_INSERTIONS_MOCK = 100;
-//        DatabaseBenchmark databaseBenchmark = new DatabaseBenchmark(PAYLOAD_MOCK, AMOUNT_OF_THREADS_MOCK, AMOUNT_OF_INSERTIONS_MOCK, databaseInfo, FILE_NAME_MOCK);
-//
-//        databaseBenchmark.performBenchmark();
-//
-//        System.out.println("benchmark.Benchmark has been created.");
+        System.out.println("Host: " + commandLineArgsParser.getHost());
+        System.out.println("Name:" + commandLineArgsParser.getName());
+
+        final String FILE_NAME_MOCK = "results.csv";
+
+        final String PASSED_HOST_MOCK = "localhost";
+        final String PASSED_PORT_MOCK = "5431";
+
+        DatabaseLocation databaseLocation = new DatabaseLocation(PASSED_HOST_MOCK, PASSED_PORT_MOCK);
+
+        final String USERNAME_MOCK = "Andrey";
+        final String USER_PASSWORD_MOCK = "qwerty";
+        DatabaseCredentials databaseCredentials = null;
+        try {
+            databaseCredentials = new DatabaseCredentials(USERNAME_MOCK, USER_PASSWORD_MOCK);
+        } catch (IllegalArgumentException error) {
+            System.err.println("An error has occured while parsing user credentials: " + error.getMessage());
+            System.exit(Constants.STATUS_INVALID_ARGUMENT);
+        }
+
+        final String DATABASE_NAME_MOCK = "test";
+
+        DatabaseInfo databaseInfo = new DatabaseInfo(databaseLocation, databaseCredentials, DATABASE_NAME_MOCK);
+
+        System.out.println("Database URL: " + databaseInfo.getDatabaseURL());
+        final int AMOUNT_OF_THREADS_MOCK = 5;
+        final int PAYLOAD_MOCK = 2;
+        final int AMOUNT_OF_INSERTIONS_MOCK = 100;
+        DatabaseBenchmark databaseBenchmark = new DatabaseBenchmark(PAYLOAD_MOCK, AMOUNT_OF_THREADS_MOCK, AMOUNT_OF_INSERTIONS_MOCK, databaseInfo, FILE_NAME_MOCK);
+
+        databaseBenchmark.performBenchmark();
+
+        System.out.println("benchmark.Benchmark has been created.");
     }
 }
