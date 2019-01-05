@@ -2,8 +2,7 @@ package benchmark.cli;
 
 import benchmark.Constants;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 // NOTE: Package-private class
 class OptionalCommandLineArguments {
@@ -15,14 +14,25 @@ class OptionalCommandLineArguments {
 
     private Map<String, String> options;
 
+    // NOTE: Option duplicates are not allowed, order is not important
+    private Set<String> avaliableOptions;
+
     // NOTE: Database location
-    private String databaseHost = ARGUMENT_NOT_PROVIDED_VALUE;
-    private String databasePort = ARGUMENT_NOT_PROVIDED_VALUE;
+    private String DB_HOST_TAG = "host";
+    private String DB_NAME_TAG = "name";
+
 
     // NOTE: Empty constructor
     public OptionalCommandLineArguments() {
         this.options = new HashMap<>();
+        this.avaliableOptions = new HashSet<>();
+        this.initAvaliableOptions();
 
+    }
+
+    private void initAvaliableOptions() {
+        this.avaliableOptions.add(DB_HOST_TAG);
+        this.avaliableOptions.add(DB_NAME_TAG);
     }
 
     public void parseOptionalArguments(String[] args) throws IllegalArgumentException {
@@ -31,10 +41,14 @@ class OptionalCommandLineArguments {
             String currentArgument = args[i];
             if (hasOptionalArgumentPrefix(currentArgument)) {
                 final String argumentName = this.getArgumentName(currentArgument);
+                if (!isArgumentExist(argumentName)) {
+                    throw new IllegalArgumentException("Argument \"" + argumentName + "\" doesn't exist. ");
+                }
                 final String argumentValue = this.getOptionValue(currentArgument);
-                System.out.println("Argument name: " + argumentName + " with value : " + argumentValue);
+                this.options.put(argumentName, argumentValue);
             }
         }
+        System.out.println("Option arguments: " + this.options.toString());
     }
 
     // NOTE: Optional arguments syntax: "--argumentName=arugmentValue", thus it...
@@ -55,6 +69,11 @@ class OptionalCommandLineArguments {
         final int equalCharacterIndex = argument.indexOf(equalChar);
         final int charNotPresentedCode = -1;
         return (equalCharacterIndex != charNotPresentedCode);
+    }
+
+    // NOTE: Checks if optional argument name is valid and does exist (e.g.: "--myAwesomeCat=.." is not a valid argument)
+    private boolean isArgumentExist(String argument) {
+        return this.avaliableOptions.contains(argument);
     }
 
     private String getOptionValue(String option) throws IllegalArgumentException {
