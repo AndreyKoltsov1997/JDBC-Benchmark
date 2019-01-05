@@ -38,7 +38,7 @@ public class Benchmark {
 
         System.out.println("Database URL: " + databaseInfo.getDatabaseURL());
         final int AMOUNT_OF_THREADS_MOCK = 5;
-        final int PAYLOAD_MOCK = 10;
+        final int PAYLOAD_MOCK = 2;
         final int AMOUNT_OF_INSERTIONS_MOCK = 100;
         DatabaseBenchmark databaseBenchmark = new DatabaseBenchmark(PAYLOAD_MOCK, AMOUNT_OF_THREADS_MOCK, AMOUNT_OF_INSERTIONS_MOCK, databaseInfo, FILE_NAME_MOCK);
 

@@ -200,17 +200,20 @@ public class DatabaseBenchmark {
         return insertionsLeft;
     }
 
+
+    // NOTE: Returning insertion payload, update unsent payload value
     private synchronized int decrementPayload() {
         int payloadLeft = this.totalPayload.get() - this.minimalPayloadPerInsertion;
-        if (payloadLeft < 0) {
+        final int minimalAvaliablePayloadValue = 0;
+        if (payloadLeft < minimalAvaliablePayloadValue) {
             // NOTE: Returning last positive value of payload
             payloadLeft = this.totalPayload.get();
-            this.totalPayload.set(0);
-            System.out.println("[decrementPayload] Payload left: " + payloadLeft);
+            this.totalPayload.set(minimalAvaliablePayloadValue);
             return payloadLeft;
         }
         this.totalPayload.set(payloadLeft);
-        return this.totalPayload.get();
+
+        return this.minimalPayloadPerInsertion;
     }
 
 
