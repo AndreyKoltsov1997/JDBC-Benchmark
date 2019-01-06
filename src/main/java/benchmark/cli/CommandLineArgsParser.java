@@ -88,7 +88,7 @@ public class CommandLineArgsParser {
         return this.optionalCommandLineArguments.getOptionByTag("table");
     }
 
-    public String getName() {
+    public String getDatabaseName() {
         return this.optionalCommandLineArguments.getOptionByTag("name");
 
     }

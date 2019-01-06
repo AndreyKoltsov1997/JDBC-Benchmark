@@ -1,6 +1,5 @@
 package benchmark.jdbc;
 
-import benchmark.Constants;
 import benchmark.database.DatabaseInfo;
 
 import java.sql.*;
@@ -26,12 +25,7 @@ public class DatabaseOperator {
     }
 
     public void establishConnection() throws SQLException, JdbcCrudFailureException {
-        if (this.connection == null) {
-            throw new SQLException("Connection with database hasn't been established.");
-        }
 
-        this.processingTableColumnNames = this.getColumnNames(this.databaseInfo.getTargetTable(), this.databaseInfo.getTargetDatabaseName());
-        System.out.println("Table column names: "+ processingTableColumnNames.toString());
         final String POSTGRES_CLASS_MOCK =  "org.postgresql.Driver";
         // TODO: Replace Postgres to some dynamic class
         try {
@@ -46,10 +40,20 @@ public class DatabaseOperator {
         this.connection = DriverManager.getConnection(databaseURL, databaseUsername, databaseUserPassword);
 
         final String targetDatabase = this.databaseInfo.getTargetDatabaseName();
-        System.out.println("isDatabaseExistInServer(" + targetDatabase + "): " + this.isDatabaseExistInServer(targetDatabase));
 
         if (!isDatabaseExistInServer(targetDatabase)) {
-            this.createDatabase(targetDatabase);
+
+            try {
+                this.createDatabase(targetDatabase);
+            } catch (SQLException error) {
+                // NOTE: I check if DB exist this way since PostgreSQL returns an empty list of catalogs, ...
+                // ... yet still throwing errors when I'm trying to create a DB with an existing name.
+                this.hasCreatedCustomDatabase = false;
+                System.out.println("Database " + targetDatabase + " exists. Using it for benchmark.");
+            }
+        } else {
+            this.processingTableColumnNames = this.getColumnNames(this.databaseInfo.getTargetTable(), this.databaseInfo.getTargetDatabaseName());
+            System.out.println("Table column names: "+ processingTableColumnNames.toString());
         }
 
 
@@ -57,7 +61,7 @@ public class DatabaseOperator {
 
 
     // NOTE: Deleting temprorary created databases and tables if needed.
-    public void shuwDownConnection() throws SQLException {
+    public void shutDownConnection() throws SQLException {
         try {
 
             // NOTE: Deletion of created database
@@ -76,37 +80,45 @@ public class DatabaseOperator {
         Statement statement = this.connection.createStatement();
         final int amountOfSuccessOperations = statement.executeUpdate(dropDatabaseSQLquery);
         if (!this.isStatementExcecutionCorrect(amountOfSuccessOperations)) {
-            throw new JdbcCrudFailureException("Unable to delete database.");
+            throw new JdbcCrudFailureException("Database " + name + " couldn't be dropped.", CrudOperationType.DELETE);
         }
     }
 
     private void createDatabase(String name) throws SQLException, JdbcCrudFailureException {
-        final String createDabataseSQLquery = "CREATE DATABASE " + name;
-        Statement statement = this.connection.createStatement();
-        final int operationsPerformed = statement.executeUpdate(createDabataseSQLquery);
-        if (!isStatementExcecutionCorrect(operationsPerformed)) {
-            throw new JdbcCrudFailureException("Unable to create database with name: " + name);
+        System.err.println("CREATING DATABASE.....");
+        if (!this.isDatabaseElementNameValid(name)) {
+            final String nameFormatMisleadingMsg = "Name should contain only latin letters, numbers and an underscore.";
+            throw new JdbcCrudFailureException("\"" + name + "\" is not a valid database name." + nameFormatMisleadingMsg, CrudOperationType.CREATE);
+        }
+        try(Statement statement = this.connection.createStatement()) {
+            final String createDatabaseSqlQuery = "CREATE DATABASE IF" + name + "name";
+            statement.executeUpdate(createDatabaseSqlQuery);
+
         }
         this.hasCreatedCustomDatabase = true;
     }
 
+    private boolean isDatabaseElementNameValid(String name) {
+        final String avaliableCharactersInNameRegEx = "^[a-zA-Z_][a-zA-Z0-9_]*$";
+        return name.matches(avaliableCharactersInNameRegEx);
+    }
+
+
+    // NOTE: This method doesn't work with PostgreSQL: it returns an empty list of catalogs, ...
+    // ... but throwing errors when I try to create DB with an existing name
     private boolean isDatabaseExistInServer(String databaseName) throws SQLException {
         if (this.connection == null) {
             System.err.println("Unable to fetch catalog: connection hasn't been established.");
             return false;
         }
-        ResultSet resultSet = this.connection.getMetaData().getCatalogs();
         boolean isDatabaseExist = false;
-//        System.out.println("resultSet.next():" + resultSet.getCursorName());
 
-        while (resultSet.next()) {
-//            int n = resultSet.getInt(1);
-//            System.out.println("resultSet.getInt(1):" + String.valueOf(n));
-            // NOTE: Processing every database name from the catalog
-            final int databaseNameIndex = 1;
-            final String processingDatabaseName = resultSet.getString(databaseNameIndex);
-            System.out.println("processingDatabaseName:" + processingDatabaseName);
-            isDatabaseExist = (processingDatabaseName.equals(databaseName));
+        try(ResultSet resultSet = this.connection.getMetaData().getCatalogs()) {
+            while (resultSet.next()) {
+                final int databaseNameIndex = 1;
+                final String processingDatabaseName = resultSet.getString(databaseNameIndex);
+                isDatabaseExist = (processingDatabaseName.equals(databaseName));
+            }
         }
         return isDatabaseExist;
     }
@@ -120,14 +132,15 @@ public class DatabaseOperator {
         ResultSetMetaData resultSetMetaData = null;
         PreparedStatement preparedStatement = null;
         List<String> columnNames = new ArrayList<String>();
-        String qualifiedSchemaName = this.getQualifiedSchemaName(schemaName, tableName);
-        try{
+        String qualifiedSchemaName = this.databaseInfo.getTargetDatabaseName(); // TEST: this.getQualifiedSchemaName(schemaName, tableName);
+        try {
             preparedStatement = this.connection.prepareStatement("select * from " + qualifiedSchemaName + " where 0=1");
             //NOTE: we're getting empty result set, yet meta data would still be avaliable
             resultSet = preparedStatement.executeQuery();
-            resultSetMetaData=resultSet.getMetaData();
-            for(int i=1; i <= resultSetMetaData.getColumnCount();i++)
+            resultSetMetaData = resultSet.getMetaData();
+            for(int i = 1; i <= resultSetMetaData.getColumnCount(); i++) {
                 columnNames.add(resultSetMetaData.getColumnLabel(i));
+            }
         } catch(SQLException error) {
             final String misleadingMsg = "An error has occured while fetching metadata from " + tableName + ". Reason: " + error.getMessage();
             throw new SQLException(misleadingMsg);
@@ -187,10 +200,14 @@ public class DatabaseOperator {
     }
 
 
-    public void createColumn(final String tableName, final String columnName, final String type) throws SQLException {
+    public void createColumn(final String tableName, final String columnName, final String type) throws SQLException, JdbcCrudFailureException {
         if (this.connection == null) {
             final String misleadingMsg = "Connection to required database hasn't been extablishes.";
             throw new IllegalArgumentException(misleadingMsg);
+        }
+        if (!this.isDatabaseElementNameValid(columnName)) {
+            final String nameFormatMisleadingMsg = "Name should contain only latin letters, numbers and an underscore.";
+            throw new JdbcCrudFailureException("\"" + columnName + "\" is not a valid database name." + nameFormatMisleadingMsg, CrudOperationType.CREATE);
         }
         // NOTE: Adding new columns
         Statement statement = this.connection.createStatement();

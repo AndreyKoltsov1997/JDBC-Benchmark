@@ -7,8 +7,10 @@
 /Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/Constants.java
 /Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/common/AtomicFloat.java
 /Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/database/DatabaseInfo.java
-/Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/jdbc/JdbcRowInserter.java
+/Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/jdbc/CrudOperationType.java
 /Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/database/components/DatabaseCredentials.java
 /Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/files/InsertionFileLogger.java
+/Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/jdbc/DatabaseOperator.java
+/Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/jdbc/JdbcCrudFailureException.java
 /Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/cli/CommandLineArgsParser.java
 /Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/cli/OptionalCommandLineArguments.java

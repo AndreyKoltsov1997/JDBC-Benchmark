@@ -93,7 +93,7 @@ public class DatabaseBenchmark {
         final String VARCHAR_TYPE = "VARCHAR(10)";
         try {
             databaseOperator.createColumn(TABLE_NAME_MOCK, COLUMN_KEY_NAME_MOCK, VARCHAR_TYPE);
-        } catch (SQLException error) {
+        } catch (Exception error) {
             System.err.println("Unable to create required column. Reason: " + error.getMessage());
         }
 
@@ -106,7 +106,7 @@ public class DatabaseBenchmark {
 
 
         try {
-            databaseOperator.shuwDownConnection();
+            databaseOperator.shutDownConnection();
         } catch (SQLException error) {
             System.err.println("Unexcpected error has occured while shutting down the connrection: " + error.getMessage());
         }

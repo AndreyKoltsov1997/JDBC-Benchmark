@@ -197,7 +197,10 @@ class OptionalCommandLineArguments {
 
     private String generateDatabaseName() {
         Timestamp timeStamp = new Timestamp(System.currentTimeMillis());
-        final String defaultName = "benchmark" + timeStamp.toString();
+//        final String whiteSpace = " ";
+//        final String emptySpace = "";
+//        final String defaultName = "benchmark" + timeStamp.toString().replaceAll(whiteSpace, emptySpace);
+        final String defaultName = "jdbcBenchmarkTmp";
         return defaultName;
     }
 

@@ -17,15 +17,15 @@ public class DatabaseInfo {
     private String targetTable;
 
     // MARK: - Constructor
-    public DatabaseInfo(DatabaseLocation location, DatabaseCredentials credentials, String targetDatabaseName) {
+    public DatabaseInfo(DatabaseLocation location, DatabaseCredentials credentials, String targetDatabaseName, String targetTable) {
         this.location = location;
         this.credentials = credentials;
 
-        if (this.isParameterValid(targetDatabaseName)) {
+        if (!this.isParameterValid(targetDatabaseName)) {
             targetDatabaseName = this.DEFAULT_NAME;
         }
         this.targetDatabaseName = targetDatabaseName;
-        this.targetTable = "link";
+        this.targetTable = targetTable;
     }
 
     public DatabaseInfo(DatabaseLocation location, DatabaseCredentials credentials) {
