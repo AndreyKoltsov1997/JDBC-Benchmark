@@ -1,24 +1,10 @@
-# NOTE: Creating PostgreSQL with both username and password set to "docker"
+FROM openjdk:8-alpine
 
-FROM library/postgres
-ENV POSTGRES_USER docker
-ENV POSTGRES_PASSWORD docker
-ENV POSTGRES_DB docker
+# Required for starting application up.
+RUN apk update && apk add bash
 
-# NOTE: Dockerizing JDBC benchmark (Java) 
-FROM openjdk:8-jdk-alpine3.7 AS builder
-RUN java -version
+RUN mkdir -p /opt/app
+ENV PROJECT_HOME /opt/app
 
-COPY . /benchmark/
-WORKDIR /benchmark/
-RUN apk --no-cache add maven && mvn --version
-RUN ls /benchmark
-RUN mvn package
+COPY out/artifacts/jdbc_benchmark_jar/jdbc-benchmark.jar $PROJECT_HOME/jdbc-benchmark.jar
 
-# Stage 2 (to create a downsized "container executable", ~87MB)
-FROM openjdk:8-jre-alpine3.7
-WORKDIR /root/
-COPY --from=builder /benchmark/target/benchmark.jar .
-
-EXPOSE 8123
-ENTRYPOINT ["java", "-jar", "./benchmark.jar"]
