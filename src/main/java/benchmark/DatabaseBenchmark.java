@@ -170,14 +170,12 @@ public class DatabaseBenchmark {
             executorService.execute(insertTask);
         }
 
-        System.out.println("SHUTTING DOWN ES!!!");
         executorService.shutdown();
         try {
             boolean hasInsertionFinished = executorService.awaitTermination(2, TimeUnit.MINUTES);
             if (hasInsertionFinished) {
                 // TODO: Create a better way to stop writing. Maybe try-with-resources?
                 ((InsertionFileLogger) insertionFileLogger).stopWriting();
-                System.out.println("Insertion has been finished");
                 this.printBenchmarkResults();
             }
         } catch (Exception error) {
