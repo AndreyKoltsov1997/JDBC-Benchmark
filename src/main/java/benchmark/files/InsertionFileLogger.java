@@ -13,7 +13,7 @@ import java.nio.file.Paths;
 public class InsertionFileLogger implements IInsertionsFileLogger {
 
     private Path pathToFile;
-    private final String REQUIRED_FILE_EXTENSION = ".csv";
+    private final static String REQUIRED_FILE_EXTENSION = ".csv";
     private boolean isActive;
     private BufferedWriter bufferedWriter;
 
@@ -27,7 +27,7 @@ public class InsertionFileLogger implements IInsertionsFileLogger {
         }
         this.isActive = true;
         if (!hasRequiredExtension(fileURI)) {
-            fileURI += this.REQUIRED_FILE_EXTENSION;
+            fileURI += InsertionFileLogger.REQUIRED_FILE_EXTENSION;
         }
         this.pathToFile = Paths.get(fileURI);
         if (!this.isFileExist(this.pathToFile)) {
@@ -38,7 +38,7 @@ public class InsertionFileLogger implements IInsertionsFileLogger {
     }
 
     private boolean hasRequiredExtension(String filename) {
-        return filename.contains(REQUIRED_FILE_EXTENSION);
+        return filename.contains(InsertionFileLogger.REQUIRED_FILE_EXTENSION);
     }
 
     public boolean isActive() {
@@ -50,16 +50,9 @@ public class InsertionFileLogger implements IInsertionsFileLogger {
     }
 
     private void createFile(String name) throws IOException {
-        System.out.println("Creating file with name: " + name + ".csv");
-        System.out.println("name.contains(this.REQUIRED_FILE_EXTENSION):" + name.contains(this.REQUIRED_FILE_EXTENSION));
-        if (!name.contains(this.REQUIRED_FILE_EXTENSION)) {
-            // NOTE: If file is not .csv, extension would be added implicitly
-            name += this.REQUIRED_FILE_EXTENSION;
-        }
         File newFile = new File(name);
         BufferedWriter writer = new BufferedWriter(new FileWriter(newFile));
         writer.close();
-        System.exit(228);
     }
 
 
