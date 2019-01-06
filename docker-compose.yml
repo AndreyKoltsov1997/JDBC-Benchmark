@@ -1,4 +1,6 @@
-version: '2'
+version: '3'
+
+
 services:
   jm-app:
     image: jdbc-benchmark
@@ -6,6 +8,9 @@ services:
     - "8080:8080"
     depends_on:
     - reference-postgres-db
+    networks:
+      vpcbr:
+        ipv4_address: 10.5.0.5
   reference-postgres-db:
     image: postgres:10.1
     ports:
@@ -14,3 +19,14 @@ services:
      - POSTGRES_PASSWORD=password
      - POSTGRES_USER=postgres
      - POSTGRES_DB=mydb
+    networks:
+      vpcbr:
+        ipv4_address: 10.5.0.6
+
+
+networks:
+    vpcbr:
+        driver: bridge
+        ipam:
+          config:
+            - subnet: 10.5.0.0/16

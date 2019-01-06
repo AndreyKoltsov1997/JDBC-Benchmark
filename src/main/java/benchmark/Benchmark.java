@@ -20,6 +20,7 @@ public class Benchmark {
 
         final CommandLineArgsParser commandLineArgsParser = new CommandLineArgsParser();
 
+        System.out.println("Launching benchmark...");
         try {
             commandLineArgsParser.parseArguments(args);
         } catch (IllegalArgumentException error) {
