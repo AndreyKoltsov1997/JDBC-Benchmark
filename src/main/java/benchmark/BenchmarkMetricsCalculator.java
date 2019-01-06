@@ -49,8 +49,9 @@ public class BenchmarkMetricsCalculator {
 
 
     // NOTE: Calculation of insert operations per second
-    public double getAverageThroughtput() {
+    public double getAverageThroughput() {
         if (!this.hasSuccessfulOperations()) {
+            System.out.println("No successful operation has been found. Throughput is zero.");
             final double zeroThroughput = 0.0;
             return zeroThroughput;
         }
@@ -91,7 +92,7 @@ public class BenchmarkMetricsCalculator {
     }
 
     private boolean hasSuccessfulOperations() {
-        return ((this.bytesInserted.get() != 0) && (this.insertedOperations.get() != 0) && (this.macrosecondsSpendOnInsertions.get() != 0));
+        return ((this.insertedOperations.get() != 0) && (this.macrosecondsSpendOnInsertions.get() != 0));
     }
 
 }

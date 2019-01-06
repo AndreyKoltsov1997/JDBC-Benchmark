@@ -19,7 +19,7 @@ public class DatabaseBenchmark {
     private final int DEFAULT_PAYLOAD = 0;
     private final int DEFAULT_AMOUNT_OF_THREDS = 1;
     private final String NO_OUTPUT_FILE_REQUIRED_FILENAME = "";
-    // TODO: Replace this valud with value from Constants class
+    // TODO: Replace this valid with value from Constants class
     private final int INFINITE_AMOUNT_OF_INSERTIONS = -9;
 
 
@@ -31,9 +31,6 @@ public class DatabaseBenchmark {
     private final int minimalPayloadPerInsertion;
     private BenchmarkMetricsCalculator benchmarkMetricsCalculator = new BenchmarkMetricsCalculator();
 
-    // AtomicFloat is used to calculate benchmark's throughput dynamicly without storing ...
-    // ... benchmark results in memory.
-//    private AtomicFloat averageThroughput = new AtomicFloat((float) 0.0);
 
     // MARK: - Constructors
 
@@ -179,7 +176,7 @@ public class DatabaseBenchmark {
                 this.printBenchmarkResults();
             }
         } catch (Exception error) {
-            System.err.println("Unable to finish executor service");
+            System.err.println("Unable to finish executor service. Reason: " + error.getMessage());
             error.printStackTrace();
         }
 
@@ -200,7 +197,7 @@ public class DatabaseBenchmark {
     }
 
     private void printBenchmarkResults() {
-        final double averageThroughput = benchmarkMetricsCalculator.getAverageThroughtput();
+        final double averageThroughput = benchmarkMetricsCalculator.getAverageThroughput();
         final double bandWidth = benchmarkMetricsCalculator.getBandwidth();
         System.out.println("Average throughput: " + averageThroughput + ", bandwidth: " + bandWidth);
     }
@@ -245,11 +242,11 @@ public class DatabaseBenchmark {
     // NOTE: Returning insertion payload, update unsent payload value
     private synchronized int decrementPayload() {
         int payloadLeft = this.totalPayload.get() - this.minimalPayloadPerInsertion;
-        final int minimalAvaliablePayloadValue = 0;
-        if (payloadLeft < minimalAvaliablePayloadValue) {
+        final int minimalAvailablePayloadValue = 0;
+        if (payloadLeft < minimalAvailablePayloadValue) {
             // NOTE: Returning last positive value of payload
             payloadLeft = this.totalPayload.get();
-            this.totalPayload.set(minimalAvaliablePayloadValue);
+            this.totalPayload.set(minimalAvailablePayloadValue);
             return payloadLeft;
         }
         this.totalPayload.set(payloadLeft);
