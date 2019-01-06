@@ -6,33 +6,32 @@ import benchmark.database.DatabaseInfo;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 
 // TODO: Add necessary connection closing
-public class JdbcRowInserter {
+public class DatabaseOperator {
 
     private final DatabaseInfo databaseInfo;
     private Connection connection;
     private List<String> processingTableColumnNames;
 
-    // MARK: - Constructor
-    public JdbcRowInserter(DatabaseInfo databaseInfo) {
-        this.databaseInfo = databaseInfo;
-        try {
-            this.establishConnection();
-            final String SCHEMA_MOCK = "public";
-            final String TABLE_NAME = this.databaseInfo.getTargetTable();
-            System.out.println("Table name: " + TABLE_NAME);
-            this.processingTableColumnNames = this.getColumnNames(TABLE_NAME, SCHEMA_MOCK);
+    private boolean hasCreatedCustomDatabase = false;
 
-        } catch (SQLException error) {
-            System.out.println("Unable to establish conection with database. Reason: " + error.getMessage());
-            System.exit(Constants.CONNECTION_ERROR);
-        }
+    // MARK: - Constructor
+    public DatabaseOperator(DatabaseInfo databaseInfo) {
+        this.databaseInfo = databaseInfo;
+        final String SCHEMA_MOCK = "public";
+        final String TABLE_NAME = this.databaseInfo.getTargetTable();
+        System.out.println("Table name: " + TABLE_NAME);
     }
 
-    private void establishConnection() throws SQLException {
+    public void establishConnection() throws SQLException, JdbcCrudFailureException {
+        if (this.connection == null) {
+            throw new SQLException("Connection with database hasn't been established.");
+        }
+
+        this.processingTableColumnNames = this.getColumnNames(this.databaseInfo.getTargetTable(), this.databaseInfo.getTargetDatabaseName());
+        System.out.println("Table column names: "+ processingTableColumnNames.toString());
         final String POSTGRES_CLASS_MOCK =  "org.postgresql.Driver";
         // TODO: Replace Postgres to some dynamic class
         try {
@@ -45,17 +44,50 @@ public class JdbcRowInserter {
         final String databaseUsername = databaseInfo.getUsername();
         final String databaseUserPassword = databaseInfo.getPassword();
         this.connection = DriverManager.getConnection(databaseURL, databaseUsername, databaseUserPassword);
-//        final String CATALOG_MOCK = "testee";
-//        try {
-//            this.connection.setCatalog(CATALOG_MOCK);
-//        } catch (Exception error) {
-//            System.err.println("Unable to connect to calalog: " +  CATALOG_MOCK);
-//        }
 
-        System.out.println("isDatabaseExistInServer(Andrey): " + this.isDatabaseExistInServer("Andrey"));
-        System.out.println("isDatabaseExistInServer(test): " + this.isDatabaseExistInServer("test"));
+        final String targetDatabase = this.databaseInfo.getTargetDatabaseName();
+        System.out.println("isDatabaseExistInServer(" + targetDatabase + "): " + this.isDatabaseExistInServer(targetDatabase));
+
+        if (!isDatabaseExistInServer(targetDatabase)) {
+            this.createDatabase(targetDatabase);
+        }
 
 
+    }
+
+
+    // NOTE: Deleting temprorary created databases and tables if needed.
+    public void shuwDownConnection() throws SQLException {
+        try {
+
+            // NOTE: Deletion of created database
+            if (this.hasCreatedCustomDatabase) {
+                this.dropDatabase(this.databaseInfo.getTargetDatabaseName());
+            }
+
+            // TODO: Add deletion of created tables, etc
+        } catch (JdbcCrudFailureException deleteError) {
+            System.err.println("An error has occured while deleting: " + deleteError.getMessage());
+        }
+    }
+
+    private void dropDatabase(String name) throws SQLException, JdbcCrudFailureException {
+        String dropDatabaseSQLquery = "DROP DATABASE " + name;
+        Statement statement = this.connection.createStatement();
+        final int amountOfSuccessOperations = statement.executeUpdate(dropDatabaseSQLquery);
+        if (!this.isStatementExcecutionCorrect(amountOfSuccessOperations)) {
+            throw new JdbcCrudFailureException("Unable to delete database.");
+        }
+    }
+
+    private void createDatabase(String name) throws SQLException, JdbcCrudFailureException {
+        final String createDabataseSQLquery = "CREATE DATABASE " + name;
+        Statement statement = this.connection.createStatement();
+        final int operationsPerformed = statement.executeUpdate(createDabataseSQLquery);
+        if (!isStatementExcecutionCorrect(operationsPerformed)) {
+            throw new JdbcCrudFailureException("Unable to create database with name: " + name);
+        }
+        this.hasCreatedCustomDatabase = true;
     }
 
     private boolean isDatabaseExistInServer(String databaseName) throws SQLException {

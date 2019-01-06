@@ -1,11 +1,11 @@
 package benchmark;
 
-import benchmark.common.AtomicFloat;
 import benchmark.common.RandomAsciiStringGenerator;
 import benchmark.database.DatabaseInfo;
 import benchmark.files.IInsertionsFileLogger;
 import benchmark.files.InsertionFileLogger;
-import benchmark.jdbc.JdbcRowInserter;
+import benchmark.jdbc.DatabaseOperator;
+import benchmark.jdbc.JdbcCrudFailureException;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -77,33 +77,45 @@ public class DatabaseBenchmark {
 
     public void performBenchmark() {
 
-        JdbcRowInserter jdbcRowInserter = new JdbcRowInserter(this.databaseInfo);
-//        final String DB_NAME_MOCK = "test";
+        DatabaseOperator databaseOperator = new DatabaseOperator(this.databaseInfo);
+        try {
+            databaseOperator.establishConnection();
+        } catch (SQLException error) {
+            System.err.println("Unable to establish connetion with the database at " + this.databaseInfo.getDatabaseURL() + ", reason: " + error.getMessage());
+            System.exit(Constants.CONNECTION_ERROR);
+        } catch (JdbcCrudFailureException error) {
+            System.err.println("An error has occured while performing CRUD operations with database: " + error.getMessage());
+        }
+        //        final String DB_NAME_MOCK = "test";
         final String TABLE_NAME_MOCK = this.databaseInfo.getTargetTable(); // DEBUG: "link";
         final String COLUMN_KEY_NAME_MOCK = "key";
         final String COLUMN_VALUE_NAME_MOCK = "value";
         final String VARCHAR_TYPE = "VARCHAR(10)";
         try {
-            jdbcRowInserter.createColumn(TABLE_NAME_MOCK, COLUMN_KEY_NAME_MOCK, VARCHAR_TYPE);
-
+            databaseOperator.createColumn(TABLE_NAME_MOCK, COLUMN_KEY_NAME_MOCK, VARCHAR_TYPE);
         } catch (SQLException error) {
-            System.out.println("Unable to create required column. Reason: " + error.getMessage());
+            System.err.println("Unable to create required column. Reason: " + error.getMessage());
         }
 
         try {
-            this.performInsertionTest(jdbcRowInserter);
+            this.performInsertionTest(databaseOperator);
         } catch (IOException error) {
             final String misleadingMsg = "An error has occured while working with file: " + error.getMessage();
             System.err.println(misleadingMsg);
         }
 
 
+        try {
+            databaseOperator.shuwDownConnection();
+        } catch (SQLException error) {
+            System.err.println("Unexcpected error has occured while shutting down the connrection: " + error.getMessage());
+        }
 
     }
 
     // NOTE: Testing INSERT operations via JDBC connector into the specified database.
-    // ... JdbcRowInserter is an object which perform insert operations
-    private void performInsertionTest(JdbcRowInserter jdbcRowInserter) throws IOException {
+    // ... DatabaseOperator is an object which perform insert operations
+    private void performInsertionTest(DatabaseOperator databaseOperator) throws IOException {
         // TODO: Do something with insertion file logger - it shouldn't be created if not needed
         IInsertionsFileLogger insertionFileLogger = new InsertionFileLogger(this.outputFileName);
         Runnable insertTask = () -> {
@@ -134,7 +146,7 @@ public class DatabaseBenchmark {
 
                 try {
                     Long insertionStartTime = System.nanoTime();
-                    jdbcRowInserter.insertValueIntoColumn(COLUMN_KEY_NAME_MOCK, randomString);
+                    databaseOperator.insertValueIntoColumn(COLUMN_KEY_NAME_MOCK, randomString);
                     Long currentInsertionTime = System.nanoTime() - insertionStartTime;
                     System.out.println("Total insertion time time: " + this.convertNanoSecondToMicroseconds(currentInsertionTime) + " microseconds.");
                     if (((InsertionFileLogger) insertionFileLogger).isActive()) {

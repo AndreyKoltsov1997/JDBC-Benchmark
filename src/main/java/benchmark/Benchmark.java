@@ -20,7 +20,6 @@ public class Benchmark {
 
         final CommandLineArgsParser commandLineArgsParser = new CommandLineArgsParser();
 
-        System.out.println("Launching benchmark...");
         try {
             commandLineArgsParser.parseArguments(args);
         } catch (IllegalArgumentException error) {
@@ -28,8 +27,6 @@ public class Benchmark {
             System.exit(Constants.STATUS_INVALID_ARGUMENT);
         }
 
-        System.out.println("Host: " + commandLineArgsParser.getHost());
-        System.out.println("Name:" + commandLineArgsParser.getName());
 
         final String FILE_NAME_MOCK = commandLineArgsParser.getFileNameForLogs(); // DEBUG: "results.csv";
 
@@ -57,6 +54,7 @@ public class Benchmark {
         final int PAYLOAD_MOCK = commandLineArgsParser.getPayload(); // DEBUG: 2;
         final int AMOUNT_OF_INSERTIONS_MOCK = commandLineArgsParser.getAmountOfInsertions(); // DEBUG: 100;
         DatabaseBenchmark databaseBenchmark = new DatabaseBenchmark(PAYLOAD_MOCK, AMOUNT_OF_THREADS_MOCK, AMOUNT_OF_INSERTIONS_MOCK, databaseInfo, FILE_NAME_MOCK);
+
 
         databaseBenchmark.performBenchmark();
 
