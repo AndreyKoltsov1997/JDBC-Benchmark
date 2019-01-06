@@ -44,6 +44,7 @@ public class JdbcRowInserter {
         final String databaseUsername = databaseInfo.getUsername();
         final String databaseUserPassword = databaseInfo.getPassword();
         this.connection = DriverManager.getConnection(databaseURL, databaseUsername, databaseUserPassword);
+//        System.out.println("Connection TO STRING: " + this.connection.getSchema);
 
     }
 
@@ -58,11 +59,11 @@ public class JdbcRowInserter {
         List<String> columnNames = new ArrayList<String>();
         String qualifiedSchemaName = this.getQualifiedSchemaName(schemaName, tableName);
         try{
-            preparedStatement=this.connection.prepareStatement("select * from " + qualifiedSchemaName + " where 0=1");
+            preparedStatement = this.connection.prepareStatement("select * from " + qualifiedSchemaName + " where 0=1");
             //NOTE: we're getting empty result set, yet meta data would still be avaliable
-            resultSet=preparedStatement.executeQuery();
+            resultSet = preparedStatement.executeQuery();
             resultSetMetaData=resultSet.getMetaData();
-            for(int i=1;i<=resultSetMetaData.getColumnCount();i++)
+            for(int i=1; i <= resultSetMetaData.getColumnCount();i++)
                 columnNames.add(resultSetMetaData.getColumnLabel(i));
         } catch(SQLException error) {
             final String misleadingMsg = "An error has occured while fetching metadata from " + tableName + ". Reason: " + error.getMessage();
@@ -167,6 +168,5 @@ public class JdbcRowInserter {
     private Boolean isColumnExistInCurrentDB(final String column) {
         return this.processingTableColumnNames.contains(column);
     }
-
 
 }

@@ -30,15 +30,15 @@ public class Benchmark {
         System.out.println("Host: " + commandLineArgsParser.getHost());
         System.out.println("Name:" + commandLineArgsParser.getName());
 
-        final String FILE_NAME_MOCK = "results.csv";
+        final String FILE_NAME_MOCK = commandLineArgsParser.getFileNameForLogs(); // DEBUG: "results.csv";
 
-        final String PASSED_HOST_MOCK = "localhost";
-        final String PASSED_PORT_MOCK = "5431";
+        final String PASSED_HOST_MOCK = commandLineArgsParser.getHost(); // DEBUG: "localhost";
+        final String PASSED_PORT_MOCK = commandLineArgsParser.getPort(); //"5431";
 
         DatabaseLocation databaseLocation = new DatabaseLocation(PASSED_HOST_MOCK, PASSED_PORT_MOCK);
 
-        final String USERNAME_MOCK = "Andrey";
-        final String USER_PASSWORD_MOCK = "qwerty";
+        final String USERNAME_MOCK = commandLineArgsParser.getUserName(); // DEBUG: "Andrey";
+        final String USER_PASSWORD_MOCK = commandLineArgsParser.getUserPassword(); // DEBUG: "qwerty";
         DatabaseCredentials databaseCredentials = null;
         try {
             databaseCredentials = new DatabaseCredentials(USERNAME_MOCK, USER_PASSWORD_MOCK);
@@ -47,14 +47,14 @@ public class Benchmark {
             System.exit(Constants.STATUS_INVALID_ARGUMENT);
         }
 
-        final String DATABASE_NAME_MOCK = "test";
+        final String DATABASE_NAME_MOCK = commandLineArgsParser.getName(); // DEBUG: "test";
 
         DatabaseInfo databaseInfo = new DatabaseInfo(databaseLocation, databaseCredentials, DATABASE_NAME_MOCK);
 
         System.out.println("Database URL: " + databaseInfo.getDatabaseURL());
-        final int AMOUNT_OF_THREADS_MOCK = 5;
-        final int PAYLOAD_MOCK = 2;
-        final int AMOUNT_OF_INSERTIONS_MOCK = 100;
+        final int AMOUNT_OF_THREADS_MOCK = commandLineArgsParser.getAmountOfThreads(); // DEBUG: 5;
+        final int PAYLOAD_MOCK = commandLineArgsParser.getPayload(); // DEBUG: 2;
+        final int AMOUNT_OF_INSERTIONS_MOCK = commandLineArgsParser.getAmountOfInsertions(); // DEBUG: 100;
         DatabaseBenchmark databaseBenchmark = new DatabaseBenchmark(PAYLOAD_MOCK, AMOUNT_OF_THREADS_MOCK, AMOUNT_OF_INSERTIONS_MOCK, databaseInfo, FILE_NAME_MOCK);
 
         databaseBenchmark.performBenchmark();

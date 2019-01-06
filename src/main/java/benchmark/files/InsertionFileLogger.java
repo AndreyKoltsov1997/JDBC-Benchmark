@@ -1,5 +1,7 @@
 package benchmark.files;
 
+import benchmark.Constants;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -11,23 +13,53 @@ import java.nio.file.Paths;
 public class InsertionFileLogger implements IInsertionsFileLogger {
 
     private Path pathToFile;
+    private final String REQUIRED_FILE_EXTENSION = ".csv";
+    private boolean isActive;
     private BufferedWriter bufferedWriter;
 
     public InsertionFileLogger(String fileURI) throws IOException {
+        System.err.println("Creating file logger, URL: " + fileURI);
+        if (!this.shouldCreateLogger(fileURI)) {
+            System.err.println("Shuldn't be created");
+            // NOTE: If empty URI has been passed, logging is not required
+            this.isActive = false;
+            return;
+        }
+        this.isActive = true;
+        if (!hasRequiredExtension(fileURI)) {
+            fileURI += this.REQUIRED_FILE_EXTENSION;
+        }
         this.pathToFile = Paths.get(fileURI);
         if (!this.isFileExist(this.pathToFile)) {
-            final String misleadingMsg = "File hasn't been found at URI: " + fileURI;
+            // NOTE: Create file if it doesn't exist
             this.createFile(fileURI);
         }
         this.bufferedWriter = Files.newBufferedWriter(this.pathToFile);
+    }
 
+    private boolean hasRequiredExtension(String filename) {
+        return filename.contains(REQUIRED_FILE_EXTENSION);
+    }
 
+    public boolean isActive() {
+        return this.isActive;
+    }
+
+    private boolean shouldCreateLogger(String fileURI) {
+        return (!fileURI.equals(Constants.NO_OUTPUT_REQUIRED_FILENAME));
     }
 
     private void createFile(String name) throws IOException {
+        System.out.println("Creating file with name: " + name + ".csv");
+        System.out.println("name.contains(this.REQUIRED_FILE_EXTENSION):" + name.contains(this.REQUIRED_FILE_EXTENSION));
+        if (!name.contains(this.REQUIRED_FILE_EXTENSION)) {
+            // NOTE: If file is not .csv, extension would be added implicitly
+            name += this.REQUIRED_FILE_EXTENSION;
+        }
         File newFile = new File(name);
         BufferedWriter writer = new BufferedWriter(new FileWriter(newFile));
         writer.close();
+        System.exit(228);
     }
 
 

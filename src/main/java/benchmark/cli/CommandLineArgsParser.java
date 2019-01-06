@@ -14,18 +14,16 @@ public class CommandLineArgsParser {
     private String userName;
     private String userPassword;
 
-    // NOTE: Database target components
-    private String databaseName;
-    private String targetTableName;
-
-    // NOTE: Benchmark components
-    private String payloadSize;
-    private String amountOfInsertOperations;
-    private String fileNameForLogs;
-    private String amountOfThreads;
 
     private OptionalCommandLineArguments optionalCommandLineArguments = new OptionalCommandLineArguments();
 
+    public String getUserName() {
+        return userName;
+    }
+
+    public String getUserPassword() {
+        return userPassword;
+    }
 
 
 
@@ -113,9 +111,6 @@ public class CommandLineArgsParser {
         final String insertionAmount = this.optionalCommandLineArguments.getOptionByTag("insertions");
         return Integer.valueOf(insertionAmount);
     }
-//
-//    public String getPort() {
-//        return this.optionalCommandLineArguments.getPort();
-//    }
+
 
 }

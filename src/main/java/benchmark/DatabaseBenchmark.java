@@ -95,7 +95,7 @@ public class DatabaseBenchmark {
         try {
             this.performInsertionTest(jdbcRowInserter);
         } catch (IOException error) {
-            final String misleadingMsg = "An error hsa occured while working with file: " + error.getMessage();
+            final String misleadingMsg = "An error has occured while working with file: " + error.getMessage();
             System.err.println(misleadingMsg);
         }
 
@@ -115,11 +115,7 @@ public class DatabaseBenchmark {
                 String randomString = "";
 
                 final int payloadLeft = this.decrementPayload();
-//                System.out.println("========");
-//                System.out.println("Payload left: " + payloadLeft + "modifying from Thread: " + Thread.currentThread().getName());
-//                System.out.println("Total payload: " + this.totalPayload.get());
-//                System.out.println("Minimal payload: " + this.minimalPayloadPerInsertion);
-//                System.out.println("========");
+
 
                 if (payloadLeft < this.minimalPayloadPerInsertion) {
                     // NOTE: If the payload left is smaller than the required minimum (e.g.: when ..
@@ -143,7 +139,7 @@ public class DatabaseBenchmark {
                     jdbcRowInserter.insertValueIntoColumn(COLUMN_KEY_NAME_MOCK, randomString);
                     Long currentInsertionTime = System.nanoTime() - insertionStartTime;
                     System.out.println("Total insertion time time: " + this.convertNanoSecondToMicroseconds(currentInsertionTime) + " microseconds.");
-                    if (insertionFileLogger != null) {
+                    if (((InsertionFileLogger) insertionFileLogger).isActive()) {
                         insertionFileLogger.logOperation(this.databaseInfo.getTargetDatabaseName(), this.databaseInfo.getTargetTable(), randomString, String.valueOf(currentInsertionTime));
                     }
 
