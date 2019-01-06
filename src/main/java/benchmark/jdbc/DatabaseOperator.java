@@ -14,7 +14,11 @@ public class DatabaseOperator {
 
     private final DatabaseInfo databaseInfo;
     private Connection connection;
-    private List<String> processingTableColumnNames;
+
+    private static List<String> processingTableColumnNames = new ArrayList<String>() {{
+        add(Constants.KEY_COLUMN_NAME);
+        add(Constants.VALUE_COLUMN_NAME);
+    }};
 
     private boolean hasCreatedCustomDatabase = false;
 
@@ -75,14 +79,10 @@ public class DatabaseOperator {
         }
 
 
-        // TODO: Move required columns into a different class-variable of constants
-        List<String> requiredColumns = new ArrayList<>();
-        requiredColumns.add("key");
-        requiredColumns.add("value");
         final String varcharType = "VARCHAR(10)";
         String processingColumnName = "";
         try {
-            for (String columnName : requiredColumns) {
+            for (String columnName : DatabaseOperator.processingTableColumnNames) {
                 processingColumnName = columnName;
                 this.createColumn(columnName, varcharType);
             }
@@ -103,6 +103,10 @@ public class DatabaseOperator {
     }
     // NOTE: Deleting temprorary created databases and tables if needed.
     public void shutDownConnection() throws SQLException {
+        if (this.connection == null) {
+            return;
+        }
+
         try {
 
             // NOTE: Deletion of created database
@@ -110,18 +114,32 @@ public class DatabaseOperator {
                 this.dropDatabase(this.databaseInfo.getTargetDatabaseName());
             }
 
-            // TODO: Add deletion of created tables, etc
+            // TODO: Add deletion of created tables
+
+            for (String createdColumn: DatabaseOperator.processingTableColumnNames) {
+                this.dropColumnWithinTable(this.databaseInfo.getTargetTable(), createdColumn);
+            }
+
+            this.connection.close();
+
         } catch (JdbcCrudFailureException deleteError) {
             System.err.println("An error has occured while deleting: " + deleteError.getMessage());
         }
     }
 
     private void dropDatabase(String name) throws SQLException, JdbcCrudFailureException {
-        String dropDatabaseSQLquery = "DROP DATABASE " + name;
+        final String dropDatabaseSqlQuery = "DROP DATABASE " + name;
         Statement statement = this.connection.createStatement();
-        final int amountOfSuccessOperations = statement.executeUpdate(dropDatabaseSQLquery);
+        final int amountOfSuccessOperations = statement.executeUpdate(dropDatabaseSqlQuery);
         if (!this.isStatementExcecutionCorrect(amountOfSuccessOperations)) {
             throw new JdbcCrudFailureException("Database " + name + " couldn't be dropped.", CrudOperationType.DELETE);
+        }
+    }
+
+    private void dropColumnWithinTable(String table, String column) throws SQLException {
+        final String dropColumnSqlQuery = String.format("ALTER TABLE \"%s\" DROP %s;", table, column);
+        try (PreparedStatement preparedStatement = this.connection.prepareStatement(dropColumnSqlQuery)) {
+            preparedStatement.executeUpdate();
         }
     }
 

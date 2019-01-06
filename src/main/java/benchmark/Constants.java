@@ -9,4 +9,7 @@ public class Constants {
     public static final String NO_OUTPUT_REQUIRED_FILENAME = "";
 
 
+    public static final String KEY_COLUMN_NAME = "key";
+    public static final String VALUE_COLUMN_NAME = "value";
+
 }

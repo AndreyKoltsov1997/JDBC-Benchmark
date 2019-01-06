@@ -5,6 +5,7 @@ benchmark/common/RandomAsciiStringGenerator.class
 benchmark/cli/CommandLineArgsParser.class
 benchmark/jdbc/JdbcCrudFailureException$1.class
 benchmark/common/AtomicFloat.class
+benchmark/jdbc/DatabaseOperator$1.class
 benchmark/jdbc/CrudOperationType.class
 benchmark/jdbc/JdbcCrudFailureException.class
 benchmark/database/DatabaseInfo.class
