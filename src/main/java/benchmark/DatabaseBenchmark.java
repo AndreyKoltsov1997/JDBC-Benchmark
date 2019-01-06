@@ -112,12 +112,10 @@ public class DatabaseBenchmark {
     // NOTE: Testing INSERT operations via JDBC connector into the specified database.
     // ... DatabaseOperator is an object which perform insert operations
     private void performInsertionTest(DatabaseOperator databaseOperator) throws IOException {
-        System.out.println("Trying to perform insertion test....");
 
         // TODO: Do something with insertion file logger - it shouldn't be created if not needed
         IInsertionsFileLogger insertionFileLogger = new InsertionFileLogger(this.outputFileName);
         Runnable insertTask = () -> {
-            System.out.println("Insertion task has started.");
             while (this.shouldContinueInserting()) {
 
                 RandomAsciiStringGenerator randomAsciiStringGenerator = new RandomAsciiStringGenerator();
@@ -160,22 +158,22 @@ public class DatabaseBenchmark {
                     this.logFailedOperation(this.databaseInfo.getTargetDatabaseName(), this.databaseInfo.getTargetTable(), randomString, error.getMessage());
                 } catch (Exception error) {
                     final String misleadingMsg = "An error has occured while inserting new value into column: " + error.getMessage();
-                    System.out.println(misleadingMsg);
+                    System.err.println(misleadingMsg);
                 }
 
             }
         };
 
         final int amountOfThreads = this.amountOfThreads;
-        System.out.println("Creating multi-thread executor service...");
         ExecutorService executorService = Executors.newCachedThreadPool();
         for (int i = 0; i < amountOfThreads; ++i) {
-            System.out.println("Starting service number " + i);
             executorService.execute(insertTask);
         }
+
+        System.out.println("SHUTTING DOWN ES!!!");
         executorService.shutdown();
         try {
-            boolean hasInsertionFinished = executorService.awaitTermination(1, TimeUnit.MINUTES);
+            boolean hasInsertionFinished = executorService.awaitTermination(2, TimeUnit.MINUTES);
             if (hasInsertionFinished) {
                 // TODO: Create a better way to stop writing. Maybe try-with-resources?
                 ((InsertionFileLogger) insertionFileLogger).stopWriting();
@@ -183,7 +181,8 @@ public class DatabaseBenchmark {
                 this.printBenchmarkResults();
             }
         } catch (Exception error) {
-            System.out.println("Unable to finish excecutor service: " + error.getLocalizedMessage());
+            System.err.println("Unable to finish executor service");
+            error.printStackTrace();
         }
 
     }
@@ -192,17 +191,20 @@ public class DatabaseBenchmark {
     // MARK: - Private methods
 
 
-    private void updateMetrics(final int insertedPayload, final Long macrosecondsSpentOnInsertion) {
-        System.out.println("updating metrics..");
+    private void updateMetrics(final int insertedPayload, final Long macrosecondsSpentOnInsertion) throws IllegalArgumentException {
+        if (this.benchmarkMetricsCalculator == null) {
+            throw new IllegalArgumentException("Benchmark metrics calculator hasn't been created, unable to update metrics.");
+        }
         benchmarkMetricsCalculator.addBytesInserted(insertedPayload);
         benchmarkMetricsCalculator.addMacrosecondsSpentOnInsertion(macrosecondsSpentOnInsertion);
         benchmarkMetricsCalculator.incrementSuccessfulInsertions();
+
     }
 
     private void printBenchmarkResults() {
-        final double averageThroughtput = benchmarkMetricsCalculator.getAverageThroughtput();
+        final double averageThroughput = benchmarkMetricsCalculator.getAverageThroughtput();
         final double bandWidth = benchmarkMetricsCalculator.getBandwidth();
-        System.out.println("Average thoughtput: " + averageThroughtput + ", bendwidth: " + bandWidth);
+        System.out.println("Average throughput: " + averageThroughput + ", bandwidth: " + bandWidth);
     }
 
 
@@ -225,7 +227,6 @@ public class DatabaseBenchmark {
             return false;
         }
         this.decrementInsertions();
-        System.out.println("Insertions left (END): " + insertionsLeft);
         return true;
     }
 
@@ -234,7 +235,6 @@ public class DatabaseBenchmark {
             throw new IllegalArgumentException("Amount of insertions is infinite and couldn't be decremented.");
         }
         // NOTE: It works correctly if .decrementAndGet() and setting a value are different operations
-        System.out.println("Decrementing amount of insertions: " + this.amountOfInsertions.get());
         this.amountOfInsertions.decrementAndGet();
         final int insertionsLeft = this.amountOfInsertions.get();
         return insertionsLeft;

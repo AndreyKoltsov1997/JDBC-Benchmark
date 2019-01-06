@@ -58,11 +58,14 @@ public class InsertionFileLogger implements IInsertionsFileLogger {
 
     @Override
     public void logOperation(String targetDatabase, String targetTable, String insertedKey, String operationDuration) throws IOException {
-        System.out.println("Logged");
         this.bufferedWriter.write(targetDatabase + "," + targetTable + "," + insertedKey + "," + operationDuration + "\n");
     }
 
     public void stopWriting() throws IOException {
+        if (!this.isActive) {
+            // NOTE: Nothing to be stopped in case logger is not active
+            return;
+        }
         this.bufferedWriter.flush();
         this.bufferedWriter.close();
     }

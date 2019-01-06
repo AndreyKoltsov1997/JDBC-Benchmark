@@ -227,18 +227,6 @@ public class DatabaseOperator {
 
 
 
-    private boolean isDBexistMetdatata(String name) throws SQLException {
-        DatabaseMetaData md = this.connection.getMetaData();
-        ResultSet rs = md.getTables(null, null, "table_name", null);
-        if (rs.next()) {
-            System.out.println("exist?");
-            //Table Exist
-        }
-        return true;
-    }
-
-
-
     public void createTable(final String name) throws SQLException {
         String sqlCreate = "CREATE TABLE IF NOT EXISTS \"" + name + "\""
                 + "  (key           VARCHAR(10),"
@@ -275,9 +263,6 @@ public class DatabaseOperator {
             throw new IllegalArgumentException(misleadingMsg);
         }
 
-        final String targetTable = this.databaseInfo.getTargetTable();
-        // TODO: Repalce to string formatter
-
         if (value.isEmpty()) {
             // NOTE: SQL doesn't allow to inster empty strings, so I'm adding an empty value.
             final String minimalStringAllowed = " ";
@@ -298,6 +283,7 @@ public class DatabaseOperator {
     }
 
     private Boolean isColumnExistInCurrentDB(final String column) {
+        // TODO: Impliment method
         return this.processingTableColumnNames.contains(column);
     }
 
