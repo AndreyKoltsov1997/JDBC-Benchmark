@@ -17,6 +17,7 @@
 
         <!--NOTE: Specifying app description properties (name, etc)-->
         <app.name>jdbc-benchmark</app.name>
+        <app.name.with.dependencies>${app.name}-${project.version}-jar-with-dependencies</app.name.with.dependencies>
     </properties>
 
     <dependencies>
@@ -25,6 +26,8 @@
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <version>42.2.5</version>
+            <type>jar</type>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 
@@ -43,6 +46,30 @@
                         </manifest>
                     </archive>
                     <finalName>${app.name}</finalName>
+                </configuration>
+            </plugin>
+
+            <!--NOTE: Includng dependencines into the JAR-->
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <mainClass>benchmark.Benchmark</mainClass>
+                        </manifest>
+                    </archive>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
                 </configuration>
             </plugin>
 
@@ -68,13 +95,13 @@
                 <configuration>
                     <imageName>${app.name}</imageName>
                     <baseImage>java</baseImage>
-                    <entryPoint>["java", "-jar", "/${app.name}.jar", "postgres", "password"]</entryPoint>
+                    <entryPoint>["java", "-jar", "/${app.name}.jar", "postgres", "password", "--host=localhost", "--port=5432"]</entryPoint>
                     <!-- copy the service's jar file from target into the root directory of the image -->
                     <resources>
                         <resource>
                             <targetPath>/</targetPath>
                             <directory>${project.build.directory}</directory>
-                            <include>${app.name}.jar</include>
+                            <include>${app.name.with.dependencies}.jar</include>
                         </resource>
                     </resources>
                 </configuration>
