@@ -218,7 +218,7 @@ public class DatabaseBenchmark {
     }
 
     private Boolean shouldContinueInserting() {
-        if (this.amountOfInsertions.get() == Constants.INFINITE_AMOUNT_OF_INSERTIONS) {
+        if (this.isInsertionsInfinite()) {
             return true;
         }
         final int insertionsLeft = this.decrementInsertions();
@@ -231,7 +231,10 @@ public class DatabaseBenchmark {
         return (insertionsLeft >= 0);
     }
 
-    private synchronized int decrementInsertions() {
+    private synchronized int decrementInsertions() throws IllegalArgumentException {
+        if (this.isInsertionsInfinite()) {
+            throw new IllegalArgumentException("Amount of insertions is infinite and couldn't be decremented.");
+        }
         // NOTE: It works correctly if .decrementAndGet() and setting a value are different operations
         System.out.println("Decrementing amount of insertions: " + this.amountOfInsertions.get());
         this.amountOfInsertions.decrementAndGet();
@@ -240,6 +243,9 @@ public class DatabaseBenchmark {
     }
 
 
+    private boolean isInsertionsInfinite() {
+        return this.amountOfInsertions.get() == Constants.INFINITE_AMOUNT_OF_INSERTIONS;
+    }
     // NOTE: Returning insertion payload, update unsent payload value
     private synchronized int decrementPayload() {
         int payloadLeft = this.totalPayload.get() - this.minimalPayloadPerInsertion;
