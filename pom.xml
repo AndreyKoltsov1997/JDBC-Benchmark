@@ -5,14 +5,18 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>jdbc</groupId>
-    <artifactId>benchmark</artifactId>
+    <artifactId>jdbc-benchmark</artifactId>
     <version>1.0-SNAPSHOT</version>
 
 
-    <!-- NOTE: Specifying target java version (Java 8) -->
+    <!-- MARK: Specifying app properties (arguments included) -->
     <properties>
+        <!-- NOTE: Specifying target java version (Java 8) -->
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+
+        <!--NOTE: Specifying app description properties (name, etc)-->
+        <app.name>jdbc-benchmark</app.name>
     </properties>
 
     <dependencies>
@@ -38,6 +42,7 @@
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
+                    <finalName>${app.name}</finalName>
                 </configuration>
             </plugin>
 
@@ -49,7 +54,7 @@
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
-                    <finalName>${APP_NAME}</finalName>
+                    <finalName>${app.name}</finalName>
                 </configuration>
             </plugin>
         </plugins>
