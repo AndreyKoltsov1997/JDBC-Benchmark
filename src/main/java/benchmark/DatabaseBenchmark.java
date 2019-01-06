@@ -91,7 +91,7 @@ public class DatabaseBenchmark {
         final String COLUMN_KEY_NAME_MOCK = "key";
         final String COLUMN_VALUE_NAME_MOCK = "value";
         final String VARCHAR_TYPE = "VARCHAR(10)";
-      
+
 
         try {
             this.performInsertionTest(databaseOperator);

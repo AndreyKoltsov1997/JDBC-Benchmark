@@ -92,6 +92,14 @@ public class DatabaseOperator {
     }
 
 
+    private boolean isColumnExistInTable(final String table, final String column) throws SQLException {
+        DatabaseMetaData md = connection.getMetaData();
+        ResultSet rs = md.getColumns(null, null, table, column);
+        if (rs.next()) {
+            return true;
+        }
+        return false;
+    }
     // NOTE: Deleting temprorary created databases and tables if needed.
     public void shutDownConnection() throws SQLException {
         try {
@@ -123,7 +131,7 @@ public class DatabaseOperator {
             throw new JdbcCrudFailureException("\"" + name + "\" is not a valid database name." + nameFormatMisleadingMsg, CrudOperationType.CREATE);
         }
         try(Statement statement = this.connection.createStatement()) {
-            final String createDatabaseSqlQuery = "CREATE DATABASE IF NOT EXISTS " + name + "name";
+            final String createDatabaseSqlQuery = "CREATE DATABASE " + name + "name";
             statement.executeUpdate(createDatabaseSqlQuery);
 
         }
@@ -214,7 +222,7 @@ public class DatabaseOperator {
 
     public void createTable(final String name) throws SQLException {
         final String DELETE_TABLE_NAME_MOCK = "tmp";
-        String sqlCreate = "CREATE TABLE IF NOT EXISTS " + DELETE_TABLE_NAME_MOCK
+        String sqlCreate = "CREATE TABLE IF NOT EXISTS \"" + name + "\""
                 + "  (key           VARCHAR(10),"
                 + "   value            VARCHAR(10));";
 
@@ -225,11 +233,14 @@ public class DatabaseOperator {
 
 
     private void createColumn(final String name, final String type) throws JdbcCrudFailureException, SQLException {
+        if (this.isColumnExistInTable(this.databaseInfo.getTargetTable(), name)) {
+            return;
+        }
         if (!this.isDatabaseElementNameValid(name)) {
             throw new JdbcCrudFailureException("\"" + name + "\" is not a valid column name.", CrudOperationType.CREATE);
         }
 
-        final String addColumnSqlQuery = String.format("ALTER TABLE %s ADD %s %s;", this.databaseInfo.getTargetDatabaseName(), name, type);
+        final String addColumnSqlQuery = String.format("ALTER TABLE \"%s\" ADD %s %s;", this.databaseInfo.getTargetTable(), name, type);
         try (PreparedStatement preparedStatement = this.connection.prepareStatement(addColumnSqlQuery)) {
             preparedStatement.executeUpdate();
         }
