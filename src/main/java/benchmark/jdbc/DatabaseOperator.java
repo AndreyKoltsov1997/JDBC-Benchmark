@@ -240,7 +240,6 @@ public class DatabaseOperator {
 
 
     public void createTable(final String name) throws SQLException {
-        final String DELETE_TABLE_NAME_MOCK = "tmp";
         String sqlCreate = "CREATE TABLE IF NOT EXISTS \"" + name + "\""
                 + "  (key           VARCHAR(10),"
                 + "   value            VARCHAR(10));";
@@ -266,9 +265,9 @@ public class DatabaseOperator {
     }
 
 
-    public void insertValueIntoColumn(final String column, final String value) throws SQLException, IllegalArgumentException {
+    public void insertValueIntoColumn(final String column, String value) throws SQLException, IllegalArgumentException {
         if (this.connection == null) {
-            final String misleadingMsg = "Connection to required database hasn't been extablishes.";
+            final String misleadingMsg = "Connection to required database hasn't been established.";
             throw new IllegalArgumentException(misleadingMsg);
         }
         if (!isColumnExistInCurrentDB(column)) {
@@ -278,13 +277,19 @@ public class DatabaseOperator {
 
         final String targetTable = this.databaseInfo.getTargetTable();
         // TODO: Repalce to string formatter
-        
-        String insertSQLstatement = "INSERT INTO public." + targetTable + "(" + column + ") VALUES ('" + value + "')";
-        PreparedStatement preparedStatement = this.connection.prepareStatement(insertSQLstatement);
-        // NOTE: (JavaDoc) either (1) the row count for SQL Data Manipulation Language (DML) statements or ...
-        // ... (2) 0 for SQL statements that return nothing.
-        preparedStatement.executeUpdate();
 
+        if (value.isEmpty()) {
+            // NOTE: SQL doesn't allow to inster empty strings, so I'm adding an empty value.
+            final String minimalStringAllowed = " ";
+            value = minimalStringAllowed;
+        }
+        
+        String insertSqlQuery = String.format("INSERT INTO \"%s\" (%s) VALUES ('%s');", this.databaseInfo.getTargetTable(), column, value); //"INSERT INTO " + targetTable + "(" + column + ") VALUES ('" + value + "')";
+        try (PreparedStatement preparedStatement = this.connection.prepareStatement(insertSqlQuery)) {
+            // NOTE: (JavaDoc) either (1) the row count for SQL Data Manipulation Language (DML) statements or ...
+            // ... (2) 0 for SQL statements that return nothing.
+            preparedStatement.executeUpdate();
+        }
 
     }
 

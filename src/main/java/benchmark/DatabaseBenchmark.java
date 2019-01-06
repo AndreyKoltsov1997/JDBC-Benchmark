@@ -125,10 +125,9 @@ public class DatabaseBenchmark {
 
                 final int payloadLeft = this.decrementPayload();
 
-
                 if (payloadLeft < this.minimalPayloadPerInsertion) {
                     // NOTE: If the payload left is smaller than the required minimum (e.g.: when ..
-                    // ... left paload is equal to reminder of the division
+                    // ... left payload is equal to reminder of the division
                     randomString = randomAsciiStringGenerator.getRandomString(this.totalPayload.get());
                 } else {
                     randomString = randomAsciiStringGenerator.getRandomString(this.minimalPayloadPerInsertion);
@@ -221,14 +220,13 @@ public class DatabaseBenchmark {
         if (this.isInsertionsInfinite()) {
             return true;
         }
-        final int insertionsLeft = this.decrementInsertions();
-        System.out.println("Insertions left (BEGIN): " + insertionsLeft);
-
-        if (insertionsLeft == this.INFINITE_AMOUNT_OF_INSERTIONS) {
-            return true;
+        final int insertionsLeft = this.amountOfInsertions.get();
+        if (insertionsLeft <= 0) {
+            return false;
         }
+        this.decrementInsertions();
         System.out.println("Insertions left (END): " + insertionsLeft);
-        return (insertionsLeft >= 0);
+        return true;
     }
 
     private synchronized int decrementInsertions() throws IllegalArgumentException {

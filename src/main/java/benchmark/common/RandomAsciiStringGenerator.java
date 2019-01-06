@@ -17,6 +17,10 @@ public class RandomAsciiStringGenerator {
     // MARK: - Public methods
 
     public String getRandomString(final int length) {
+        final String emptyString = "";
+        if (length == 0) {
+            return emptyString;
+        }
         StringBuilder stringBuilder = new StringBuilder(length);
         for (int i = 0; i < length; i++) {
             final int randomIndex = this.secureRandom.nextInt(this.ASCII_SYMBOLS.length());
