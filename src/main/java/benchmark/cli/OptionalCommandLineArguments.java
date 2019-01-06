@@ -113,13 +113,14 @@ class OptionalCommandLineArguments {
     }
 
 
-    // NOTE: Returning localhost if host hasn't been specified
 
+    // NOTE: Fetching CLI argument value by its name
     public String getOptionByTag(final String tag) throws IllegalArgumentException {
         if (!isArgumentExist(tag)) {
             throw new IllegalArgumentException("Option \"" + tag + "\" doesn't exist.");
         }
 
+        // TODO: Update switching since it looks gross
         switch(tag) {
             case DB_NAME_TAG:
                 String processingTag = DB_NAME_TAG;

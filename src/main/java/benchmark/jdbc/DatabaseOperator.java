@@ -74,6 +74,8 @@ public class DatabaseOperator {
             System.out.println("Table " + targetTableName + " exists. Using it for benchmark.");
         }
 
+
+        // TODO: Move required columns into a different class-variable of constants
         List<String> requiredColumns = new ArrayList<>();
         requiredColumns.add("key");
         requiredColumns.add("value");
@@ -86,7 +88,6 @@ public class DatabaseOperator {
             }
         } catch (SQLException error) {
             System.out.println("Column " + processingColumnName + " exists. Using it for benchmark.");
-
         }
 
     }

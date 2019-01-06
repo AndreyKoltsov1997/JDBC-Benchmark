@@ -81,10 +81,10 @@ public class DatabaseBenchmark {
         try {
             databaseOperator.establishConnection();
         } catch (SQLException error) {
-            System.err.println("Unable to establish connetion with the database at " + this.databaseInfo.getDatabaseURL() + ", reason: " + error.getMessage());
+            System.err.println("Unable to establish connection with the database at " + this.databaseInfo.getDatabaseURL() + ", reason: " + error.getMessage());
             System.exit(Constants.CONNECTION_ERROR);
         } catch (JdbcCrudFailureException error) {
-            System.err.println("An error has occured while performing CRUD operations with database: " + error.getMessage());
+            System.err.println("An error has occurred while performing CRUD operations with database: " + error.getMessage());
         }
         //        final String DB_NAME_MOCK = "test";
         final String TABLE_NAME_MOCK = this.databaseInfo.getTargetTable(); // DEBUG: "link";
@@ -96,7 +96,7 @@ public class DatabaseBenchmark {
         try {
             this.performInsertionTest(databaseOperator);
         } catch (IOException error) {
-            final String misleadingMsg = "An error has occured while working with file: " + error.getMessage();
+            final String misleadingMsg = "An error has occurred while working with file: " + error.getMessage();
             System.err.println(misleadingMsg);
         }
 
@@ -112,9 +112,12 @@ public class DatabaseBenchmark {
     // NOTE: Testing INSERT operations via JDBC connector into the specified database.
     // ... DatabaseOperator is an object which perform insert operations
     private void performInsertionTest(DatabaseOperator databaseOperator) throws IOException {
+        System.out.println("Trying to perform insertion test....");
+
         // TODO: Do something with insertion file logger - it shouldn't be created if not needed
         IInsertionsFileLogger insertionFileLogger = new InsertionFileLogger(this.outputFileName);
         Runnable insertTask = () -> {
+            System.out.println("Insertion task has started.");
             while (this.shouldContinueInserting()) {
 
                 RandomAsciiStringGenerator randomAsciiStringGenerator = new RandomAsciiStringGenerator();
@@ -154,10 +157,8 @@ public class DatabaseBenchmark {
                     final int payloadInserted = randomAsciiStringGenerator.getPayloadOfUTF8String(randomString);
                     this.updateMetrics(payloadInserted, currentInsertionTime);
 
-
                 } catch (SQLException error) {
                     this.logFailedOperation(this.databaseInfo.getTargetDatabaseName(), this.databaseInfo.getTargetTable(), randomString, error.getMessage());
-
                 } catch (Exception error) {
                     final String misleadingMsg = "An error has occured while inserting new value into column: " + error.getMessage();
                     System.out.println(misleadingMsg);
@@ -167,14 +168,16 @@ public class DatabaseBenchmark {
         };
 
         final int amountOfThreads = this.amountOfThreads;
-        ExecutorService es = Executors.newCachedThreadPool();
+        System.out.println("Creating multi-thread executor service...");
+        ExecutorService executorService = Executors.newCachedThreadPool();
         for (int i = 0; i < amountOfThreads; ++i) {
-            es.execute(insertTask);
+            System.out.println("Starting service number " + i);
+            executorService.execute(insertTask);
         }
-        es.shutdown();
+        executorService.shutdown();
         try {
-            boolean finshed = es.awaitTermination(1, TimeUnit.MINUTES);
-            if (finshed) {
+            boolean hasInsertionFinished = executorService.awaitTermination(1, TimeUnit.MINUTES);
+            if (hasInsertionFinished) {
                 // TODO: Create a better way to stop writing. Maybe try-with-resources?
                 ((InsertionFileLogger) insertionFileLogger).stopWriting();
                 System.out.println("Insertion has been finished");
@@ -215,16 +218,22 @@ public class DatabaseBenchmark {
     }
 
     private Boolean shouldContinueInserting() {
+        if (this.amountOfInsertions.get() == Constants.INFINITE_AMOUNT_OF_INSERTIONS) {
+            return true;
+        }
         final int insertionsLeft = this.decrementInsertions();
+        System.out.println("Insertions left (BEGIN): " + insertionsLeft);
 
         if (insertionsLeft == this.INFINITE_AMOUNT_OF_INSERTIONS) {
             return true;
         }
+        System.out.println("Insertions left (END): " + insertionsLeft);
         return (insertionsLeft >= 0);
     }
 
     private synchronized int decrementInsertions() {
         // NOTE: It works correctly if .decrementAndGet() and setting a value are different operations
+        System.out.println("Decrementing amount of insertions: " + this.amountOfInsertions.get());
         this.amountOfInsertions.decrementAndGet();
         final int insertionsLeft = this.amountOfInsertions.get();
         return insertionsLeft;
