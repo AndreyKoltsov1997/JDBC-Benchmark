@@ -1,0 +1,16 @@
+version: '2'
+services:
+  jm-app:
+    image: emc-challenge-jdbc-benchmark
+    ports:
+    - "8080:8080"
+    depends_on:
+    - reference-postgres-db
+  reference-postgres-db:
+    image: postgres:10.1
+    ports:
+     - "5431:5432"
+    environment:
+     - POSTGRES_PASSWORD=password
+     - POSTGRES_USER=postgres
+     - POSTGRES_DB=mydb

@@ -36,7 +36,10 @@ public class AtomicFloat extends Number {
         return intBitsToFloat(bits.getAndSet(floatToIntBits(newValue)));
     }
 
-
+    public final boolean weakCompareAndSet(float expect, float update) {
+        return bits.weakCompareAndSet(floatToIntBits(expect),
+                floatToIntBits(update));
+    }
 
     public double doubleValue() { return (double) floatValue(); }
     public int intValue()       { return (int) get();           }
