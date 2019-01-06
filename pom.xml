@@ -68,7 +68,7 @@
                 <configuration>
                     <imageName>${app.name}</imageName>
                     <baseImage>java</baseImage>
-                    <entryPoint>["java", "-jar", "/${app.name}.jar"]</entryPoint>
+                    <entryPoint>["java", "-jar", "/${app.name}.jar", "postgres", "password"]</entryPoint>
                     <!-- copy the service's jar file from target into the root directory of the image -->
                     <resources>
                         <resource>
