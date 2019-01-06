@@ -91,11 +91,7 @@ public class DatabaseBenchmark {
         final String COLUMN_KEY_NAME_MOCK = "key";
         final String COLUMN_VALUE_NAME_MOCK = "value";
         final String VARCHAR_TYPE = "VARCHAR(10)";
-        try {
-            databaseOperator.createColumn(TABLE_NAME_MOCK, COLUMN_KEY_NAME_MOCK, VARCHAR_TYPE);
-        } catch (Exception error) {
-            System.err.println("Unable to create required column. Reason: " + error.getMessage());
-        }
+      
 
         try {
             this.performInsertionTest(databaseOperator);

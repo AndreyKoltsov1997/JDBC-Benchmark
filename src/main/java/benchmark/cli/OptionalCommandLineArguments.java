@@ -207,7 +207,11 @@ class OptionalCommandLineArguments {
 
     // NOTE: If table name is not set, generating it with timestamp
     private String generateTableName() {
-        Timestamp timeStamp = new Timestamp(System.currentTimeMillis());
-        return timeStamp.toString();
+        String timeStamp = new Timestamp(System.currentTimeMillis()).toString();
+        // TODO: avaliableCharactersInNameRegEx is already in use inside DBOperator
+        final String nonNumberSymbolsRegEx = "[^0-9]";
+        final String emptyValue = "";
+        final String result = timeStamp.replaceAll(nonNumberSymbolsRegEx, emptyValue);
+        return result;
     }
 }
