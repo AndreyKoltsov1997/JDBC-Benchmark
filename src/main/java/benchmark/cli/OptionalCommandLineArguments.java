@@ -1,6 +1,6 @@
 package benchmark.cli;
 
-import benchmark.Constants;
+import benchmark.common.Constants;
 
 import java.sql.Timestamp;
 import java.util.*;

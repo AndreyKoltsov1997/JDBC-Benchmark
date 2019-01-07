@@ -27,7 +27,6 @@ public class DatabaseCredentials {
     }
 
     // MARK: - Private
-    // TODO: Potential copy-paste of parameters (see Database Location - fix that
     private Boolean isUserLoginParameterValid(String parameter) {
         final String emptyString = "";
         return ((parameter != null) && (!parameter.equals(emptyString)));

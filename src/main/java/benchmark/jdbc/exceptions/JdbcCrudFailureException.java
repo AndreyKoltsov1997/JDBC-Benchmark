@@ -1,10 +1,14 @@
-package benchmark.jdbc;
+package benchmark.jdbc.exceptions;
 
 
+import benchmark.jdbc.CrudOperationType;
+
+// NOTE: Custom exception class for CRUD operations performed via JDBC.
 public class JdbcCrudFailureException extends Exception {
 
     private final String message;
 
+    // MARK: - Constructor
     public JdbcCrudFailureException(String message, final CrudOperationType type) {
         super(message);
         String misleadingMsg = "";

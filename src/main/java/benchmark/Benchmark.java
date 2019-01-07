@@ -1,15 +1,16 @@
 package benchmark;
 
 import benchmark.cli.CommandLineArgsParser;
+import benchmark.common.Constants;
 import benchmark.database.components.DatabaseCredentials;
 import benchmark.database.DatabaseInfo;
 import benchmark.database.components.DatabaseLocation;
 
+// NOTE: Benchmark is a main class of JDBC benchmark app
 public class Benchmark {
 
-
+    // MARK: - Program entry point
     public static void main(String[] args) {
-
 
         final CommandLineArgsParser commandLineArgsParser = new CommandLineArgsParser();
 

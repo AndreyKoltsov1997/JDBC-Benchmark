@@ -1,11 +1,12 @@
 package benchmark.jdbc;
 
-import benchmark.Constants;
+import benchmark.common.Constants;
 import benchmark.database.DatabaseInfo;
 import benchmark.jdbc.common.DatabaseElementCreator;
 import benchmark.jdbc.common.DatabaseElementEraser;
 import benchmark.jdbc.common.DatabaseElementInserter;
 import benchmark.jdbc.common.DatabaseElementValidator;
+import benchmark.jdbc.exceptions.JdbcCrudFailureException;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -13,9 +14,17 @@ import java.util.List;
 import java.util.Map;
 
 
+// NOTE: A class that provides connection to specified DB via JDBC and performing operations with it.
 public class DatabaseOperator {
 
+    // MARK: - Constants
     private final static String POSTGRES_DRIVER_CLASS_NAME = "org.postgresql.Driver";
+    private final static List<String> processingTableColumnNames = new ArrayList<String>() {{
+        add(Constants.KEY_COLUMN_NAME);
+        add(Constants.VALUE_COLUMN_NAME);
+    }};
+
+
     private final DatabaseInfo databaseInfo;
     private Connection connection;
 
@@ -24,10 +33,6 @@ public class DatabaseOperator {
     private DatabaseElementEraser databaseElementEraser;
     private DatabaseElementInserter databaseElementInserter;
 
-    private static List<String> processingTableColumnNames = new ArrayList<String>() {{
-        add(Constants.KEY_COLUMN_NAME);
-        add(Constants.VALUE_COLUMN_NAME);
-    }};
 
     private boolean hasCreatedCustomDatabase = false;
 

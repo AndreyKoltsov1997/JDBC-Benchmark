@@ -4,11 +4,13 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+// NOTE: A class responsible for insertion of values into connected DB via JDBC.
 public class DatabaseElementInserter {
 
     private Connection connection;
     private DatabaseElementValidator databaseElementValidator;
 
+    // MARK: - Constructor
     public DatabaseElementInserter(Connection connection, DatabaseElementValidator databaseElementValidator) {
         if (connection == null) {
             throw new IllegalArgumentException("Unable to create inserter since connection hasn't been established.");
@@ -16,6 +18,8 @@ public class DatabaseElementInserter {
         this.connection = connection;
         this.databaseElementValidator = databaseElementValidator;
     }
+
+    // MARK: - Public methods
 
     // NOTE: Inserting row into specified column.
     public void insertValueIntoColumn(final String table, final String column, String value) throws SQLException, IllegalArgumentException {

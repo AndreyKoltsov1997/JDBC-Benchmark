@@ -1,11 +1,12 @@
 package benchmark;
 
+import benchmark.common.Constants;
 import benchmark.common.RandomAsciiStringGenerator;
 import benchmark.database.DatabaseInfo;
 import benchmark.files.InsertionFileLogger;
 import benchmark.database.ColumnType;
 import benchmark.jdbc.DatabaseOperator;
-import benchmark.jdbc.JdbcCrudFailureException;
+import benchmark.metrics.BenchmarkMetricsCalculator;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -18,12 +19,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class JdbcBenchmark {
 
-    private final int DEFAULT_PAYLOAD = 0;
-    private final int DEFAULT_AMOUNT_OF_THREDS = 1;
-    private final String NO_OUTPUT_FILE_REQUIRED_FILENAME = "";
-    // TODO: Replace this valid with value from Constants class
-    private final int INFINITE_AMOUNT_OF_INSERTIONS = -9;
-    private final static int KEY_LENGTH = 10;
+    // MARK: - Constants
+    private static final String NO_OUTPUT_FILE_REQUIRED_FILENAME = Constants.NO_OUTPUT_REQUIRED_FILENAME;
+    private static final int INFINITE_AMOUNT_OF_INSERTIONS = Constants.INFINITE_AMOUNT_OF_INSERTIONS;
+    private static final int KEY_LENGTH = 10;
 
 
     private DatabaseInfo databaseInfo;
@@ -35,27 +34,7 @@ public class JdbcBenchmark {
     private BenchmarkMetricsCalculator benchmarkMetricsCalculator = new BenchmarkMetricsCalculator();
 
 
-    // MARK: - Constructors
-
-    public JdbcBenchmark(DatabaseInfo databaseInfo) {
-        this.databaseInfo = databaseInfo;
-
-        this.totalPayload = new AtomicInteger(this.DEFAULT_PAYLOAD);
-        this.amountOfThreads = this.DEFAULT_AMOUNT_OF_THREDS;
-        this.outputFileName = this.NO_OUTPUT_FILE_REQUIRED_FILENAME;
-        this.amountOfInsertions = new AtomicInteger(this.INFINITE_AMOUNT_OF_INSERTIONS);
-        this.minimalPayloadPerInsertion = this.getMinimalPayloadPerInsertion();
-    }
-
-    public JdbcBenchmark(int totalPayload, int amountOfThreads, int amountOfInsertions, DatabaseInfo databaseInfo) {
-        this.totalPayload = new AtomicInteger(totalPayload);
-        this.amountOfThreads = amountOfThreads;
-        this.amountOfInsertions = new AtomicInteger(amountOfInsertions);
-        this.databaseInfo = databaseInfo;
-        this.outputFileName = this.NO_OUTPUT_FILE_REQUIRED_FILENAME;
-        this.minimalPayloadPerInsertion = this.getMinimalPayloadPerInsertion();
-
-    }
+    // MARK: - Constructor
 
     public JdbcBenchmark(int totalPayload, int amountOfThreads, int amountOfInsertions, DatabaseInfo databaseInfo, String outputFileName) {
         // NOTE: Random ASCII generator uses UTF-8 encoding, that means we have 1 byte per symbol in a string
@@ -72,7 +51,7 @@ public class JdbcBenchmark {
     // MARK: - Public methods
 
     public Boolean isFileOutputRequired() {
-        return (outputFileName.equals(this.NO_OUTPUT_FILE_REQUIRED_FILENAME));
+        return (outputFileName.equals(JdbcBenchmark.NO_OUTPUT_FILE_REQUIRED_FILENAME));
     }
 
     public void performBenchmark() {

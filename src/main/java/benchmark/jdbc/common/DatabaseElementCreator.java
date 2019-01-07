@@ -1,19 +1,24 @@
 package benchmark.jdbc.common;
 
 import benchmark.jdbc.CrudOperationType;
-import benchmark.jdbc.JdbcCrudFailureException;
+import benchmark.jdbc.exceptions.JdbcCrudFailureException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+// NOTE: A class responsible for creating elements within connected DB via JDBC.
+
 public class DatabaseElementCreator {
+
+    // MARK: - Constants
     private final static String TAG = DatabaseElementCreator.class.getName();
 
     private Connection connection;
     private final DatabaseElementValidator databaseElementValidator;
 
+    // MARK: - Constructor
     public DatabaseElementCreator(Connection connection, DatabaseElementValidator databaseElementValidator) {
         if (connection == null) {
             throw new IllegalArgumentException(DatabaseElementCreator.TAG + "Unable to get database connection.");
@@ -22,6 +27,8 @@ public class DatabaseElementCreator {
         this.databaseElementValidator = databaseElementValidator;
     }
 
+
+    // MARK: - Public methods
 
     // NOTE: Creating a column into current database.
     public void createColumnIfNotExists(final String table, final String column, final String type) throws JdbcCrudFailureException, SQLException {

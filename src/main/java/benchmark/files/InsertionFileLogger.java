@@ -1,6 +1,6 @@
 package benchmark.files;
 
-import benchmark.Constants;
+import benchmark.common.Constants;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -12,15 +12,25 @@ import java.nio.file.Paths;
 
 public class InsertionFileLogger implements IInsertionsFileLogger {
 
-    private Path pathToFile;
+    // MARK: - Constants
     private final static String REQUIRED_FILE_EXTENSION = ".csv";
+
+
+    private Path pathToFile;
     private boolean isActive;
     private BufferedWriter bufferedWriter;
 
+    // MARK: Getters and setters
+    public boolean isActive() {
+        return this.isActive;
+    }
+
+
+    // MARK: - Constructor
     public InsertionFileLogger(String fileURI) throws IOException {
         System.err.println("Creating file logger, URL: " + fileURI);
         if (!this.shouldCreateLogger(fileURI)) {
-            System.err.println("Shuldn't be created");
+            System.err.println("Shouldn't be created");
             // NOTE: If empty URI has been passed, logging is not required
             this.isActive = false;
             return;
@@ -37,13 +47,22 @@ public class InsertionFileLogger implements IInsertionsFileLogger {
         this.bufferedWriter = Files.newBufferedWriter(this.pathToFile);
     }
 
+    // MARK: - Public methods
+
+    public void stopWriting() throws IOException {
+        if (!this.isActive) {
+            // NOTE: Nothing to be stopped in case logger is not active
+            return;
+        }
+        this.bufferedWriter.flush();
+        this.bufferedWriter.close();
+    }
+
+    // MARK: - Private methods
     private boolean hasRequiredExtension(String filename) {
         return filename.contains(InsertionFileLogger.REQUIRED_FILE_EXTENSION);
     }
 
-    public boolean isActive() {
-        return this.isActive;
-    }
 
     private boolean shouldCreateLogger(String fileURI) {
         return (!fileURI.equals(Constants.NO_OUTPUT_REQUIRED_FILENAME));
@@ -55,22 +74,15 @@ public class InsertionFileLogger implements IInsertionsFileLogger {
         writer.close();
     }
 
+    private boolean isFileExist(Path path) {
+        return (path != null);
+    }
 
+
+    // MARK: - Overrides
     @Override
     public void logOperation(String targetDatabase, String targetTable, String insertedKey, String operationDuration) throws IOException {
         this.bufferedWriter.write(targetDatabase + "," + targetTable + "," + insertedKey + "," + operationDuration + "\n");
     }
 
-    public void stopWriting() throws IOException {
-        if (!this.isActive) {
-            // NOTE: Nothing to be stopped in case logger is not active
-            return;
-        }
-        this.bufferedWriter.flush();
-        this.bufferedWriter.close();
-    }
-
-    private boolean isFileExist(Path path) {
-        return (path != null);
-    }
 }

@@ -1,22 +1,28 @@
 package benchmark.jdbc.common;
 
 import benchmark.jdbc.CrudOperationType;
-import benchmark.jdbc.JdbcCrudFailureException;
+import benchmark.jdbc.exceptions.JdbcCrudFailureException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+
+// NOTE: A class responsible for erasing elements from connected DB via JDBC.
+
 public class DatabaseElementEraser {
 
     private Connection connection;
     private DatabaseElementValidator databaseElementValidator;
 
+    // MARK: - Constructor
     public DatabaseElementEraser(Connection connection, DatabaseElementValidator databaseElementValidator) {
         this.connection = connection;
         this.databaseElementValidator = databaseElementValidator;
     }
+
+    // MARK: - Public methods
 
     // NOTE: Deleting column within specified table.
     public void dropColumnWithinTable(String table, String column) throws SQLException {

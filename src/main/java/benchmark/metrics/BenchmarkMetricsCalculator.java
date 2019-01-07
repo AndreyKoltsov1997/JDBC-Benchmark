@@ -1,17 +1,14 @@
-package benchmark;
+package benchmark.metrics;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+
+// NOTE: A class responsible for calculation of required benchmark metrics.
 public class BenchmarkMetricsCalculator {
 
     private AtomicInteger insertedOperations;
     private AtomicInteger macrosecondsSpendOnInsertions;
     private AtomicInteger bytesInserted;
-
-    // NOTE: Storing list of overflowed int values in case of infinite insertion
-    private List<Integer> overflowedMacrosecondValues;
 
 
     public BenchmarkMetricsCalculator() {
@@ -19,7 +16,6 @@ public class BenchmarkMetricsCalculator {
         this.insertedOperations = new AtomicInteger(initialMetricValue);
         this.macrosecondsSpendOnInsertions = new AtomicInteger(initialMetricValue);
         this.bytesInserted = new AtomicInteger(initialMetricValue);
-        this.overflowedMacrosecondValues = new LinkedList<>();
     }
 
     public synchronized void incrementSuccessfulInsertions() {
@@ -28,16 +24,6 @@ public class BenchmarkMetricsCalculator {
 
     public synchronized void addMacrosecondsSpentOnInsertion(final Long macroseconds) {
         int macrosecondsSpentOnInsertion = this.safeLongToInt(macroseconds);
-//        try {
-//            macrosecondsSpentOnInsertion = this.safeLongToInt(macroseconds);
-//        } catch (IllegalArgumentException error) {
-//            // NOTE: Handling integer overflow
-//            overflowedMacrosecondValues.add(Integer.MAX_VALUE);
-//            final int macrosecondsCounterResetValue = 0;
-//            this.macrosecondsSpendOnInsertions.set(macrosecondsCounterResetValue);
-//            return;
-//
-//        }
         final int updatedTime = this.macrosecondsSpendOnInsertions.get() + macrosecondsSpentOnInsertion;
         this.macrosecondsSpendOnInsertions.set(updatedTime);
     }
@@ -89,6 +75,7 @@ public class BenchmarkMetricsCalculator {
         return (int) value;
     }
 
+    // NOTE: Benchmark has successful operations in case any value has been inserted.
     private boolean hasSuccessfulOperations() {
         return ((this.insertedOperations.get() != 0) && (this.macrosecondsSpendOnInsertions.get() != 0));
     }

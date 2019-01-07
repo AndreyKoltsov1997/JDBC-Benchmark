@@ -1,7 +1,5 @@
 package benchmark.cli;
 
-import benchmark.Constants;
-
 public class CommandLineArgsParser {
 
 

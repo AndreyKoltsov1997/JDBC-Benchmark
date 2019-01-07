@@ -8,11 +8,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class DatabaseElementValidator {
+
     private Connection connection;
 
+    // MARK: - Constructor
     public DatabaseElementValidator(Connection connection) {
         this.connection = connection;
     }
+
+    // MARK: - Public methods
 
     public boolean isDatabaseElementNameValid(String name) {
         final String availableCharactersInNameRegEx = "^[a-zA-Z_][a-zA-Z0-9_]*$";

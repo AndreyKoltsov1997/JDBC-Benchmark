@@ -5,6 +5,8 @@ import benchmark.database.components.DatabaseLocation;
 
 public class DatabaseInfo {
 
+
+    // MARK: - Constants
     // NOTE: Default database targetDatabaseName
     private final String DEFAULT_NAME = "jdbc_benchmark";
 
@@ -12,34 +14,10 @@ public class DatabaseInfo {
     private final DatabaseLocation location;
     private final DatabaseCredentials credentials;
 
-
     private final String targetDatabaseName;
     private String targetTable;
 
-    // MARK: - Constructor
-    public DatabaseInfo(DatabaseLocation location, DatabaseCredentials credentials, String targetDatabaseName, String targetTable) {
-        this.location = location;
-        this.credentials = credentials;
-
-        if (!this.isParameterValid(targetDatabaseName)) {
-            targetDatabaseName = this.DEFAULT_NAME;
-        }
-        this.targetDatabaseName = targetDatabaseName;
-        this.targetTable = targetTable;
-    }
-
-    public DatabaseInfo(DatabaseLocation location, DatabaseCredentials credentials) {
-        this.location = location;
-        this.credentials = credentials;
-        this.targetDatabaseName = this.DEFAULT_NAME;
-    }
-
-    public final String getDatabaseURL() {
-        final String jdbcNotation = "jdbc";
-        final String DATABASE_NOTATION_MOCK = "postgresql";
-        // TODO: Look up better ways of formatting
-        return String.format("%s:%s://%s/", jdbcNotation, DATABASE_NOTATION_MOCK, this.location.toString());
-    }
+    // MARK: Getters and setters
 
     public final String getUsername() {
         return this.credentials.getUsername();
@@ -53,9 +31,31 @@ public class DatabaseInfo {
         return targetTable;
     }
 
-
     public String getTargetDatabaseName() {
         return targetDatabaseName;
+    }
+
+    // MARK: - Constructor
+    public DatabaseInfo(DatabaseLocation location, DatabaseCredentials credentials, String targetDatabaseName, String targetTable) {
+        this.location = location;
+        this.credentials = credentials;
+
+        if (!this.isParameterValid(targetDatabaseName)) {
+            targetDatabaseName = this.DEFAULT_NAME;
+        }
+        this.targetDatabaseName = targetDatabaseName;
+        this.targetTable = targetTable;
+    }
+
+
+
+    // MARK: - Public methods
+
+    public final String getDatabaseURL() {
+        final String jdbcNotation = "jdbc";
+        final String DATABASE_NOTATION_MOCK = "postgresql";
+        // TODO: Look up better ways of formatting
+        return String.format("%s:%s://%s/", jdbcNotation, DATABASE_NOTATION_MOCK, this.location.toString());
     }
 
     // MARK: - Private
@@ -64,6 +64,5 @@ public class DatabaseInfo {
         final String emptyString = "";
         return ((parameter != null) && (!parameter.equals(emptyString)));
     }
-
 
 }

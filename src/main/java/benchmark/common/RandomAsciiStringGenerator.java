@@ -1,7 +1,5 @@
 package benchmark.common;
 
-import benchmark.Constants;
-
 import java.security.SecureRandom;
 
 public class RandomAsciiStringGenerator {

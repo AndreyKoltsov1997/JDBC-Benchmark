@@ -2,6 +2,7 @@ package benchmark.database.components;
 
 public class DatabaseLocation {
 
+    // MARK: - Constants
     // NOTE: Default parameters are set if passed parameters are null
     private final String DEFAULT_HOST = "localhost";
     private final String DEFAULT_PORT = "8080";
@@ -20,10 +21,6 @@ public class DatabaseLocation {
     }
 
     // MARK: - Constructor
-    public DatabaseLocation() {
-        this.host = this.DEFAULT_HOST;
-        this.port = this.DEFAULT_PORT;
-    }
 
     public DatabaseLocation(String host, String port) {
         if (!isLocationParameterValid(host)) {
@@ -44,6 +41,7 @@ public class DatabaseLocation {
     }
 
 
+    // MARK: Overrides
     @Override
     public String toString() {
         final String localtionDelimiter = ":";
