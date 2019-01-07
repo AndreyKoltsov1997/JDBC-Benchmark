@@ -9,6 +9,7 @@ benchmark/jdbc/DatabaseOperator$1.class
 benchmark/jdbc/CrudOperationType.class
 benchmark/jdbc/JdbcCrudFailureException.class
 benchmark/database/DatabaseInfo.class
+benchmark/ColumnType.class
 benchmark/cli/OptionalCommandLineArguments.class
 benchmark/files/IInsertionsFileLogger.class
 benchmark/database/components/DatabaseCredentials.class
@@ -16,3 +17,4 @@ benchmark/files/InsertionFileLogger.class
 benchmark/jdbc/DatabaseOperator.class
 benchmark/DatabaseBenchmark.class
 benchmark/Benchmark.class
+benchmark/DatabaseBenchmark$1.class

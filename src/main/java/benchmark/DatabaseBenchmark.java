@@ -9,6 +9,8 @@ import benchmark.jdbc.JdbcCrudFailureException;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -21,6 +23,7 @@ public class DatabaseBenchmark {
     private final String NO_OUTPUT_FILE_REQUIRED_FILENAME = "";
     // TODO: Replace this valid with value from Constants class
     private final int INFINITE_AMOUNT_OF_INSERTIONS = -9;
+    private final static int KEY_LENGTH = 10;
 
 
     private DatabaseInfo databaseInfo;
@@ -106,20 +109,19 @@ public class DatabaseBenchmark {
 
     }
 
-    // NOTE: Testing INSERT operations via JDBC connector into the specified database.
-    // ... DatabaseOperator is an object which perform insert operations
-    private void performInsertionTest(DatabaseOperator databaseOperator) throws IOException {
 
-        // TODO: Do something with insertion file logger - it shouldn't be created if not needed
-        IInsertionsFileLogger insertionFileLogger = new InsertionFileLogger(this.outputFileName);
-        Runnable insertTask = () -> {
-            while (this.shouldContinueInserting()) {
 
-                RandomAsciiStringGenerator randomAsciiStringGenerator = new RandomAsciiStringGenerator();
-                String randomString = "";
+    private String getRandomStringForBenchmark(RandomAsciiStringGenerator randomAsciiStringGenerator, ColumnType columnType) {
+        String randomString = "";
+        randomAsciiStringGenerator = new RandomAsciiStringGenerator();
+        final int payloadLeft = this.decrementPayload();
 
-                final int payloadLeft = this.decrementPayload();
-
+        switch (columnType) {
+            case KEY:
+                // NOTE: Key has fixed length. So, even if there's not enough payload, it will be inserted.
+                randomString = randomAsciiStringGenerator.getRandomString(DatabaseBenchmark.KEY_LENGTH);
+                break;
+            case VALUE:
                 if (payloadLeft < this.minimalPayloadPerInsertion) {
                     // NOTE: If the payload left is smaller than the required minimum (e.g.: when ..
                     // ... left payload is equal to reminder of the division
@@ -127,36 +129,74 @@ public class DatabaseBenchmark {
                 } else {
                     randomString = randomAsciiStringGenerator.getRandomString(this.minimalPayloadPerInsertion);
                 }
+                break;
+        }
+
+        return randomString;
+    }
 
 
-                System.out.println("Inserting random string: " + randomString);
 
-                final String COLUMN_KEY_NAME_MOCK = "key";
-                final String COLUMN_VALUE_NAME_MOCK = "value";
+    // NOTE: Testing INSERT operations via JDBC connector into the specified database.
+    // ... DatabaseOperator is an object which perform insert operations
+    private void performInsertionTest(DatabaseOperator databaseOperator) throws IOException {
+
+        // TODO: Do something with insertion file logger - it shouldn't be created if not needed
+        IInsertionsFileLogger insertionFileLogger = new InsertionFileLogger(this.outputFileName);
+        Runnable insertTask = () -> {
+            // NOTE: Creating random string generator once so it won't be created each insertion
+            // WARNING: Insertions could be infinite
+            RandomAsciiStringGenerator randomAsciiStringGenerator = new RandomAsciiStringGenerator();
+            while (this.shouldContinueInserting()) {
+
+//                String randomString = "";
+//
+//
+//                final int payloadLeft = this.decrementPayload();
+//
+//                if (payloadLeft < this.minimalPayloadPerInsertion) {
+//                    // NOTE: If the payload left is smaller than the required minimum (e.g.: when ..
+//                    // ... left payload is equal to reminder of the division
+//                    randomString = randomAsciiStringGenerator.getRandomString(this.totalPayload.get());
+//                } else {
+//                    randomString = randomAsciiStringGenerator.getRandomString(this.minimalPayloadPerInsertion);
+//                }
+
 
                 // NOTE: Not using JDBC Batch since we're trying to get average insertion time, ...
                 // ... thus we should calculate each insertion operation.
 
-                try {
-                    Long insertionStartTime = System.nanoTime();
-                    databaseOperator.insertValueIntoColumn(COLUMN_KEY_NAME_MOCK, randomString);
-                    Long currentInsertionTime = System.nanoTime() - insertionStartTime;
-                    System.out.println("Total insertion time time: " + this.convertNanoSecondToMicroseconds(currentInsertionTime) + " microseconds.");
-                    if (((InsertionFileLogger) insertionFileLogger).isActive()) {
-                        insertionFileLogger.logOperation(this.databaseInfo.getTargetDatabaseName(), this.databaseInfo.getTargetTable(), randomString, String.valueOf(currentInsertionTime));
+                Map<String, String> insertingValues = new HashMap<String, String>();
+                final String key = this.getRandomStringForBenchmark(randomAsciiStringGenerator, ColumnType.KEY);
+                insertingValues.put(Constants.KEY_COLUMN_NAME, key);
+                final String value = this.getRandomStringForBenchmark(randomAsciiStringGenerator, ColumnType.VALUE);
+                insertingValues.put(Constants.VALUE_COLUMN_NAME, value);
+
+
+                for (Map.Entry<String, String> insertingRow: insertingValues.entrySet()) {
+                    // NOTE: Inserting key and value separately. It's 2 different INSERT operations and ...
+                    // ... should be logged separately.
+                    try {
+                        final String insertingString = insertingRow.getValue();
+                        Long insertionStartTime = System.nanoTime();
+                        databaseOperator.insertKeyValueTest(insertingRow);
+                        Long currentInsertionTime = System.nanoTime() - insertionStartTime;
+                        System.out.println("Total insertion time time: " + this.convertNanoSecondToMicroseconds(currentInsertionTime) + " microseconds.");
+                        if (((InsertionFileLogger) insertionFileLogger).isActive()) {
+                            insertionFileLogger.logOperation(this.databaseInfo.getTargetDatabaseName(), this.databaseInfo.getTargetTable(), insertingString, String.valueOf(currentInsertionTime));
+                        }
+                        final int payloadInserted = randomAsciiStringGenerator.getPayloadOfUTF8String(insertingString);
+                        this.updateMetrics(payloadInserted, currentInsertionTime);
+
+                    } catch (SQLException error) {
+                        this.logFailedOperation(this.databaseInfo.getTargetDatabaseName(), this.databaseInfo.getTargetTable(), insertingRow.getValue(), error.getMessage());
+                    } catch (Exception error) {
+                        final String misleadingMsg = "An error has occurred while inserting new value into column: " + error.getMessage();
+                        System.err.println(misleadingMsg);
                     }
-
-                    // NOTE: Updating metrics in case of successful insertion
-                    // TODO: Add payload for BOTH key and value
-                    final int payloadInserted = randomAsciiStringGenerator.getPayloadOfUTF8String(randomString);
-                    this.updateMetrics(payloadInserted, currentInsertionTime);
-
-                } catch (SQLException error) {
-                    this.logFailedOperation(this.databaseInfo.getTargetDatabaseName(), this.databaseInfo.getTargetTable(), randomString, error.getMessage());
-                } catch (Exception error) {
-                    final String misleadingMsg = "An error has occured while inserting new value into column: " + error.getMessage();
-                    System.err.println(misleadingMsg);
                 }
+
+
 
             }
         };

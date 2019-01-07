@@ -7,6 +7,8 @@ import com.sun.tools.internal.jxc.ap.Const;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 
 // TODO: Add necessary connection closing
@@ -253,11 +255,20 @@ public class DatabaseOperator {
     }
 
 
-    public void insertValueIntoColumn(final String column, String value) throws SQLException, IllegalArgumentException {
+
+
+    public void insertKeyValueTest(Map.Entry<String, String> value) throws SQLException, IllegalArgumentException  {
         if (this.connection == null) {
             final String misleadingMsg = "Connection to required database hasn't been established.";
             throw new IllegalArgumentException(misleadingMsg);
         }
+        final String columnName = value.getKey();
+        final String columnValue = value.getValue();
+        this.insertValueIntoColumn(columnName, columnValue);
+    }
+
+    private void insertValueIntoColumn(final String column, String value) throws SQLException, IllegalArgumentException {
+
         if (!isColumnExistInCurrentDB(column)) {
             final String misleadingMsg = "Column " + column + " doesn't exist in database " + this.databaseInfo.getTargetDatabaseName();
             throw new IllegalArgumentException(misleadingMsg);

@@ -1,12 +1,15 @@
 package benchmark.common;
 
+import benchmark.Constants;
+
 import java.security.SecureRandom;
 
 public class RandomAsciiStringGenerator {
 
-    private final String ASCII_SYMBOLS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    private final static String ASCII_SYMBOLS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
     private final SecureRandom secureRandom;
+    private final static int RANDOM_KEY_LENGTH = 10;
 
 
     // MARK: - Constructor
@@ -33,6 +36,12 @@ public class RandomAsciiStringGenerator {
     public int getPayloadOfUTF8String(final String string) {
         // NOTE: UTF-8 string has 1 byte per symbol
         return string.length();
+    }
+
+
+    // NOTE: Key is a random string with fixed length
+    public String getRandomKey() {
+        return this.getRandomString(RandomAsciiStringGenerator.RANDOM_KEY_LENGTH);
     }
 
 }

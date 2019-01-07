@@ -67,7 +67,6 @@ public class BenchmarkMetricsCalculator {
             return zeroBandwidth;
         }
         final double secondsSpentOnInsertion = this.getSecondsSpentOnInsertion();
-        System.out.println("[bandwidth] secondsSpentOnInsertion:" + secondsSpentOnInsertion);
 
         final double result = bytesInserted.get() / secondsSpentOnInsertion;
         return result;
@@ -77,7 +76,6 @@ public class BenchmarkMetricsCalculator {
     private double getSecondsSpentOnInsertion() {
         final int secondsToMacrosecondsPower = -6;
         final int convertionBase = 10;
-        System.out.println("this.macrosecondsSpendOnInsertions.get(): " + this.macrosecondsSpendOnInsertions.get());
         final double secondsToMacrosecondsMultiplicator = Math.pow(convertionBase, secondsToMacrosecondsPower);
         final double result = this.macrosecondsSpendOnInsertions.get() * secondsToMacrosecondsMultiplicator;
         return result;

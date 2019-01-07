@@ -11,6 +11,7 @@
 /Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/database/components/DatabaseCredentials.java
 /Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/files/InsertionFileLogger.java
 /Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/jdbc/DatabaseOperator.java
+/Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/ColumnType.java
 /Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/jdbc/JdbcCrudFailureException.java
 /Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/cli/CommandLineArgsParser.java
 /Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/cli/OptionalCommandLineArguments.java
