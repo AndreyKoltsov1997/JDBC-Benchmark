@@ -1,8 +1,12 @@
 package benchmark.common;
 
 public class Constants {
-    public static final Integer STATUS_INVALID_ARGUMENT = -2;
-    public static final Integer CONNECTION_ERROR = -3;
+
+    // MARK: - Exit statuses
+    public static final int EXIT_STATUS_SUCCESS = 0;
+    public static final Integer EXIT_STATUS_INVALID_ARGUMENT = -2;
+    public static final Integer EXIT_STATUS_CONNECTION_ERROR = -3;
+
     public static final String CLI_OPTION_PREFIX = "--";
     public static final int INFINITE_AMOUNT_OF_INSERTIONS = -9;
     public static final String NO_OUTPUT_REQUIRED_FILENAME = "";
@@ -18,5 +22,5 @@ public class Constants {
     public static final String DEFAULT_DATABASE_NAME = "jdbcBenchmarkDb";
 
 
-
+    public static final int DEFAULT_PAYLOAD = 0;
 }

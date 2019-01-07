@@ -37,7 +37,10 @@ public class JdbcBenchmark {
     // MARK: - Constructor
 
     public JdbcBenchmark(int totalPayload, int amountOfThreads, int amountOfInsertions, DatabaseInfo databaseInfo, String outputFileName) {
-        // NOTE: Random ASCII generator uses UTF-8 encoding, that means we have 1 byte per symbol in a string
+        if (this.isCreatingBenchmarkPointless(totalPayload, amountOfInsertions)) {
+            System.out.println("Nothing to be inserted in the database since both payload and amount of insertions are equal to zero.");
+            System.exit(Constants.EXIT_STATUS_SUCCESS);
+        }
         this.totalPayload = new AtomicInteger(totalPayload);
         this.amountOfThreads = amountOfThreads;
         this.amountOfInsertions = new AtomicInteger(amountOfInsertions);
@@ -62,7 +65,7 @@ public class JdbcBenchmark {
             databaseOperatorDAO = new DatabaseOperatorDAO(this.databaseInfo, this.minimalPayloadPerInsertion);
         } catch (SQLException error) {
             System.err.println("Unable to establish connection with the database at " + this.databaseInfo.getDatabaseJdbcUrl() + ", reason: " + error.getMessage());
-            System.exit(Constants.CONNECTION_ERROR);
+            System.exit(Constants.EXIT_STATUS_CONNECTION_ERROR);
         }
 
 
@@ -84,8 +87,7 @@ public class JdbcBenchmark {
 
     private String getRandomStringForBenchmark(RandomAsciiStringGenerator randomAsciiStringGenerator, ColumnType columnType) {
         String randomString = "";
-        randomAsciiStringGenerator = new RandomAsciiStringGenerator();
-        final int payloadLeft = this.decrementPayload();
+        final int payloadLeft = this.totalPayload.get();
 
         switch (columnType) {
             case KEY:
@@ -117,18 +119,18 @@ public class JdbcBenchmark {
             // NOTE: Creating random string generator once so it won't be created each insertion
             // WARNING: Insertions could be infinite
             RandomAsciiStringGenerator randomAsciiStringGenerator = new RandomAsciiStringGenerator();
+            Map<String, String> insertingValues = new HashMap<String, String>();
+            final String key = this.getRandomStringForBenchmark(randomAsciiStringGenerator, ColumnType.KEY);
+            insertingValues.put(Constants.KEY_COLUMN_NAME, key);
+            final String value = this.getRandomStringForBenchmark(randomAsciiStringGenerator, ColumnType.VALUE);
+            insertingValues.put(Constants.VALUE_COLUMN_NAME, value);
+
+            // NOTE: Inserting key-value per operation
+            final int amountOfInsertingValues = 2;
             while (this.shouldContinueInserting()) {
 
                 // NOTE: Not using JDBC Batch since we're trying to get average insertion time, ...
                 // ... thus we should calculate each insertion operation.
-
-                Map<String, String> insertingValues = new HashMap<String, String>();
-                final String key = this.getRandomStringForBenchmark(randomAsciiStringGenerator, ColumnType.KEY);
-                insertingValues.put(Constants.KEY_COLUMN_NAME, key);
-                final String value = this.getRandomStringForBenchmark(randomAsciiStringGenerator, ColumnType.VALUE);
-                insertingValues.put(Constants.VALUE_COLUMN_NAME, value);
-
-
                 for (Map.Entry<String, String> insertingRow : insertingValues.entrySet()) {
                     // NOTE: Inserting key and value separately. It's 2 different INSERT operations and ...
                     // ... should be logged separately.
@@ -183,10 +185,13 @@ public class JdbcBenchmark {
 
 
     private void updateMetrics(final int insertedPayload, final Long microsecondsSpentOnInsertion) throws IllegalArgumentException {
+        this.decrementPayload(insertedPayload);
+        this.decrementInsertions();
+
         if (this.benchmarkMetricsCalculator == null) {
             throw new IllegalArgumentException("Benchmark metrics calculator hasn't been created, unable to update metrics.");
         }
-        System.out.println("Updating metrics. Bytes inserted: " + insertedPayload + " for " + microsecondsSpentOnInsertion + ". It's insertion number" + this.amountOfInsertions.get());
+        System.out.println("Updating metrics. Bytes inserted: " + insertedPayload + " for " + microsecondsSpentOnInsertion + ". Insertions left " + this.amountOfInsertions.get());
         benchmarkMetricsCalculator.addBytesInserted(insertedPayload);
         benchmarkMetricsCalculator.addMicrosecondsSpentOnInsertion(microsecondsSpentOnInsertion);
         benchmarkMetricsCalculator.incrementSuccessfulInsertions();
@@ -211,20 +216,35 @@ public class JdbcBenchmark {
     }
 
     private Boolean shouldContinueInserting() {
+        return (!this.hasReachedRequiredInsertionAmount() && !this.hasReachedRequiredPayload());
+//        if (this.isInsertionsInfinite()) {
+//            return true;
+//        }
+//        int insertionsLeft = this.amountOfInsertions.get() - amountOfInsertedValues;
+//
+//        final int insertionsLowerBound = 0;
+//        if (insertionsLeft <= insertionsLowerBound) {
+//            this.amountOfInsertions.set(insertionsLowerBound);
+//            return false;
+//        }
+//        this.amountOfInsertions.set(insertionsLeft);
+//        return true;
+    }
+
+    private boolean hasReachedRequiredInsertionAmount() {
         if (this.isInsertionsInfinite()) {
-            return true;
-        }
-        final int insertionsLeft = this.amountOfInsertions.get();
-        if (insertionsLeft <= 0) {
             return false;
         }
-        this.decrementInsertions();
-        return true;
+       return (this.amountOfInsertions.get() < 0);
+    }
+
+    private boolean hasReachedRequiredPayload() {
+        return (this.totalPayload.get() <= 0);
     }
 
     private synchronized int decrementInsertions() throws IllegalArgumentException {
         if (this.isInsertionsInfinite()) {
-            throw new IllegalArgumentException("Amount of insertions is infinite and couldn't be decremented.");
+            return Constants.INFINITE_AMOUNT_OF_INSERTIONS;
         }
         // NOTE: It works correctly if .decrementAndGet() and setting a value are different operations
         this.amountOfInsertions.decrementAndGet();
@@ -238,8 +258,9 @@ public class JdbcBenchmark {
     }
 
     // NOTE: Returning insertion payload, update unsent payload value
-    private synchronized int decrementPayload() {
-        int payloadLeft = this.totalPayload.get() - this.minimalPayloadPerInsertion;
+    private synchronized int decrementPayload(final int decrementValue) {
+        // NOTE: Using UTF-8 ASCII 1-byte characters.
+        int payloadLeft = this.totalPayload.get() - decrementValue;
         final int minimalAvailablePayloadValue = 0;
         if (payloadLeft < minimalAvailablePayloadValue) {
             // NOTE: Returning last positive value of payload
@@ -266,7 +287,13 @@ public class JdbcBenchmark {
             // NOTE: If amount of insertions is the way bigger than payload, inserting 1 byte per operation
             result = oneBytePerInsertion;
         }
+        System.out.println("MINIMAL AMOUNT OF PAYLOAD IN OPERATION:" + result);
         return result;
     }
+
+    private boolean isCreatingBenchmarkPointless(int totalPayload, int amountOfInsertions) {
+        return ((totalPayload == 0) && (amountOfInsertions == 0));
+    }
+
 
 }

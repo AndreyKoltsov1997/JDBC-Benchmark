@@ -24,38 +24,38 @@ public class CommandLineArgsParser {
 
 
     public String getHost() {
-        return this.optionalCommandLineArguments.getOptionByTag("host");
+        return this.optionalCommandLineArguments.getOptionByTag(OptionalCommandLineArguments.DB_HOST_TAG);
     }
 
     public String getPort() {
-        return this.optionalCommandLineArguments.getOptionByTag("port");
+        return this.optionalCommandLineArguments.getOptionByTag(OptionalCommandLineArguments.DB_PORT_TAG);
     }
 
     public String getTableName() {
-        return this.optionalCommandLineArguments.getOptionByTag("table");
+        return this.optionalCommandLineArguments.getOptionByTag(OptionalCommandLineArguments.DB_TABLE_TAG);
     }
 
     public String getDatabaseName() {
-        return this.optionalCommandLineArguments.getOptionByTag("name");
+        return this.optionalCommandLineArguments.getOptionByTag(OptionalCommandLineArguments.DB_NAME_TAG);
 
     }
 
     public int getAmountOfThreads() {
-        final String amountOfThreads = this.optionalCommandLineArguments.getOptionByTag("threads");
+        final String amountOfThreads = this.optionalCommandLineArguments.getOptionByTag(OptionalCommandLineArguments.AMOUNT_OF_THREADS_TAG);
         return Integer.valueOf(amountOfThreads);
     }
 
     public int getPayload() {
-        final String payload = this.optionalCommandLineArguments.getOptionByTag("payload");
+        final String payload = this.optionalCommandLineArguments.getOptionByTag(OptionalCommandLineArguments.PAYLOAD_TAG);
         return Integer.valueOf(payload);
     }
 
     public String getFileNameForLogs() {
-        return this.optionalCommandLineArguments.getOptionByTag("file");
+        return this.optionalCommandLineArguments.getOptionByTag(OptionalCommandLineArguments.OUTPUT_FILE_TAG);
     }
 
     public int getAmountOfInsertions() {
-        final String insertionAmount = this.optionalCommandLineArguments.getOptionByTag("insertions");
+        final String insertionAmount = this.optionalCommandLineArguments.getOptionByTag(OptionalCommandLineArguments.INSERT_AMOUNT_TAG);
         return Integer.valueOf(insertionAmount);
     }
 

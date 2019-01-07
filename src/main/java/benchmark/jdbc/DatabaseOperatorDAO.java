@@ -51,7 +51,7 @@ public class DatabaseOperatorDAO {
 
         } catch (JdbcCrudFailureException error) {
             System.err.println("Unable to create required DB element, reason: " + error.getMessage());
-            System.exit(Constants.CONNECTION_ERROR);
+            System.exit(Constants.EXIT_STATUS_CONNECTION_ERROR);
         }
     }
 

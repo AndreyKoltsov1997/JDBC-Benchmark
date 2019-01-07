@@ -19,23 +19,30 @@ public class Benchmark {
             commandLineArgsParser.parseArguments(args);
         } catch (IllegalArgumentException error) {
             System.err.println(error.getMessage());
-            System.exit(Constants.STATUS_INVALID_ARGUMENT);
+            System.exit(Constants.EXIT_STATUS_INVALID_ARGUMENT);
         }
 
         // NOTE: Fetching Database location from CL arguments
-        final String host = commandLineArgsParser.getHost();
-        final String port = commandLineArgsParser.getPort();
-        DatabaseLocation databaseLocation = new DatabaseLocation(host, port);
+        DatabaseLocation databaseLocation = null;
+        try {
+            final String host = commandLineArgsParser.getHost();
+            final String port = commandLineArgsParser.getPort();
+            databaseLocation = new DatabaseLocation(host, port);
+        } catch (NumberFormatException error) {
+            System.err.println("Unable to parse entered database location. Reason: " + error.getMessage());
+            System.exit(Constants.EXIT_STATUS_INVALID_ARGUMENT);
+        }
+
 
         // NOTE: Fetching Database credentials from CL arguments
-        final String username = commandLineArgsParser.getUserName();
-        final String password = commandLineArgsParser.getUserPassword();
         DatabaseCredentials databaseCredentials = null;
         try {
+            final String username = commandLineArgsParser.getUserName();
+            final String password = commandLineArgsParser.getUserPassword();
             databaseCredentials = new DatabaseCredentials(username, password);
         } catch (IllegalArgumentException error) {
-            System.err.println("An error has occurred while parsing user credentials: " + error.getMessage());
-            System.exit(Constants.STATUS_INVALID_ARGUMENT);
+            System.err.println("Unable to parse entered database credentials: " + error.getMessage());
+            System.exit(Constants.EXIT_STATUS_INVALID_ARGUMENT);
         }
 
         // NOTE: Fetching database info from CL arguments
@@ -47,11 +54,18 @@ public class Benchmark {
         DatabaseInfo databaseInfo = new DatabaseInfo(databaseLocation, databaseCredentials, databaseName, databaseTargetTable, databaseType);
 
         // NOTE: Fetching benchmark parameters from CL arguments
-        final int amountOfThreads = commandLineArgsParser.getAmountOfThreads();
-        final int payload = commandLineArgsParser.getPayload();
-        final int amountOfInsertions = commandLineArgsParser.getAmountOfInsertions();
-        final String fileName = commandLineArgsParser.getFileNameForLogs();
-        JdbcBenchmark jdbcBenchmark = new JdbcBenchmark(payload, amountOfThreads, amountOfInsertions, databaseInfo, fileName);
+        JdbcBenchmark jdbcBenchmark = null;
+
+        try {
+            final int amountOfThreads = commandLineArgsParser.getAmountOfThreads();
+            final int payload = commandLineArgsParser.getPayload();
+            final int amountOfInsertions = commandLineArgsParser.getAmountOfInsertions();
+            final String fileName = commandLineArgsParser.getFileNameForLogs();
+            jdbcBenchmark = new JdbcBenchmark(payload, amountOfThreads, amountOfInsertions, databaseInfo, fileName);
+        } catch (NumberFormatException error) {
+            System.err.println("Unable to parse entered benchmark configurations. Reason: " + error.getMessage());
+            System.exit(Constants.EXIT_STATUS_INVALID_ARGUMENT);
+        }
 
         jdbcBenchmark.performBenchmark();
     }

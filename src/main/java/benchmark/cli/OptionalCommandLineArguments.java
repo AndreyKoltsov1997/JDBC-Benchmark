@@ -19,16 +19,16 @@ class OptionalCommandLineArguments {
 
     // NOTE: Optional CLI arguments tags. WARNING: MAKE SURE to modify initializing of avaliable options container ...
     // ... in case of adding a new one.
-    private static final String DB_HOST_TAG = "host";
-    private final String DB_PORT_TAG = "port";
-    private final String DB_NAME_TAG = "name";
-    private final String DB_TABLE_TAG = "table";
+    public static final String DB_HOST_TAG = "host";
+    public static final String DB_PORT_TAG = "port";
+    public static final String DB_NAME_TAG = "name";
+    public static final String DB_TABLE_TAG = "table";
 
-    private final String PAYLOAD_TAG = "payload";
-    private final String INSERT_AMOUNT_TAG = "insertions";
+    public static final String PAYLOAD_TAG = "payload";
+    public static final String INSERT_AMOUNT_TAG = "insertions";
 
-    private final String OUTPUT_FILE_TAG = "file";
-    private final String AMOUNT_OF_THREADS_TAG = "threads";
+    public static final String OUTPUT_FILE_TAG = "file";
+    public static final String AMOUNT_OF_THREADS_TAG = "threads";
 
 
     private Map<String, String> options;
@@ -72,7 +72,7 @@ class OptionalCommandLineArguments {
                 this.options.put(argumentName, argumentValue);
             }
         }
-        System.out.println("Option arguments: " + this.options.toString());
+        System.out.println("Optional arguments: " + this.options.toString());
     }
 
     // NOTE: Optional arguments syntax: "--argumentName=arugmentValue", thus it...
@@ -120,7 +120,7 @@ class OptionalCommandLineArguments {
 
 
     // NOTE: Fetching CLI argument value by its name
-    public String getOptionByTag(final String tag) throws IllegalArgumentException {
+    public String getOptionByTag(final String tag) throws IllegalArgumentException, NumberFormatException {
         if (!isArgumentExist(tag)) {
             throw new IllegalArgumentException("Option \"" + tag + "\" doesn't exist.");
         }
@@ -143,6 +143,7 @@ class OptionalCommandLineArguments {
                 }
                 return this.options.get(processingTag);
 
+                // NOTE: Processing optional DB port
             case DB_PORT_TAG:
                 processingTag = DB_PORT_TAG;
                 if (!isArgumentSet(processingTag)) {
@@ -157,34 +158,69 @@ class OptionalCommandLineArguments {
                     return this.generateTableName();
                 }
                 return this.options.get(processingTag);
+
+                // NOTE: Processing entered payload
             case PAYLOAD_TAG:
                 processingTag = PAYLOAD_TAG;
                 if (!isArgumentSet(processingTag)) {
-                    final String defaultPayload = "0";
+                    final String defaultPayload = String.valueOf(Constants.DEFAULT_PAYLOAD);
                     return defaultPayload;
                 }
-                return this.options.get(processingTag);
+                final String enteredPayload = this.options.get(processingTag);
+                if (!isPayloadValid(Integer.valueOf(enteredPayload))) {
+                    throw new IllegalArgumentException("Payload should be a non-negative integer number.");
+                }
+                return enteredPayload;
+
+                // NOTE: Processing entered amount of insertions
             case INSERT_AMOUNT_TAG:
                 processingTag = INSERT_AMOUNT_TAG;
                 if (!isArgumentSet(INSERT_AMOUNT_TAG)) {
                     return String.valueOf(Constants.INFINITE_AMOUNT_OF_INSERTIONS);
                 }
-                return this.options.get(processingTag);
+                final String enteredAmountOfInserts = this.options.get(processingTag);
+                if (!this.isEnteredAmountOfInsertsValid(Integer.valueOf(enteredAmountOfInserts))) {
+                    throw new IllegalArgumentException("Amount of inserts should be a non-negative integer number.");
+                }
+                return enteredAmountOfInserts;
+
+                // NOTE: Processing entered file name
             case OUTPUT_FILE_TAG:
                 processingTag = OUTPUT_FILE_TAG;
                 if (!isArgumentSet(processingTag)) {
                     return this.ARGUMENT_NOT_PROVIDED_VALUE;
                 }
                 return this.options.get(processingTag);
+
+                // NOTE: Processing entered amount of threads
             case AMOUNT_OF_THREADS_TAG:
                 processingTag = AMOUNT_OF_THREADS_TAG;
                 if (!isArgumentSet(processingTag)) {
                     return String.valueOf(Constants.DEFAULT_AMOUNT_OF_THREADS);
                 }
-                return this.options.get(processingTag);
+                final String enteredAmountOfThreads = this.options.get(processingTag);
+                if (!isEnteredAmountOfThreadsValid(Integer.valueOf(enteredAmountOfThreads))) {
+                    throw new IllegalArgumentException("Amount of threads should be grater or equal 1.");
+                }
+                return enteredAmountOfThreads;
             default:
                 throw new IllegalArgumentException("Option \"" + tag + "\" doesn't exist.");
         }
+    }
+
+    private boolean isEnteredAmountOfThreadsValid(final int amountOfThreads) {
+        final int minimalAmountOfThreads = 1;
+        return (amountOfThreads >= minimalAmountOfThreads);
+    }
+
+    private boolean isEnteredAmountOfInsertsValid(final int amountOfInserts) {
+        final int minimalAmountOfInsertions = 0;
+        return (amountOfInserts >= minimalAmountOfInsertions);
+    }
+
+    private boolean isPayloadValid(final int payload) {
+        final int minimalPayload = 0;
+        return (payload >= minimalPayload);
     }
 
     private boolean isArgumentSet(String argumentTag) {

@@ -27,7 +27,8 @@ public class BenchmarkMetricsCalculator {
     }
 
     public synchronized void incrementSuccessfulInsertions() {
-        this.insertedOperations.incrementAndGet();
+        final int amountOfSuccessfulInsertions =  this.insertedOperations.incrementAndGet();
+        System.out.println("Adding successful insertion: " + amountOfSuccessfulInsertions);
     }
 
     public synchronized void addMicrosecondsSpentOnInsertion(final Long microseconds) {
@@ -66,6 +67,8 @@ public class BenchmarkMetricsCalculator {
         }
         final double secondsSpentOnInsertion = convertMacrosecondsToSeconds(this.microsecondsSpendOnInsertions.get());
         System.out.println("[Bandwidth] secondsSpentOnInsertion: " + secondsSpentOnInsertion);
+        System.out.println("[Bandwidth] Paload inserted: " + bytesInserted.get());
+
         final double result = bytesInserted.get() / secondsSpentOnInsertion;
         return result;
     }
