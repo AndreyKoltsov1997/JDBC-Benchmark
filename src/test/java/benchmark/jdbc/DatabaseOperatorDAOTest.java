@@ -21,21 +21,15 @@ public class DatabaseOperatorDAOTest {
     }
 
     // WARNING: Test is usable with a valid DB connection. You'd have to create a valid database DAO.
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = SQLException.class)
     public void testInsertOnUnreachableConnection() throws SQLException, IllegalArgumentException {
-        DatabaseOperatorDAO databaseOperatorDAO = null;
-        try {
-            // WARNING: Creating DAO with unreachable connection will always success the test.
-            databaseOperatorDAO = new DatabaseOperatorDAO(getTestDatabaseInfo());
+        DatabaseOperatorDAO databaseOperatorDAO = new DatabaseOperatorDAO(getTestDatabaseInfo());
 
-        } catch (SQLException error) {
-            // NOTE: If connection hasn't been established, the test still succeeds.
-            assertTrue(true);
-        }
         Map<String, String> testParameters = new HashMap<>();
         final String testKey = "key";
         final String testValue = "value";
         testParameters.put(testKey, testValue);
+
         Map.Entry<String, String> parametersEntry = testParameters.entrySet().iterator().next();
         databaseOperatorDAO.insertSpecifiedValue(parametersEntry);
 

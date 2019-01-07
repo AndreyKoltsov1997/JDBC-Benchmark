@@ -87,6 +87,7 @@ public class DatabaseOperatorDAO {
             final String misleadingMsg = "Connection to required database hasn't been established.";
             throw new IllegalArgumentException(misleadingMsg);
         }
+
         final String columnName = value.getKey();
         final String columnValue = value.getValue();
         this.databaseElementInserter.insertValueIntoColumn(this.databaseInfo.getTargetTable(), columnName, columnValue);
