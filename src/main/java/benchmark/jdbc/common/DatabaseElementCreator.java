@@ -32,15 +32,17 @@ public class DatabaseElementCreator {
 
     // NOTE: Creating a column into current database.
     public void createColumnIfNotExists(final String table, final String column, final String type) throws JdbcCrudFailureException, SQLException {
+
         if (this.databaseElementValidator.isColumnExistInTable(table, column)) {
             // NOTE: Do nothing if column is already exist.
             return;
         }
+
         if (!this.databaseElementValidator.isDatabaseElementNameValid(column)) {
             throw new JdbcCrudFailureException(DatabaseElementCreator.TAG + "\"" + column + "\" is not a valid column name.", CrudOperationType.CREATE);
         }
 
-        final String addColumnSqlQuery = String.format(DatabaseElementCreator.TAG + "ALTER TABLE \"%s\" ADD %s %s;", table, column, type);
+        final String addColumnSqlQuery = String.format("ALTER TABLE \"%s\" ADD \"%s\" %s;", table, column, type);
         try (PreparedStatement preparedStatement = this.connection.prepareStatement(addColumnSqlQuery)) {
             preparedStatement.executeUpdate();
         }

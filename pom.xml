@@ -68,7 +68,7 @@
                 </configuration>
             </plugin>
 
-            <!--NOTE: Includng dependencines into the JAR-->
+            <!--NOTE: Including dependencies into the JAR-->
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <executions>
@@ -114,7 +114,7 @@
                 <configuration>
                     <imageName>${app.name}</imageName>
                     <baseImage>java</baseImage>
-                    <entryPoint>["java", "-jar", "/${app.name.with.dependencies}.jar", "postgres", "password", "--host=10.5.0.6", "--port=5432", "--insertions=5"]</entryPoint>
+                    <entryPoint>["java", "-jar", "/${app.name.with.dependencies}.jar", "postgres", "password", "--host=10.5.0.6", "--port=5432", "--insertions=5", "--threads=1", "--payload=100000"]</entryPoint>
                     <!-- copy the service's jar file from target into the root directory of the image -->
                     <resources>
                         <resource>

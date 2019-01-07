@@ -22,7 +22,7 @@ public class JdbcBenchmark {
     // MARK: - Constants
     private static final String NO_OUTPUT_FILE_REQUIRED_FILENAME = Constants.NO_OUTPUT_REQUIRED_FILENAME;
     private static final int INFINITE_AMOUNT_OF_INSERTIONS = Constants.INFINITE_AMOUNT_OF_INSERTIONS;
-    private static final int KEY_LENGTH = 10;
+    public static final int KEY_LENGTH = 10;
 
 
     private DatabaseInfo databaseInfo;
@@ -59,7 +59,7 @@ public class JdbcBenchmark {
         DatabaseOperatorDAO databaseOperatorDAO = null;
         try {
             // NOTE: Establishing connection inside scope
-            databaseOperatorDAO = new DatabaseOperatorDAO(this.databaseInfo);
+            databaseOperatorDAO = new DatabaseOperatorDAO(this.databaseInfo, this.minimalPayloadPerInsertion);
         } catch (SQLException error) {
             System.err.println("Unable to establish connection with the database at " + this.databaseInfo.getDatabaseJdbcUrl() + ", reason: " + error.getMessage());
             System.exit(Constants.CONNECTION_ERROR);

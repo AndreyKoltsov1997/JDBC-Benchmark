@@ -1,5 +1,6 @@
 package benchmark.jdbc;
 
+import benchmark.JdbcBenchmark;
 import benchmark.common.Constants;
 import benchmark.database.DatabaseInfo;
 import benchmark.jdbc.common.DatabaseElementCreator;
@@ -37,7 +38,7 @@ public class DatabaseOperatorDAO {
     private boolean hasCreatedCustomDatabase = false;
 
     // MARK: - Constructor
-    public DatabaseOperatorDAO(DatabaseInfo databaseInfo) throws SQLException {
+    public DatabaseOperatorDAO(DatabaseInfo databaseInfo, final int minimalPayload) throws SQLException {
         this.databaseInfo = databaseInfo;
 
         this.establishConnection();
@@ -45,8 +46,10 @@ public class DatabaseOperatorDAO {
         // NOTE: Creating DB element validator if connection has been established.
         this.createDatabaseSupportingObjects();
 
+
+
         try {
-            this.createMissingDatabaseElements();
+            this.createMissingDatabaseElements(minimalPayload);
 
         } catch (JdbcCrudFailureException error) {
             System.err.println("Unable to create required DB element, reason: " + error.getMessage());
@@ -72,6 +75,7 @@ public class DatabaseOperatorDAO {
 
             // NOTE: Deletion of created columns
             for (String createdColumn : DatabaseOperatorDAO.processingTableColumnNames) {
+                System.out.println("Dropping column: " + createdColumn);
                 this.databaseElementEraser.dropColumnWithinTable(this.databaseInfo.getTargetTable(), createdColumn);
             }
             this.connection.close();
@@ -97,7 +101,7 @@ public class DatabaseOperatorDAO {
     // MARK: - Private methods
 
     // NOTE: Creating database elements (catalog, table, column) if necessary
-    private void createMissingDatabaseElements() throws JdbcCrudFailureException {
+    private void createMissingDatabaseElements(final int minimalPayload) throws JdbcCrudFailureException {
         final String targetDatabase = this.databaseInfo.getTargetDatabaseName();
         try {
             this.databaseElementCreator.createDatabase(targetDatabase);
@@ -120,19 +124,29 @@ public class DatabaseOperatorDAO {
         }
 
 
-        final String varcharType = "VARCHAR(10)";
         String processingColumnName = "";
         try {
-            for (String columnName : DatabaseOperatorDAO.processingTableColumnNames) {
-                processingColumnName = columnName;
-                this.databaseElementCreator.createColumnIfNotExists(this.databaseInfo.getTargetTable(), columnName, varcharType);
-            }
+            // NOTE: Creating "key" column. Length is static.
+            final String keyColumnTag = Constants.KEY_COLUMN_NAME;
+            this.databaseElementCreator.createColumnIfNotExists(this.databaseInfo.getTargetTable(), keyColumnTag, getDatabaseChatTypeTag(JdbcBenchmark.KEY_LENGTH));
+
+            // NOTE: Creating "value" column. Length is based on payload.
+            final String valueColumnTag = Constants.VALUE_COLUMN_NAME;
+            this.databaseElementCreator.createColumnIfNotExists(this.databaseInfo.getTargetTable(), valueColumnTag, getDatabaseChatTypeTag(minimalPayload));
+
         } catch (SQLException error) {
-            System.out.println("Column " + processingColumnName + " exists. Using it for benchmark.");
+            System.out.println("Column " + processingColumnName + " exists. Using it for benchmark. " + error.getMessage());
         } catch (JdbcCrudFailureException error) {
             System.err.println("Unable to create column \"" + processingColumnName + "\". Reason: " + error.getMessage());
         }
     }
+
+
+    // NOTE: Returns type tag for specified length (amount of characters)
+    private String getDatabaseChatTypeTag(final int length) {
+        return String.format("VARCHAR(%s)", length);
+    }
+
 
     // NOTE: Creating objects for CRUD operations if connection has been established.
     private void createDatabaseSupportingObjects() {

@@ -17,13 +17,15 @@ public class DatabaseOperatorDAOTest {
 
     @Test(expected = SQLException.class)
     public void testUnreachableConnection() throws SQLException {
-        new DatabaseOperatorDAO(getTestDatabaseInfo());
+        final int testPayload = 1;
+        new DatabaseOperatorDAO(getTestDatabaseInfo(), testPayload);
     }
 
     // WARNING: Test is usable with a valid DB connection. You'd have to create a valid database DAO.
     @Test(expected = SQLException.class)
     public void testInsertOnUnreachableConnection() throws SQLException, IllegalArgumentException {
-        DatabaseOperatorDAO databaseOperatorDAO = new DatabaseOperatorDAO(getTestDatabaseInfo());
+        final int testPayload = 0;
+        DatabaseOperatorDAO databaseOperatorDAO = new DatabaseOperatorDAO(getTestDatabaseInfo(), testPayload);
 
         Map<String, String> testParameters = new HashMap<>();
         final String testKey = "key";
