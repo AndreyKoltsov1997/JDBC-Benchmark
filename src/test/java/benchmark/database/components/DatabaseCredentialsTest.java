@@ -22,6 +22,7 @@ public class DatabaseCredentialsTest {
             // NOTE: If an exception is thrown, test is correct.
             isUsernameParsingCorrect = true;
         }
+        assertTrue(isUsernameParsingCorrect);
 
         boolean isPasswordParsingCorrect = false;
         try {
@@ -30,6 +31,7 @@ public class DatabaseCredentialsTest {
             // NOTE: If an exception is thrown, test is correct.
             isPasswordParsingCorrect = true;
         }
+        assertTrue(isPasswordParsingCorrect);
 
         boolean isValidParametersParsingCorrect = false;
         try {
@@ -39,10 +41,9 @@ public class DatabaseCredentialsTest {
             // NOTE: If an exception is thrown, test is NOT correct.
             isValidParametersParsingCorrect = false;
         }
+        assertTrue(isValidParametersParsingCorrect);
 
-        boolean isTestSuccessed = (isUsernameParsingCorrect && isPasswordParsingCorrect && isValidParametersParsingCorrect);
 
-        assertTrue(isTestSuccessed);
     }
 
 }

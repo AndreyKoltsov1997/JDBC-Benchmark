@@ -5,7 +5,7 @@ import benchmark.common.RandomAsciiStringGenerator;
 import benchmark.database.DatabaseInfo;
 import benchmark.files.InsertionFileLogger;
 import benchmark.database.ColumnType;
-import benchmark.jdbc.DatabaseOperator;
+import benchmark.jdbc.DatabaseOperatorDAO;
 import benchmark.metrics.BenchmarkMetricsCalculator;
 
 import java.io.IOException;
@@ -56,9 +56,10 @@ public class JdbcBenchmark {
 
     public void performBenchmark() {
 
-        DatabaseOperator databaseOperator = new DatabaseOperator(this.databaseInfo);
+        DatabaseOperatorDAO databaseOperatorDAO = null;
         try {
-            databaseOperator.establishConnection();
+            // NOTE: Establishing connection inside scope
+            databaseOperatorDAO = new DatabaseOperatorDAO(this.databaseInfo);
         } catch (SQLException error) {
             System.err.println("Unable to establish connection with the database at " + this.databaseInfo.getDatabaseJdbcUrl() + ", reason: " + error.getMessage());
             System.exit(Constants.CONNECTION_ERROR);
@@ -66,14 +67,14 @@ public class JdbcBenchmark {
 
 
         try {
-            this.performInsertionTest(databaseOperator);
+            this.performInsertionTest(databaseOperatorDAO);
         } catch (IOException error) {
             final String misleadingMsg = "An error has occurred while working with file: " + error.getMessage();
             System.err.println(misleadingMsg);
         }
 
         try {
-            databaseOperator.shutDownConnection();
+            databaseOperatorDAO.shutDownConnection();
         } catch (SQLException error) {
             System.err.println("Unexpected error has occurred while shutting down the connection: " + error.getMessage());
         }
@@ -107,8 +108,8 @@ public class JdbcBenchmark {
 
 
     // NOTE: Testing INSERT operations via JDBC connector into the specified database.
-    // ... DatabaseOperator is an object which perform insert operations
-    private void performInsertionTest(DatabaseOperator databaseOperator) throws IOException {
+    // ... DatabaseOperatorDAO is an object which perform insert operations
+    private void performInsertionTest(DatabaseOperatorDAO databaseOperatorDAO) throws IOException {
 
         // TODO: Do something with insertion file logger - it shouldn't be created if not needed
         InsertionFileLogger insertionFileLogger = new InsertionFileLogger(this.outputFileName);
@@ -134,7 +135,7 @@ public class JdbcBenchmark {
                     try {
                         final String insertingString = insertingRow.getValue();
                         Long insertionStartTime = System.nanoTime();
-                        databaseOperator.insertSpecifiedValue(insertingRow);
+                        databaseOperatorDAO.insertSpecifiedValue(insertingRow);
                         Long currentInsertionTime = System.nanoTime() - insertionStartTime;
                         System.out.println("Total insertion time time: " + this.convertNanoSecondToMicroseconds(currentInsertionTime) + " microseconds.");
                         if (insertionFileLogger.isActive()) {

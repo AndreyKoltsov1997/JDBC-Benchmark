@@ -1,7 +1,6 @@
 package benchmark.jdbc;
 
 import benchmark.common.Constants;
-import benchmark.database.BenchmarkSupportingDatabases;
 import benchmark.database.DatabaseInfo;
 import benchmark.jdbc.common.DatabaseElementCreator;
 import benchmark.jdbc.common.DatabaseElementEraser;
@@ -16,7 +15,7 @@ import java.util.Map;
 
 
 // NOTE: A class that provides connection to specified DB via JDBC and performing operations with it.
-public class DatabaseOperator {
+public class DatabaseOperatorDAO {
 
     // MARK: - Constants
     private final static String POSTGRES_DRIVER_CLASS_NAME = "org.postgresql.Driver";
@@ -38,22 +37,10 @@ public class DatabaseOperator {
     private boolean hasCreatedCustomDatabase = false;
 
     // MARK: - Constructor
-    public DatabaseOperator(DatabaseInfo databaseInfo) {
+    public DatabaseOperatorDAO(DatabaseInfo databaseInfo) throws SQLException {
         this.databaseInfo = databaseInfo;
-    }
 
-    public void establishConnection() throws SQLException {
-
-        // NOTE: Connection to PostgreSQL Database
-        try {
-            Class.forName(DatabaseOperator.POSTGRES_DRIVER_CLASS_NAME);
-        } catch (ClassNotFoundException error) {
-            System.err.println("PostgreSQL Driver hasn't been found");
-        }
-        final String databaseURL = databaseInfo.getDatabaseJdbcUrl();
-        final String databaseUsername = databaseInfo.getUsername();
-        final String databaseUserPassword = databaseInfo.getPassword();
-        this.connection = DriverManager.getConnection(databaseURL, databaseUsername, databaseUserPassword);
+        this.establishConnection();
 
         // NOTE: Creating DB element validator if connection has been established.
         this.createDatabaseSupportingObjects();
@@ -67,16 +54,46 @@ public class DatabaseOperator {
         }
     }
 
-    // NOTE: Creating objects for CRUD operations if connection has been established.
-    private void createDatabaseSupportingObjects() {
+
+    // MARK: - Public methods
+
+    // NOTE: Closing the established connection and deleting temporary created databases and tables if needed.
+    public void shutDownConnection() throws SQLException {
         if (this.connection == null) {
-            throw new IllegalArgumentException("Connection hasn't been established. Unable to create supporting objects.");
+            return;
         }
-        this.databaseElementValidator = new DatabaseElementValidator(this.connection);
-        this.databaseElementCreator = new DatabaseElementCreator(this.connection, databaseElementValidator);
-        this.databaseElementEraser = new DatabaseElementEraser(this.connection, databaseElementValidator);
-        this.databaseElementInserter = new DatabaseElementInserter(this.connection, databaseElementValidator);
+        try {
+            // NOTE: Deletion of created database
+            if (this.hasCreatedCustomDatabase) {
+                this.databaseElementEraser.dropDatabase(this.databaseInfo.getTargetDatabaseName());
+                return;
+            }
+            // TODO: Add deletion of created tables
+
+            // NOTE: Deletion of created columns
+            for (String createdColumn : DatabaseOperatorDAO.processingTableColumnNames) {
+                this.databaseElementEraser.dropColumnWithinTable(this.databaseInfo.getTargetTable(), createdColumn);
+            }
+            this.connection.close();
+
+        } catch (JdbcCrudFailureException deleteError) {
+            System.err.println("An error has occurred while deleting: " + deleteError.getMessage());
+        }
     }
+
+    // NOTE: Parameter "value" - a pair which contains target column name and value of it's row.
+    public void insertSpecifiedValue(Map.Entry<String, String> value) throws SQLException, IllegalArgumentException {
+        if (this.connection == null) {
+            final String misleadingMsg = "Connection to required database hasn't been established.";
+            throw new IllegalArgumentException(misleadingMsg);
+        }
+        final String columnName = value.getKey();
+        final String columnValue = value.getValue();
+        this.databaseElementInserter.insertValueIntoColumn(this.databaseInfo.getTargetTable(), columnName, columnValue);
+    }
+
+
+    // MARK: - Private methods
 
     // NOTE: Creating database elements (catalog, table, column) if necessary
     private void createMissingDatabaseElements() throws JdbcCrudFailureException {
@@ -105,7 +122,7 @@ public class DatabaseOperator {
         final String varcharType = "VARCHAR(10)";
         String processingColumnName = "";
         try {
-            for (String columnName : DatabaseOperator.processingTableColumnNames) {
+            for (String columnName : DatabaseOperatorDAO.processingTableColumnNames) {
                 processingColumnName = columnName;
                 this.databaseElementCreator.createColumnIfNotExists(this.databaseInfo.getTargetTable(), columnName, varcharType);
             }
@@ -116,41 +133,30 @@ public class DatabaseOperator {
         }
     }
 
-
-    // NOTE: Closing the established connection and deleting temporary created databases and tables if needed.
-    public void shutDownConnection() throws SQLException {
+    // NOTE: Creating objects for CRUD operations if connection has been established.
+    private void createDatabaseSupportingObjects() {
         if (this.connection == null) {
-            return;
+            throw new IllegalArgumentException("Connection hasn't been established. Unable to create supporting objects.");
         }
+        this.databaseElementValidator = new DatabaseElementValidator(this.connection);
+        this.databaseElementCreator = new DatabaseElementCreator(this.connection, databaseElementValidator);
+        this.databaseElementEraser = new DatabaseElementEraser(this.connection, databaseElementValidator);
+        this.databaseElementInserter = new DatabaseElementInserter(this.connection, databaseElementValidator);
+    }
+
+    private void establishConnection() throws SQLException, IllegalArgumentException {
+
+        // NOTE: Connection to PostgreSQL Database
         try {
-            // NOTE: Deletion of created database
-            if (this.hasCreatedCustomDatabase) {
-                this.databaseElementEraser.dropDatabase(this.databaseInfo.getTargetDatabaseName());
-                return;
-            }
-            // TODO: Add deletion of created tables
-
-            // NOTE: Deletion of created columns
-            for (String createdColumn : DatabaseOperator.processingTableColumnNames) {
-                this.databaseElementEraser.dropColumnWithinTable(this.databaseInfo.getTargetTable(), createdColumn);
-            }
-            this.connection.close();
-
-        } catch (JdbcCrudFailureException deleteError) {
-            System.err.println("An error has occurred while deleting: " + deleteError.getMessage());
+            Class.forName(DatabaseOperatorDAO.POSTGRES_DRIVER_CLASS_NAME);
+        } catch (ClassNotFoundException error) {
+            System.err.println("PostgreSQL Driver hasn't been found");
         }
+        final String databaseURL = databaseInfo.getDatabaseJdbcUrl();
+        final String databaseUsername = databaseInfo.getUsername();
+        final String databaseUserPassword = databaseInfo.getPassword();
+        this.connection = DriverManager.getConnection(databaseURL, databaseUsername, databaseUserPassword);
     }
 
-
-    // NOTE: Parameter "value" - a pair which contains target column name and value of it's row.
-    public void insertSpecifiedValue(Map.Entry<String, String> value) throws SQLException, IllegalArgumentException {
-        if (this.connection == null) {
-            final String misleadingMsg = "Connection to required database hasn't been established.";
-            throw new IllegalArgumentException(misleadingMsg);
-        }
-        final String columnName = value.getKey();
-        final String columnValue = value.getValue();
-        this.databaseElementInserter.insertValueIntoColumn(this.databaseInfo.getTargetTable(), columnName, columnValue);
-    }
 
 }
