@@ -164,7 +164,7 @@ public class JdbcBenchmark {
                     try {
                         final String insertingString = insertingRow.getValue();
                         Long insertionStartTime = System.nanoTime();
-                        databaseOperator.insertKeyValueTest(insertingRow);
+                        databaseOperator.insertSpecifiedValue(insertingRow);
                         Long currentInsertionTime = System.nanoTime() - insertionStartTime;
                         System.out.println("Total insertion time time: " + this.convertNanoSecondToMicroseconds(currentInsertionTime) + " microseconds.");
                         if ((insertionFileLogger).isActive()) {
