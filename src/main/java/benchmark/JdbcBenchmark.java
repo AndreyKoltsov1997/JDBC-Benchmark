@@ -137,7 +137,8 @@ public class JdbcBenchmark {
                         Long insertionStartTime = System.nanoTime();
                         databaseOperatorDAO.insertSpecifiedValue(insertingRow);
                         Long currentInsertionTime = System.nanoTime() - insertionStartTime;
-                        System.out.println("Total insertion time time: " + this.convertNanoSecondToMicroseconds(currentInsertionTime) + " microseconds.");
+                        currentInsertionTime = TimeUnit.NANOSECONDS.toMicros(currentInsertionTime);
+                        System.out.println("String inserted for: " + currentInsertionTime + " microseconds.");
                         if (insertionFileLogger.isActive()) {
                             insertionFileLogger.logOperation(this.databaseInfo.getTargetDatabaseName(), this.databaseInfo.getTargetTable(), insertingString, String.valueOf(currentInsertionTime));
                         }
@@ -181,12 +182,13 @@ public class JdbcBenchmark {
     // MARK: - Private methods
 
 
-    private void updateMetrics(final int insertedPayload, final Long macrosecondsSpentOnInsertion) throws IllegalArgumentException {
+    private void updateMetrics(final int insertedPayload, final Long microsecondsSpentOnInsertion) throws IllegalArgumentException {
         if (this.benchmarkMetricsCalculator == null) {
             throw new IllegalArgumentException("Benchmark metrics calculator hasn't been created, unable to update metrics.");
         }
+        System.out.println("Updating metrics. Bytes inserted: " + insertedPayload + " for " + microsecondsSpentOnInsertion + ". It's insertion number" + this.amountOfInsertions.get());
         benchmarkMetricsCalculator.addBytesInserted(insertedPayload);
-        benchmarkMetricsCalculator.addMacrosecondsSpentOnInsertion(macrosecondsSpentOnInsertion);
+        benchmarkMetricsCalculator.addMicrosecondsSpentOnInsertion(microsecondsSpentOnInsertion);
         benchmarkMetricsCalculator.incrementSuccessfulInsertions();
 
     }
