@@ -28,9 +28,7 @@ public class InsertionFileLogger implements IInsertionsFileLogger {
 
     // MARK: - Constructor
     public InsertionFileLogger(String fileURI) throws IOException {
-        System.err.println("Creating file logger, URL: " + fileURI);
         if (!this.shouldCreateLogger(fileURI)) {
-            System.err.println("Shouldn't be created");
             // NOTE: If empty URI has been passed, logging is not required
             this.isActive = false;
             return;
