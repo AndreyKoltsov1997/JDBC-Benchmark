@@ -142,26 +142,12 @@ public class DatabaseBenchmark {
     private void performInsertionTest(DatabaseOperator databaseOperator) throws IOException {
 
         // TODO: Do something with insertion file logger - it shouldn't be created if not needed
-        IInsertionsFileLogger insertionFileLogger = new InsertionFileLogger(this.outputFileName);
+        InsertionFileLogger insertionFileLogger = new InsertionFileLogger(this.outputFileName);
         Runnable insertTask = () -> {
             // NOTE: Creating random string generator once so it won't be created each insertion
             // WARNING: Insertions could be infinite
             RandomAsciiStringGenerator randomAsciiStringGenerator = new RandomAsciiStringGenerator();
             while (this.shouldContinueInserting()) {
-
-//                String randomString = "";
-//
-//
-//                final int payloadLeft = this.decrementPayload();
-//
-//                if (payloadLeft < this.minimalPayloadPerInsertion) {
-//                    // NOTE: If the payload left is smaller than the required minimum (e.g.: when ..
-//                    // ... left payload is equal to reminder of the division
-//                    randomString = randomAsciiStringGenerator.getRandomString(this.totalPayload.get());
-//                } else {
-//                    randomString = randomAsciiStringGenerator.getRandomString(this.minimalPayloadPerInsertion);
-//                }
-
 
                 // NOTE: Not using JDBC Batch since we're trying to get average insertion time, ...
                 // ... thus we should calculate each insertion operation.
@@ -182,7 +168,7 @@ public class DatabaseBenchmark {
                         databaseOperator.insertKeyValueTest(insertingRow);
                         Long currentInsertionTime = System.nanoTime() - insertionStartTime;
                         System.out.println("Total insertion time time: " + this.convertNanoSecondToMicroseconds(currentInsertionTime) + " microseconds.");
-                        if (((InsertionFileLogger) insertionFileLogger).isActive()) {
+                        if ((insertionFileLogger).isActive()) {
                             insertionFileLogger.logOperation(this.databaseInfo.getTargetDatabaseName(), this.databaseInfo.getTargetTable(), insertingString, String.valueOf(currentInsertionTime));
                         }
                         final int payloadInserted = randomAsciiStringGenerator.getPayloadOfUTF8String(insertingString);
@@ -195,8 +181,6 @@ public class DatabaseBenchmark {
                         System.err.println(misleadingMsg);
                     }
                 }
-
-
 
             }
         };
