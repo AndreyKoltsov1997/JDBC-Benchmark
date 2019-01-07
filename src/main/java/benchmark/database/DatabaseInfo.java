@@ -1,5 +1,6 @@
 package benchmark.database;
 
+import benchmark.common.Constants;
 import benchmark.database.components.DatabaseCredentials;
 import benchmark.database.components.DatabaseLocation;
 
@@ -7,8 +8,7 @@ public class DatabaseInfo {
 
 
     // MARK: - Constants
-    // NOTE: Default database targetDatabaseName
-    private final String DEFAULT_NAME = "jdbc_benchmark";
+    private static final String POSTGRESQL_JDBC_NOTATION = "postgresql";
 
     // NOTE: Locations
     private final DatabaseLocation location;
@@ -16,6 +16,7 @@ public class DatabaseInfo {
 
     private final String targetDatabaseName;
     private String targetTable;
+    private BenchmarkSupportingDatabases benchmarkSupportingDatabases;
 
     // MARK: Getters and setters
 
@@ -36,26 +37,31 @@ public class DatabaseInfo {
     }
 
     // MARK: - Constructor
-    public DatabaseInfo(DatabaseLocation location, DatabaseCredentials credentials, String targetDatabaseName, String targetTable) {
+    public DatabaseInfo(DatabaseLocation location, DatabaseCredentials credentials, String targetDatabaseName, String targetTable, BenchmarkSupportingDatabases database) {
         this.location = location;
         this.credentials = credentials;
 
         if (!this.isParameterValid(targetDatabaseName)) {
-            targetDatabaseName = this.DEFAULT_NAME;
+            targetDatabaseName = Constants.DEFAULT_DATABASE_NAME;
         }
         this.targetDatabaseName = targetDatabaseName;
         this.targetTable = targetTable;
+
+        this.benchmarkSupportingDatabases = database;
     }
 
 
 
     // MARK: - Public methods
 
-    public final String getDatabaseURL() {
+    public final String getDatabaseJdbcUrl() {
         final String jdbcNotation = "jdbc";
-        final String DATABASE_NOTATION_MOCK = "postgresql";
-        // TODO: Look up better ways of formatting
-        return String.format("%s:%s://%s/", jdbcNotation, DATABASE_NOTATION_MOCK, this.location.toString());
+        final String currentDatabaseNameNotation = getJdbcNameNotation(this.benchmarkSupportingDatabases);
+        if (currentDatabaseNameNotation == null) {
+            System.err.println("Unable to find JDBC notation for " + this.getTargetDatabaseName());
+            System.exit(Constants.STATUS_INVALID_ARGUMENT);
+        }
+        return String.format("%s:%s://%s/", jdbcNotation, currentDatabaseNameNotation, this.location.toString());
     }
 
     // MARK: - Private
@@ -64,5 +70,19 @@ public class DatabaseInfo {
         final String emptyString = "";
         return ((parameter != null) && (!parameter.equals(emptyString)));
     }
+
+
+    // NOTE: Retrieving JDBC notation for required database. Supported ...
+    // ... databases are listen within BenchmarkSupportingDatabases enum.
+    private String getJdbcNameNotation(BenchmarkSupportingDatabases database) {
+        switch (database) {
+            case POSTGRESQL:
+                return DatabaseInfo.POSTGRESQL_JDBC_NOTATION;
+        }
+        return null;
+    }
+
+
+
 
 }

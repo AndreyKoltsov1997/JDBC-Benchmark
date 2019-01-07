@@ -1,1 +1,4 @@
+benchmark/database/components/DatabaseCredentialsTest.class
 benchmark/cli/CommandLineArgsParserTest.class
+benchmark/common/RandomAsciiStringGeneratorTest.class
+benchmark/cli/OptionalCommandLineArgumentsTest.class

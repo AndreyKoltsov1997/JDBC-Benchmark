@@ -45,7 +45,4 @@ public class DatabaseCredentialsTest {
         assertTrue(isTestCorrect);
     }
 
-    @Test
-    public void getPassword() {
-    }
 }

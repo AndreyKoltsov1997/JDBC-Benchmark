@@ -11,9 +11,11 @@ class OptionalCommandLineArguments {
 
     // MARK: - Constants
 
+
     private final String ARGUMENT_NOT_PROVIDED_VALUE = "";
     private final char ARGUMENT_EQUALS_SIGN = '=';
     private final char OPTIONAL_ARGUMENT_PREFIX_ELEMENT = '-';
+
 
     // NOTE: Optional CLI arguments tags. WARNING: MAKE SURE to modify initializing of avaliable options container ...
     // ... in case of adding a new one.
@@ -136,7 +138,7 @@ class OptionalCommandLineArguments {
                 processingTag = DB_HOST_TAG;
 
                 if (!isArgumentSet(processingTag)) {
-                    final String defaultHost = "localhost";
+                    final String defaultHost = Constants.DEFAULT_HOST;
                     return defaultHost;
                 }
                 return this.options.get(processingTag);
@@ -144,7 +146,7 @@ class OptionalCommandLineArguments {
             case DB_PORT_TAG:
                 processingTag = DB_PORT_TAG;
                 if (!isArgumentSet(processingTag)) {
-                    final String defaultPort = "8080";
+                    final String defaultPort = Constants.DEFAULT_PORT;
                     return defaultPort;
                 }
                 return this.options.get(processingTag);
@@ -200,7 +202,7 @@ class OptionalCommandLineArguments {
 
 
     private String generateDatabaseName() {
-        final String defaultName = "jdbcBenchmarkDb";
+        final String defaultName = Constants.DEFAULT_DATABASE_NAME;
         return defaultName;
     }
 

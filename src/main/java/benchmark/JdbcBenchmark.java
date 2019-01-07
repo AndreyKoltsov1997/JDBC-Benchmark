@@ -60,7 +60,7 @@ public class JdbcBenchmark {
         try {
             databaseOperator.establishConnection();
         } catch (SQLException error) {
-            System.err.println("Unable to establish connection with the database at " + this.databaseInfo.getDatabaseURL() + ", reason: " + error.getMessage());
+            System.err.println("Unable to establish connection with the database at " + this.databaseInfo.getDatabaseJdbcUrl() + ", reason: " + error.getMessage());
             System.exit(Constants.CONNECTION_ERROR);
         }
 

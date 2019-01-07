@@ -1,6 +1,7 @@
 package benchmark.jdbc;
 
 import benchmark.common.Constants;
+import benchmark.database.BenchmarkSupportingDatabases;
 import benchmark.database.DatabaseInfo;
 import benchmark.jdbc.common.DatabaseElementCreator;
 import benchmark.jdbc.common.DatabaseElementEraser;
@@ -49,7 +50,7 @@ public class DatabaseOperator {
         } catch (ClassNotFoundException error) {
             System.err.println("PostgreSQL Driver hasn't been found");
         }
-        final String databaseURL = databaseInfo.getDatabaseURL();
+        final String databaseURL = databaseInfo.getDatabaseJdbcUrl();
         final String databaseUsername = databaseInfo.getUsername();
         final String databaseUserPassword = databaseInfo.getPassword();
         this.connection = DriverManager.getConnection(databaseURL, databaseUsername, databaseUserPassword);

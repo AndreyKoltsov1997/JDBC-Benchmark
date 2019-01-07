@@ -2,6 +2,7 @@ package benchmark;
 
 import benchmark.cli.CommandLineArgsParser;
 import benchmark.common.Constants;
+import benchmark.database.BenchmarkSupportingDatabases;
 import benchmark.database.components.DatabaseCredentials;
 import benchmark.database.DatabaseInfo;
 import benchmark.database.components.DatabaseLocation;
@@ -40,7 +41,10 @@ public class Benchmark {
         // NOTE: Fetching database info from CL arguments
         final String databaseName = commandLineArgsParser.getDatabaseName();
         final String databaseTargetTable = commandLineArgsParser.getTableName();
-        DatabaseInfo databaseInfo = new DatabaseInfo(databaseLocation, databaseCredentials, databaseName, databaseTargetTable);
+        // NOTE: In this version, only PostgreSQL is supported (we had an agreement in Slack).
+        // TODO: Determine databaseType dynamicly and fetch required dependencies.
+        final BenchmarkSupportingDatabases databaseType = BenchmarkSupportingDatabases.POSTGRESQL;
+        DatabaseInfo databaseInfo = new DatabaseInfo(databaseLocation, databaseCredentials, databaseName, databaseTargetTable, databaseType);
 
         // NOTE: Fetching benchmark parameters from CL arguments
         final int amountOfThreads = commandLineArgsParser.getAmountOfThreads();

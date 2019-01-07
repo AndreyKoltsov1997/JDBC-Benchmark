@@ -3,6 +3,7 @@
 /Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/Benchmark.java
 /Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/database/components/DatabaseLocation.java
 /Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/metrics/BenchmarkMetricsCalculator.java
+/Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/database/BenchmarkSupportingDatabases.java
 /Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/files/IInsertionsFileLogger.java
 /Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/JdbcBenchmark.java
 /Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/jdbc/exceptions/JdbcCrudFailureException.java
