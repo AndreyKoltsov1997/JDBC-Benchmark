@@ -46,8 +46,6 @@ public class DatabaseOperatorDAO {
         // NOTE: Creating DB element validator if connection has been established.
         this.createDatabaseSupportingObjects();
 
-
-
         try {
             this.createMissingDatabaseElements(minimalPayload);
 
@@ -123,21 +121,20 @@ public class DatabaseOperatorDAO {
             System.out.println("Table " + targetTableName + " exists. Using it for benchmark.");
         }
 
-
-        String processingColumnName = "";
+        // NOTE: Creating columns.
         try {
             // NOTE: Creating "key" column. Length is static.
             final String keyColumnTag = Constants.KEY_COLUMN_NAME;
-            this.databaseElementCreator.createColumnIfNotExists(this.databaseInfo.getTargetTable(), keyColumnTag, getDatabaseChatTypeTag(JdbcBenchmark.KEY_LENGTH));
+            this.databaseElementCreator.createEmptyColumn(this.databaseInfo.getTargetTable(), keyColumnTag, getDatabaseChatTypeTag(JdbcBenchmark.KEY_LENGTH));
 
             // NOTE: Creating "value" column. Length is based on payload.
             final String valueColumnTag = Constants.VALUE_COLUMN_NAME;
-            this.databaseElementCreator.createColumnIfNotExists(this.databaseInfo.getTargetTable(), valueColumnTag, getDatabaseChatTypeTag(minimalPayload));
+            this.databaseElementCreator.createEmptyColumn(this.databaseInfo.getTargetTable(), valueColumnTag, getDatabaseChatTypeTag(minimalPayload));
 
         } catch (SQLException error) {
-            System.out.println("Column " + processingColumnName + " exists. Using it for benchmark. " + error.getMessage());
+            System.out.println("Column  exists. Using it for benchmark. " + error.getMessage());
         } catch (JdbcCrudFailureException error) {
-            System.err.println("Unable to create column \"" + processingColumnName + "\". Reason: " + error.getMessage());
+            System.err.println("Unable to create required column. Reason: " + error.getMessage());
         }
     }
 

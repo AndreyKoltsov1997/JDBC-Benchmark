@@ -31,21 +31,33 @@ public class DatabaseElementCreator {
     // MARK: - Public methods
 
     // NOTE: Creating a column into current database.
-    public void createColumnIfNotExists(final String table, final String column, final String type) throws JdbcCrudFailureException, SQLException {
+    public void createEmptyColumn(final String table, final String column, String type) throws JdbcCrudFailureException, SQLException {
 
-        if (this.databaseElementValidator.isColumnExistInTable(table, column)) {
-            // NOTE: Do nothing if column is already exist.
-            return;
+        try {
+            if (this.databaseElementValidator.isColumnExistInTable(table, column)) {
+                // NOTE: If required column exists, recreate it.
+                final String dropColumnSqlQuery = String.format("ALTER TABLE \"%s\" DROP COLUMN \"%s\";", table, column);
+                PreparedStatement preparedStatement = this.connection.prepareStatement(dropColumnSqlQuery);
+                preparedStatement.executeQuery();
+                preparedStatement.clearParameters();
+            }
+        } catch (SQLException error) {
+            // NOTE: Catch block means query hasn't returned anything. Continue.
+        }
+            if (!this.databaseElementValidator.isDatabaseElementNameValid(column)) {
+                throw new JdbcCrudFailureException(DatabaseElementCreator.TAG + "\"" + column + "\" is not a valid column name.", CrudOperationType.CREATE);
+            }
+
+        try {
+            final String addColumnSqlQuery = String.format("ALTER TABLE \"%s\" ADD \"%s\" %s;", table, column, type);
+            Statement statement = this.connection.createStatement();
+            statement.executeUpdate(addColumnSqlQuery);
+        } catch (Exception error) {
+            System.err.println("Column \"" + column + "\" hasn't been created. Reason: " + error.getMessage());
         }
 
-        if (!this.databaseElementValidator.isDatabaseElementNameValid(column)) {
-            throw new JdbcCrudFailureException(DatabaseElementCreator.TAG + "\"" + column + "\" is not a valid column name.", CrudOperationType.CREATE);
-        }
 
-        final String addColumnSqlQuery = String.format("ALTER TABLE \"%s\" ADD \"%s\" %s;", table, column, type);
-        try (PreparedStatement preparedStatement = this.connection.prepareStatement(addColumnSqlQuery)) {
-            preparedStatement.executeUpdate();
-        }
+
     }
 
     public void createDatabase(String name) throws SQLException, JdbcCrudFailureException {

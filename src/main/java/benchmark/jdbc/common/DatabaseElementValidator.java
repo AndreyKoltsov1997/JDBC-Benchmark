@@ -2,10 +2,7 @@ package benchmark.jdbc.common;
 
 import benchmark.database.DatabaseInfo;
 
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class DatabaseElementValidator {
 
@@ -24,11 +21,16 @@ public class DatabaseElementValidator {
     }
 
     public boolean isColumnExistInTable(final String table, final String column) throws SQLException {
-        DatabaseMetaData metaData = connection.getMetaData();
-        ResultSet rs = metaData.getColumns(null, null, table, column);
-
-        if (rs.next()) {
-            return true;
+        if (this.connection == null) {
+            throw new SQLException("Connection with target database hasn't bee established.");
+        }
+        ResultSet resultSet = connection.createStatement().executeQuery(String.format("SELECT * FROM \"%s\" WHERE 1<0;", table));
+        ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
+        // WARNING: Column indexes are started from 1
+        for (int i = 1; i <= resultSetMetaData.getColumnCount(); ++i) {
+            if (column.equals(resultSetMetaData.getColumnLabel(i))) {
+                return true;
+            }
         }
         return false;
     }
