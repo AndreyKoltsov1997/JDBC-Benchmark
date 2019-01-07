@@ -40,9 +40,9 @@ public class DatabaseCredentialsTest {
             isValidParametersParsingCorrect = false;
         }
 
-        boolean isTestCorrect = (isUsernameParsingCorrect && isPasswordParsingCorrect && isValidParametersParsingCorrect);
+        boolean isTestSuccessed = (isUsernameParsingCorrect && isPasswordParsingCorrect && isValidParametersParsingCorrect);
 
-        assertTrue(isTestCorrect);
+        assertTrue(isTestSuccessed);
     }
 
 }
