@@ -5,18 +5,15 @@ import benchmark.common.Constants;
 import java.sql.Timestamp;
 import java.util.*;
 
-// NOTE: Package-private class
+// NOTE: A class responsible for parsing OPTIONAL command line arguments.
+// Warning: Package-private class
 class OptionalCommandLineArguments {
+
+    // MARK: - Constants
 
     private final String ARGUMENT_NOT_PROVIDED_VALUE = "";
     private final char ARGUMENT_EQUALS_SIGN = '=';
-    private final char ARGUMENT_PREFIX_ELEMENT = '-';
-
-    private Map<String, String> options;
-
-    // NOTE: Option duplicates are not allowed, order is not important
-    private Set<String> avaliableOptions;
-
+    private final char OPTIONAL_ARGUMENT_PREFIX_ELEMENT = '-';
 
     // NOTE: Optional CLI arguments tags. WARNING: MAKE SURE to modify initializing of avaliable options container ...
     // ... in case of adding a new one.
@@ -26,29 +23,37 @@ class OptionalCommandLineArguments {
     private final String DB_TABLE_TAG = "table";
 
     private final String PAYLOAD_TAG = "payload";
-    private final String INSERT_AMMOUNT_TAG = "insertions";
+    private final String INSERT_AMOUNT_TAG = "insertions";
 
     private final String OUTPUT_FILE_TAG = "file";
     private final String AMOUNT_OF_THREADS_TAG = "threads";
 
 
+    private Map<String, String> options;
+
+    // NOTE: Option duplicates are not allowed, order is not important
+    private Set<String> availableOptions;
+
+
+    
+
     // NOTE: Empty constructor
     public OptionalCommandLineArguments() {
         this.options = new HashMap<>();
-        this.avaliableOptions = new HashSet<>();
+        this.availableOptions = new HashSet<>();
         this.initAvaliableOptions();
 
     }
 
     private void initAvaliableOptions() {
-        this.avaliableOptions.add(DB_HOST_TAG);
-        this.avaliableOptions.add(DB_NAME_TAG);
-        this.avaliableOptions.add(DB_PORT_TAG);
-        this.avaliableOptions.add(DB_TABLE_TAG);
-        this.avaliableOptions.add(PAYLOAD_TAG);
-        this.avaliableOptions.add(INSERT_AMMOUNT_TAG);
-        this.avaliableOptions.add(OUTPUT_FILE_TAG);
-        this.avaliableOptions.add(AMOUNT_OF_THREADS_TAG);
+        this.availableOptions.add(DB_HOST_TAG);
+        this.availableOptions.add(DB_NAME_TAG);
+        this.availableOptions.add(DB_PORT_TAG);
+        this.availableOptions.add(DB_TABLE_TAG);
+        this.availableOptions.add(PAYLOAD_TAG);
+        this.availableOptions.add(INSERT_AMOUNT_TAG);
+        this.availableOptions.add(OUTPUT_FILE_TAG);
+        this.availableOptions.add(AMOUNT_OF_THREADS_TAG);
 
     }
 
@@ -90,7 +95,7 @@ class OptionalCommandLineArguments {
 
     // NOTE: Checks if optional argument name is valid and does exist (e.g.: "--myAwesomeCat=.." is not a valid argument)
     private boolean isArgumentExist(String argument) {
-        return this.avaliableOptions.contains(argument);
+        return this.availableOptions.contains(argument);
     }
 
     private String getOptionValue(String option) throws IllegalArgumentException {
@@ -104,7 +109,7 @@ class OptionalCommandLineArguments {
     }
 
     private String getArgumentName(String argument) {
-        final int optionPrefixIndex = argument.lastIndexOf(this.ARGUMENT_PREFIX_ELEMENT);
+        final int optionPrefixIndex = argument.lastIndexOf(this.OPTIONAL_ARGUMENT_PREFIX_ELEMENT);
         final int equalSignIndex = argument.indexOf(this.ARGUMENT_EQUALS_SIGN);
         final String name = argument.substring(optionPrefixIndex + 1, equalSignIndex); // NOTE: Starting from "--" ...
         // ... to the end of string
@@ -157,9 +162,9 @@ class OptionalCommandLineArguments {
                     return defaultPayload;
                 }
                 return this.options.get(processingTag);
-            case INSERT_AMMOUNT_TAG:
-                processingTag = INSERT_AMMOUNT_TAG;
-                if (!isArgumentSet(INSERT_AMMOUNT_TAG)) {
+            case INSERT_AMOUNT_TAG:
+                processingTag = INSERT_AMOUNT_TAG;
+                if (!isArgumentSet(INSERT_AMOUNT_TAG)) {
                     return String.valueOf(Constants.INFINITE_AMOUNT_OF_INSERTIONS);
                 }
                 return this.options.get(processingTag);
