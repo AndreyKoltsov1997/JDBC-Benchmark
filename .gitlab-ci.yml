@@ -5,8 +5,6 @@ stages:
  
 benchmark_build:
   stage: build
-  tags: 
-  - benchmark-build
   only: 
   - master
   script:
