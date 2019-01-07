@@ -18,7 +18,6 @@ class OptionalCommandLineArguments {
     private Set<String> avaliableOptions;
 
 
-
     // NOTE: Optional CLI arguments tags. WARNING: MAKE SURE to modify initializing of avaliable options container ...
     // ... in case of adding a new one.
     private final String DB_HOST_TAG = "host";
@@ -98,7 +97,7 @@ class OptionalCommandLineArguments {
         if (!this.hasEqualSign(option)) {
             throw new IllegalArgumentException("Argument should have a value: " + option);
         }
-       final int equalCharIndex = option.indexOf(this.ARGUMENT_EQUALS_SIGN);
+        final int equalCharIndex = option.indexOf(this.ARGUMENT_EQUALS_SIGN);
         final String value = option.substring(equalCharIndex + 1); // NOTE: Starting from "=" ...
         // ... to the end of string
         return value;
@@ -113,7 +112,6 @@ class OptionalCommandLineArguments {
     }
 
 
-
     // NOTE: Fetching CLI argument value by its name
     public String getOptionByTag(final String tag) throws IllegalArgumentException {
         if (!isArgumentExist(tag)) {
@@ -121,7 +119,7 @@ class OptionalCommandLineArguments {
         }
 
         // TODO: Update switching since it looks gross
-        switch(tag) {
+        switch (tag) {
             case DB_NAME_TAG:
                 String processingTag = DB_NAME_TAG;
                 if (!isArgumentSet(processingTag)) {
@@ -197,11 +195,7 @@ class OptionalCommandLineArguments {
 
 
     private String generateDatabaseName() {
-        Timestamp timeStamp = new Timestamp(System.currentTimeMillis());
-//        final String whiteSpace = " ";
-//        final String emptySpace = "";
-//        final String defaultName = "benchmark" + timeStamp.toString().replaceAll(whiteSpace, emptySpace);
-        final String defaultName = "jdbcBenchmarkTmp";
+        final String defaultName = "jdbcBenchmarkDb";
         return defaultName;
     }
 
@@ -209,7 +203,6 @@ class OptionalCommandLineArguments {
     // NOTE: If table name is not set, generating it with timestamp
     private String generateTableName() {
         String timeStamp = new Timestamp(System.currentTimeMillis()).toString();
-        // TODO: avaliableCharactersInNameRegEx is already in use inside DBOperator
         final String nonNumberSymbolsRegEx = "[^0-9]";
         final String emptyValue = "";
         final String result = timeStamp.replaceAll(nonNumberSymbolsRegEx, emptyValue);

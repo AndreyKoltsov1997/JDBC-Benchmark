@@ -3,7 +3,6 @@ package benchmark.jdbc.common;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.Map;
 
 public class DatabaseElementInserter {
 
@@ -27,7 +26,7 @@ public class DatabaseElementInserter {
         }
 
         if (value.isEmpty()) {
-            // NOTE: SQL doesn't allow to inster empty strings, so I'm adding an empty value.
+            // NOTE: SQL doesn't allow insertion of empty strings, so I'm adding an empty value.
             final String minimalStringAllowed = " ";
             value = minimalStringAllowed;
         }
@@ -38,7 +37,6 @@ public class DatabaseElementInserter {
             // ... (2) 0 for SQL statements that return nothing.
             preparedStatement.executeUpdate();
         }
-
     }
 
 }

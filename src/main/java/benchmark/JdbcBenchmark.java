@@ -83,8 +83,6 @@ public class JdbcBenchmark {
         } catch (SQLException error) {
             System.err.println("Unable to establish connection with the database at " + this.databaseInfo.getDatabaseURL() + ", reason: " + error.getMessage());
             System.exit(Constants.CONNECTION_ERROR);
-        } catch (JdbcCrudFailureException error) {
-            System.err.println("An error has occurred while performing CRUD operations with database: " + error.getMessage());
         }
 
 
@@ -102,7 +100,6 @@ public class JdbcBenchmark {
         }
 
     }
-
 
 
     private String getRandomStringForBenchmark(RandomAsciiStringGenerator randomAsciiStringGenerator, ColumnType columnType) {
@@ -130,7 +127,6 @@ public class JdbcBenchmark {
     }
 
 
-
     // NOTE: Testing INSERT operations via JDBC connector into the specified database.
     // ... DatabaseOperator is an object which perform insert operations
     private void performInsertionTest(DatabaseOperator databaseOperator) throws IOException {
@@ -153,7 +149,7 @@ public class JdbcBenchmark {
                 insertingValues.put(Constants.VALUE_COLUMN_NAME, value);
 
 
-                for (Map.Entry<String, String> insertingRow: insertingValues.entrySet()) {
+                for (Map.Entry<String, String> insertingRow : insertingValues.entrySet()) {
                     // NOTE: Inserting key and value separately. It's 2 different INSERT operations and ...
                     // ... should be logged separately.
                     try {
@@ -258,6 +254,7 @@ public class JdbcBenchmark {
     private boolean isInsertionsInfinite() {
         return this.amountOfInsertions.get() == Constants.INFINITE_AMOUNT_OF_INSERTIONS;
     }
+
     // NOTE: Returning insertion payload, update unsent payload value
     private synchronized int decrementPayload() {
         int payloadLeft = this.totalPayload.get() - this.minimalPayloadPerInsertion;
@@ -272,7 +269,6 @@ public class JdbcBenchmark {
 
         return this.minimalPayloadPerInsertion;
     }
-
 
 
     private int getMinimalPayloadPerInsertion() {

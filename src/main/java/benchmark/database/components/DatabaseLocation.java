@@ -37,7 +37,7 @@ public class DatabaseLocation {
         this.port = port;
     }
 
-    // MARK: - Private methdos
+    // MARK: - Private methods
     private Boolean isLocationParameterValid(final String parameter) {
         final String emptyString = "";
         return ((parameter != null) && (!parameter.equals(emptyString)));

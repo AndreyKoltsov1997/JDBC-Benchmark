@@ -9,8 +9,6 @@ public class RandomAsciiStringGenerator {
     private final static String ASCII_SYMBOLS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
     private final SecureRandom secureRandom;
-    private final static int RANDOM_KEY_LENGTH = 10;
-
 
     // MARK: - Constructor
     public RandomAsciiStringGenerator() {
@@ -38,10 +36,5 @@ public class RandomAsciiStringGenerator {
         return string.length();
     }
 
-
-    // NOTE: Key is a random string with fixed length
-    public String getRandomKey() {
-        return this.getRandomString(RandomAsciiStringGenerator.RANDOM_KEY_LENGTH);
-    }
 
 }

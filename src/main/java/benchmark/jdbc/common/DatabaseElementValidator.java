@@ -38,7 +38,7 @@ public class DatabaseElementValidator {
         }
         boolean isDatabaseExist = false;
 
-        try(ResultSet resultSet = this.connection.getMetaData().getCatalogs()) {
+        try (ResultSet resultSet = this.connection.getMetaData().getCatalogs()) {
             while (resultSet.next()) {
                 final int databaseNameIndex = 1;
                 final String processingDatabaseName = resultSet.getString(databaseNameIndex);

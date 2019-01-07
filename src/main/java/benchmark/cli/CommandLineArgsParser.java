@@ -9,7 +9,6 @@ public class CommandLineArgsParser {
     private final int MAXIMAL_AVALIABLE_ARGUMENTS = 10;
 
 
-
     // NOTE: Database credentials
     private String userName;
     private String userPassword;
@@ -26,9 +25,9 @@ public class CommandLineArgsParser {
     }
 
 
-
     // NOTE: Empty constructor
-    public CommandLineArgsParser()  { }
+    public CommandLineArgsParser() {
+    }
 
     public void parseArguments(String[] args) throws IllegalArgumentException {
         if (!isAmountOfArgsSatysfying(args)) {
@@ -73,7 +72,6 @@ public class CommandLineArgsParser {
     private boolean isArgumentOptional(String argument) {
         return this.optionalCommandLineArguments.isArgumentOptional(argument);
     }
-
 
 
     public String getHost() {

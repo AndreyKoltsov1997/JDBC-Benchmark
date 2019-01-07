@@ -8,7 +8,6 @@ import benchmark.database.components.DatabaseLocation;
 public class Benchmark {
 
 
-
     public static void main(String[] args) {
 
 

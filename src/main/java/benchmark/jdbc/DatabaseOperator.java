@@ -36,7 +36,7 @@ public class DatabaseOperator {
         this.databaseInfo = databaseInfo;
     }
 
-    public void establishConnection() throws SQLException, JdbcCrudFailureException {
+    public void establishConnection() throws SQLException {
 
         // NOTE: Connection to PostgreSQL Database
         try {
@@ -50,7 +50,7 @@ public class DatabaseOperator {
         this.connection = DriverManager.getConnection(databaseURL, databaseUsername, databaseUserPassword);
 
         // NOTE: Creating DB element validator if connection has been established.
-       this.createDatabaseSupportingObjects();
+        this.createDatabaseSupportingObjects();
 
         try {
             this.createMissingDatabaseElements();
@@ -59,7 +59,6 @@ public class DatabaseOperator {
             System.err.println("Unable to create required DB element, reason: " + error.getMessage());
             System.exit(Constants.CONNECTION_ERROR);
         }
-
     }
 
     // NOTE: Creating objects for CRUD operations if connection has been established.
@@ -102,14 +101,13 @@ public class DatabaseOperator {
         try {
             for (String columnName : DatabaseOperator.processingTableColumnNames) {
                 processingColumnName = columnName;
-                this.databaseElementCreator.createColumnIfNotExists(this.databaseInfo.getTargetTable(),columnName, varcharType);
+                this.databaseElementCreator.createColumnIfNotExists(this.databaseInfo.getTargetTable(), columnName, varcharType);
             }
         } catch (SQLException error) {
             System.out.println("Column " + processingColumnName + " exists. Using it for benchmark.");
         } catch (JdbcCrudFailureException error) {
             System.err.println("Unable to create column \"" + processingColumnName + "\". Reason: " + error.getMessage());
         }
-
     }
 
 
@@ -127,20 +125,19 @@ public class DatabaseOperator {
             // TODO: Add deletion of created tables
 
             // NOTE: Deletion of created columns
-            for (String createdColumn: DatabaseOperator.processingTableColumnNames) {
+            for (String createdColumn : DatabaseOperator.processingTableColumnNames) {
                 this.databaseElementEraser.dropColumnWithinTable(this.databaseInfo.getTargetTable(), createdColumn);
             }
             this.connection.close();
 
         } catch (JdbcCrudFailureException deleteError) {
-            System.err.println("An error has occured while deleting: " + deleteError.getMessage());
+            System.err.println("An error has occurred while deleting: " + deleteError.getMessage());
         }
     }
 
 
-
     // NOTE: Parameter "value" - a pair which contains target column name and value of it's row.
-    public void insertSpecifiedValue(Map.Entry<String, String> value) throws SQLException, IllegalArgumentException  {
+    public void insertSpecifiedValue(Map.Entry<String, String> value) throws SQLException, IllegalArgumentException {
         if (this.connection == null) {
             final String misleadingMsg = "Connection to required database hasn't been established.";
             throw new IllegalArgumentException(misleadingMsg);
@@ -148,13 +145,6 @@ public class DatabaseOperator {
         final String columnName = value.getKey();
         final String columnValue = value.getValue();
         this.databaseElementInserter.insertValueIntoColumn(this.databaseInfo.getTargetTable(), columnName, columnValue);
-    }
-
-
-
-    private Boolean isColumnExistInCurrentDB(final String column) {
-        // TODO: Impliment method
-        return this.processingTableColumnNames.contains(column);
     }
 
 }

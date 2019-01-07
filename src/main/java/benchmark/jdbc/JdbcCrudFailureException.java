@@ -21,8 +21,8 @@ public class JdbcCrudFailureException extends Exception {
             case DELETE:
                 misleadingMsg = "Unable to DELETE information from the database. Reason: " + message;
                 break;
-                default:
-                    break;
+            default:
+                break;
         }
         this.message = misleadingMsg;
     }

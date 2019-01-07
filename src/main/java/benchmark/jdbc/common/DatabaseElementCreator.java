@@ -1,6 +1,5 @@
 package benchmark.jdbc.common;
 
-import benchmark.database.DatabaseInfo;
 import benchmark.jdbc.CrudOperationType;
 import benchmark.jdbc.JdbcCrudFailureException;
 
@@ -45,10 +44,9 @@ public class DatabaseElementCreator {
             final String nameFormatMisleadingMsg = "Name should contain only latin letters, numbers and an underscore.";
             throw new JdbcCrudFailureException(DatabaseElementCreator.TAG + "\"" + name + "\" is not a valid database name." + nameFormatMisleadingMsg, CrudOperationType.CREATE);
         }
-        try(Statement statement = this.connection.createStatement()) {
-            final String createDatabaseSqlQuery = "CREATE DATABASE " + name + "name";
+        try (Statement statement = this.connection.createStatement()) {
+            final String createDatabaseSqlQuery = String.format("CREATE DATABASE \"%s\";", name);
             statement.executeUpdate(createDatabaseSqlQuery);
-
         }
     }
 
