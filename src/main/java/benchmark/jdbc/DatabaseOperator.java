@@ -4,6 +4,7 @@ import benchmark.Constants;
 import benchmark.database.DatabaseInfo;
 import benchmark.jdbc.common.DatabaseElementCreator;
 import benchmark.jdbc.common.DatabaseElementEraser;
+import benchmark.jdbc.common.DatabaseElementInserter;
 import benchmark.jdbc.common.DatabaseElementValidator;
 
 import java.sql.*;
@@ -21,6 +22,7 @@ public class DatabaseOperator {
     private DatabaseElementValidator databaseElementValidator;
     private DatabaseElementCreator databaseElementCreator;
     private DatabaseElementEraser databaseElementEraser;
+    private DatabaseElementInserter databaseElementInserter;
 
     private static List<String> processingTableColumnNames = new ArrayList<String>() {{
         add(Constants.KEY_COLUMN_NAME);
@@ -65,9 +67,10 @@ public class DatabaseOperator {
         if (this.connection == null) {
             throw new IllegalArgumentException("Connection hasn't been established. Unable to create supporting objects.");
         }
-        this.databaseElementValidator = new DatabaseElementValidator(this.connection, this.databaseInfo);
-        this.databaseElementCreator = new DatabaseElementCreator(this.connection, this.databaseInfo, databaseElementValidator);
-        this.databaseElementEraser = new DatabaseElementEraser(this.connection, this.databaseInfo, databaseElementValidator);
+        this.databaseElementValidator = new DatabaseElementValidator(this.connection);
+        this.databaseElementCreator = new DatabaseElementCreator(this.connection, databaseElementValidator);
+        this.databaseElementEraser = new DatabaseElementEraser(this.connection, databaseElementValidator);
+        this.databaseElementInserter = new DatabaseElementInserter(this.connection, databaseElementValidator);
     }
 
     // NOTE: Creating database elements (catalog, table, column) if necessary
@@ -99,7 +102,7 @@ public class DatabaseOperator {
         try {
             for (String columnName : DatabaseOperator.processingTableColumnNames) {
                 processingColumnName = columnName;
-                this.databaseElementCreator.createColumn(columnName, varcharType);
+                this.databaseElementCreator.createColumnIfNotExists(this.databaseInfo.getTargetTable(),columnName, varcharType);
             }
         } catch (SQLException error) {
             System.out.println("Column " + processingColumnName + " exists. Using it for benchmark.");
@@ -119,6 +122,7 @@ public class DatabaseOperator {
             // NOTE: Deletion of created database
             if (this.hasCreatedCustomDatabase) {
                 this.databaseElementEraser.dropDatabase(this.databaseInfo.getTargetDatabaseName());
+                return;
             }
             // TODO: Add deletion of created tables
 
@@ -143,30 +147,10 @@ public class DatabaseOperator {
         }
         final String columnName = value.getKey();
         final String columnValue = value.getValue();
-        this.insertValueIntoColumn(columnName, columnValue);
+        this.databaseElementInserter.insertValueIntoColumn(this.databaseInfo.getTargetTable(), columnName, columnValue);
     }
 
-    // NOTE: Inserting row into specified column.
-    private void insertValueIntoColumn(final String column, String value) throws SQLException, IllegalArgumentException {
-        if (!isColumnExistInCurrentDB(column)) {
-            final String misleadingMsg = "Column " + column + " doesn't exist in database " + this.databaseInfo.getTargetDatabaseName();
-            throw new IllegalArgumentException(misleadingMsg);
-        }
 
-        if (value.isEmpty()) {
-            // NOTE: SQL doesn't allow to inster empty strings, so I'm adding an empty value.
-            final String minimalStringAllowed = " ";
-            value = minimalStringAllowed;
-        }
-        
-        String insertSqlQuery = String.format("INSERT INTO \"%s\" (%s) VALUES ('%s');", this.databaseInfo.getTargetTable(), column, value); //"INSERT INTO " + targetTable + "(" + column + ") VALUES ('" + value + "')";
-        try (PreparedStatement preparedStatement = this.connection.prepareStatement(insertSqlQuery)) {
-            // NOTE: (JavaDoc) either (1) the row count for SQL Data Manipulation Language (DML) statements or ...
-            // ... (2) 0 for SQL statements that return nothing.
-            preparedStatement.executeUpdate();
-        }
-
-    }
 
     private Boolean isColumnExistInCurrentDB(final String column) {
         // TODO: Impliment method

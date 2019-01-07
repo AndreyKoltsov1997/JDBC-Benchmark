@@ -8,13 +8,14 @@
 /Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/JdbcBenchmark.java
 /Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/database/DatabaseInfo.java
 /Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/database/ColumnType.java
-/Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/jdbc/DatabaseElementCreator.java
 /Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/jdbc/CrudOperationType.java
-/Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/jdbc/DatabaseElementValidator.java
+/Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/jdbc/common/DatabaseElementCreator.java
 /Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/database/components/DatabaseCredentials.java
 /Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/files/InsertionFileLogger.java
 /Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/jdbc/DatabaseOperator.java
+/Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/jdbc/common/DatabaseElementEraser.java
+/Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/jdbc/common/DatabaseElementValidator.java
 /Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/jdbc/JdbcCrudFailureException.java
+/Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/jdbc/common/DatabaseElementInserter.java
 /Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/cli/CommandLineArgsParser.java
 /Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/cli/OptionalCommandLineArguments.java
-/Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/jdbc/DatabaseElementEraser.java

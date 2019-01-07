@@ -12,17 +12,18 @@ import java.sql.Statement;
 public class DatabaseElementEraser  {
 
     private Connection connection;
-    private DatabaseInfo databaseInfo;
     private DatabaseElementValidator databaseElementValidator;
 
-    public DatabaseElementEraser(Connection connection, DatabaseInfo databaseInfo, DatabaseElementValidator databaseElementValidator) {
+    public DatabaseElementEraser(Connection connection, DatabaseElementValidator databaseElementValidator) {
         this.connection = connection;
-        this.databaseInfo = databaseInfo;
         this.databaseElementValidator = databaseElementValidator;
     }
 
     // NOTE: Deleting column within specified table.
     public void dropColumnWithinTable(String table, String column) throws SQLException {
+        if (!this.databaseElementValidator.isColumnExistInTable(table, column)) {
+            throw new IllegalArgumentException("Column \"" + column + "\" doesn't exist in table \"" + table + "\".");
+        }
         final String dropColumnSqlQuery = String.format("ALTER TABLE \"%s\" DROP %s;", table, column);
         try (PreparedStatement preparedStatement = this.connection.prepareStatement(dropColumnSqlQuery)) {
             preparedStatement.executeUpdate();

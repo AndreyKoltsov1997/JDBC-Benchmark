@@ -9,11 +9,9 @@ import java.sql.SQLException;
 
 public class DatabaseElementValidator {
     private Connection connection;
-    private DatabaseInfo databaseInfo;
 
-    public DatabaseElementValidator(Connection connection, DatabaseInfo databaseInfo) {
+    public DatabaseElementValidator(Connection connection) {
         this.connection = connection;
-        this.databaseInfo = databaseInfo;
     }
 
     public boolean isDatabaseElementNameValid(String name) {
@@ -22,8 +20,9 @@ public class DatabaseElementValidator {
     }
 
     public boolean isColumnExistInTable(final String table, final String column) throws SQLException {
-        DatabaseMetaData md = connection.getMetaData();
-        ResultSet rs = md.getColumns(null, null, table, column);
+        DatabaseMetaData metaData = connection.getMetaData();
+        ResultSet rs = metaData.getColumns(null, null, table, column);
+
         if (rs.next()) {
             return true;
         }

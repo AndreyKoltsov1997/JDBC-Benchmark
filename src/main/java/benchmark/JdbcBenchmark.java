@@ -86,11 +86,6 @@ public class JdbcBenchmark {
         } catch (JdbcCrudFailureException error) {
             System.err.println("An error has occurred while performing CRUD operations with database: " + error.getMessage());
         }
-        //        final String DB_NAME_MOCK = "test";
-        final String TABLE_NAME_MOCK = this.databaseInfo.getTargetTable(); // DEBUG: "link";
-        final String COLUMN_KEY_NAME_MOCK = "key";
-        final String COLUMN_VALUE_NAME_MOCK = "value";
-        final String VARCHAR_TYPE = "VARCHAR(10)";
 
 
         try {
@@ -103,7 +98,7 @@ public class JdbcBenchmark {
         try {
             databaseOperator.shutDownConnection();
         } catch (SQLException error) {
-            System.err.println("Unexcpected error has occured while shutting down the connrection: " + error.getMessage());
+            System.err.println("Unexpected error has occurred while shutting down the connection: " + error.getMessage());
         }
 
     }
@@ -167,7 +162,7 @@ public class JdbcBenchmark {
                         databaseOperator.insertSpecifiedValue(insertingRow);
                         Long currentInsertionTime = System.nanoTime() - insertionStartTime;
                         System.out.println("Total insertion time time: " + this.convertNanoSecondToMicroseconds(currentInsertionTime) + " microseconds.");
-                        if ((insertionFileLogger).isActive()) {
+                        if (insertionFileLogger.isActive()) {
                             insertionFileLogger.logOperation(this.databaseInfo.getTargetDatabaseName(), this.databaseInfo.getTargetTable(), insertingString, String.valueOf(currentInsertionTime));
                         }
                         final int payloadInserted = randomAsciiStringGenerator.getPayloadOfUTF8String(insertingString);
@@ -192,10 +187,11 @@ public class JdbcBenchmark {
 
         executorService.shutdown();
         try {
-            boolean hasInsertionFinished = executorService.awaitTermination(2, TimeUnit.MINUTES);
+            final int averageExecutorServiceTimeout = 2;
+            boolean hasInsertionFinished = executorService.awaitTermination(averageExecutorServiceTimeout, TimeUnit.MINUTES);
             if (hasInsertionFinished) {
                 // TODO: Create a better way to stop writing. Maybe try-with-resources?
-                ((InsertionFileLogger) insertionFileLogger).stopWriting();
+                insertionFileLogger.stopWriting();
                 this.printBenchmarkResults();
             }
         } catch (Exception error) {
