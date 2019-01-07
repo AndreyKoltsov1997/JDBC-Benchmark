@@ -2,4 +2,4 @@ image: maven:3.5.0-jdk-8
  
 compile:
   script:
-    - mvn clean 
+    - mvn clean compile
