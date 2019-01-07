@@ -35,7 +35,7 @@ class OptionalCommandLineArguments {
     private Set<String> availableOptions;
 
 
-    
+
 
     // NOTE: Empty constructor
     public OptionalCommandLineArguments() {
