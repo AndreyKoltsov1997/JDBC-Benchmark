@@ -27,4 +27,6 @@ benchmark_tests:
 benchmark_maven_repo_deploy:
   stage: deploy
   script:
-    - mvn deploy
+    - mvn $MAVEN_CLI_OPTIONS deploy
+  only:
+    - master
