@@ -1,6 +1,8 @@
-package benchmark.jdbc;
+package benchmark.jdbc.common;
 
 import benchmark.database.DatabaseInfo;
+import benchmark.jdbc.CrudOperationType;
+import benchmark.jdbc.JdbcCrudFailureException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

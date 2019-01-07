@@ -2,6 +2,9 @@ package benchmark.jdbc;
 
 import benchmark.Constants;
 import benchmark.database.DatabaseInfo;
+import benchmark.jdbc.common.DatabaseElementCreator;
+import benchmark.jdbc.common.DatabaseElementEraser;
+import benchmark.jdbc.common.DatabaseElementValidator;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -164,10 +167,6 @@ public class DatabaseOperator {
         }
 
     }
-
-//    private boolean isStatementExecutionCorrect(int amountOfOperations) {
-//        return (amountOfOperations > 0);
-//    }
 
     private Boolean isColumnExistInCurrentDB(final String column) {
         // TODO: Impliment method

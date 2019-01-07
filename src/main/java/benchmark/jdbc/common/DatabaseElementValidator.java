@@ -1,4 +1,4 @@
-package benchmark.jdbc;
+package benchmark.jdbc.common;
 
 import benchmark.database.DatabaseInfo;
 
