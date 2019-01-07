@@ -1,9 +1,16 @@
 image: maven:3.5.0-jdk-8
 
+variables:
+ MAVEN_CLI_OPTIONS: "-s .m2/settings.xml --batch-mode"
  
 stages:
  - build
  - test 
+ - deploy
+
+cache:
+  paths:
+  - target/
  
 benchmark_build:
   stage: build
@@ -16,3 +23,8 @@ benchmark_tests:
   stage: test
   script:
     - mvn test
+
+benchmark_maven_repo_deploy:
+  stage: deploy
+  script:
+    - mvn deploy
