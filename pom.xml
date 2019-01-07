@@ -8,6 +8,17 @@
     <artifactId>jdbc-benchmark</artifactId>
     <version>1.0-SNAPSHOT</version>
 
+    <!-- MARK: Distribution configuration -->
+    <distributionManagement>
+        <repository>
+            <id>myMavenRepoJdbcemcchallengeWrite</id>
+            <url>${myMavenRepoJdbcemcchallengeWriteUrl}</url>
+        </repository>
+        <snapshotRepository>
+            <id>myMavenRepoJdbcemcchallengeWrite</id>
+            <url>${myMavenRepoJdbcemcchallengeWriteUrl}</url>
+        </snapshotRepository>
+    </distributionManagement>
 
     <!-- MARK: Specifying app properties (arguments included) -->
     <properties>
