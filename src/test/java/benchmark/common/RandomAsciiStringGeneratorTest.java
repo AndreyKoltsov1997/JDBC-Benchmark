@@ -24,6 +24,7 @@ public class RandomAsciiStringGeneratorTest {
         assertTrue(isStringContentCorrect && isStringPayloadCorrect);
     }
 
+    // NOTE: Expecting string with 1 byte per character.
     @Test
     public void getPayloadOfUTF8String() {
         final int requiredPayload = 100;
