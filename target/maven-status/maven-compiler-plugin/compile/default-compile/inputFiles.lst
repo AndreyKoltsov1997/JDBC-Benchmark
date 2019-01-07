@@ -1,11 +1,11 @@
+/Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/common/Constants.java
 /Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/common/RandomAsciiStringGenerator.java
-/Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/BenchmarkMetricsCalculator.java
 /Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/Benchmark.java
 /Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/database/components/DatabaseLocation.java
+/Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/metrics/BenchmarkMetricsCalculator.java
 /Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/files/IInsertionsFileLogger.java
-/Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/Constants.java
-/Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/common/AtomicFloat.java
 /Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/JdbcBenchmark.java
+/Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/jdbc/exceptions/JdbcCrudFailureException.java
 /Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/database/DatabaseInfo.java
 /Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/database/ColumnType.java
 /Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/jdbc/CrudOperationType.java
@@ -15,7 +15,6 @@
 /Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/jdbc/DatabaseOperator.java
 /Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/jdbc/common/DatabaseElementEraser.java
 /Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/jdbc/common/DatabaseElementValidator.java
-/Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/jdbc/JdbcCrudFailureException.java
 /Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/jdbc/common/DatabaseElementInserter.java
 /Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/cli/CommandLineArgsParser.java
 /Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/cli/OptionalCommandLineArguments.java
