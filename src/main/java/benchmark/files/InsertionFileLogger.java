@@ -13,6 +13,7 @@ import java.nio.file.Paths;
 public class InsertionFileLogger implements IInsertionsFileLogger {
 
     // MARK: - Constants
+    public static final String TAG = InsertionFileLogger.class.getName();
     private final static String REQUIRED_FILE_EXTENSION = ".csv";
 
 
@@ -80,6 +81,10 @@ public class InsertionFileLogger implements IInsertionsFileLogger {
     // MARK: - Overrides
     @Override
     public void logOperation(String targetDatabase, String targetTable, String insertedKey, String operationDuration) throws IOException {
+        if (!this.isActive) {
+            System.err.println(InsertionFileLogger.TAG + " Operation couldn't be logged since logger is not active.");
+            return;
+        }
         this.bufferedWriter.write(targetDatabase + "," + targetTable + "," + insertedKey + "," + operationDuration + "\n");
     }
 
