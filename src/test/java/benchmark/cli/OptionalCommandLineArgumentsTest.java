@@ -26,6 +26,5 @@ public class OptionalCommandLineArgumentsTest {
         final boolean isIncorrectArgumentOK = optionalCommandLineArguments.isArgumentOptional(incorrectOptionalArgument);
         boolean isTestCorrect = (isCorrectArgumentOK && !isIncorrectArgumentOK);
         assertTrue(isTestCorrect);
-
     }
 }

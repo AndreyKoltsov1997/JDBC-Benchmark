@@ -4,7 +4,7 @@ import java.security.SecureRandom;
 
 public class RandomAsciiStringGenerator {
 
-    private final static String ASCII_SYMBOLS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    public final static String AVAILABLE_SYMBOLS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
     private final SecureRandom secureRandom;
 
@@ -22,8 +22,8 @@ public class RandomAsciiStringGenerator {
         }
         StringBuilder stringBuilder = new StringBuilder(length);
         for (int i = 0; i < length; i++) {
-            final int randomIndex = this.secureRandom.nextInt(this.ASCII_SYMBOLS.length());
-            stringBuilder.append(this.ASCII_SYMBOLS.charAt(randomIndex));
+            final int randomIndex = this.secureRandom.nextInt(RandomAsciiStringGenerator.AVAILABLE_SYMBOLS.length());
+            stringBuilder.append(RandomAsciiStringGenerator.AVAILABLE_SYMBOLS.charAt(randomIndex));
         }
         return stringBuilder.toString();
     }
