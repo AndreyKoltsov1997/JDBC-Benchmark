@@ -17,7 +17,7 @@ class OptionalCommandLineArguments {
 
     // NOTE: Optional CLI arguments tags. WARNING: MAKE SURE to modify initializing of avaliable options container ...
     // ... in case of adding a new one.
-    private final String DB_HOST_TAG = "host";
+    private static final String DB_HOST_TAG = "host";
     private final String DB_PORT_TAG = "port";
     private final String DB_NAME_TAG = "name";
     private final String DB_TABLE_TAG = "table";
@@ -41,11 +41,11 @@ class OptionalCommandLineArguments {
     public OptionalCommandLineArguments() {
         this.options = new HashMap<>();
         this.availableOptions = new HashSet<>();
-        this.initAvaliableOptions();
+        this.initAvailableOptions();
 
     }
 
-    private void initAvaliableOptions() {
+    private void initAvailableOptions() {
         this.availableOptions.add(DB_HOST_TAG);
         this.availableOptions.add(DB_NAME_TAG);
         this.availableOptions.add(DB_PORT_TAG);
@@ -57,7 +57,7 @@ class OptionalCommandLineArguments {
 
     }
 
-    public void parseOptionalArguments(String[] args) throws IllegalArgumentException {
+    void parseOptionalArguments(String[] args) throws IllegalArgumentException {
         // NOTE: Fetching values from given arguments
         for (int i = 0; i < args.length; ++i) {
             String currentArgument = args[i];

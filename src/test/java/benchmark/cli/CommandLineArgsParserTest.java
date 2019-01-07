@@ -29,8 +29,6 @@ public class CommandLineArgsParserTest {
             // ... incorrect optional argument, methods work correctly.
             isTestCorrect = true;
         }
-
         assertTrue(isTestCorrect);
-
     }
 }
