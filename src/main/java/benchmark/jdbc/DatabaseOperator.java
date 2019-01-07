@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.Set;
 
 
-// TODO: Add necessary connection closing
 public class DatabaseOperator {
 
     private final DatabaseInfo databaseInfo;
@@ -103,6 +102,7 @@ public class DatabaseOperator {
         }
         return false;
     }
+
     // NOTE: Deleting temprorary created databases and tables if needed.
     public void shutDownConnection() throws SQLException {
         if (this.connection == null) {
@@ -110,18 +110,15 @@ public class DatabaseOperator {
         }
 
         try {
-
             // NOTE: Deletion of created database
             if (this.hasCreatedCustomDatabase) {
                 this.dropDatabase(this.databaseInfo.getTargetDatabaseName());
             }
-
             // TODO: Add deletion of created tables
 
             for (String createdColumn: DatabaseOperator.processingTableColumnNames) {
                 this.dropColumnWithinTable(this.databaseInfo.getTargetTable(), createdColumn);
             }
-
             this.connection.close();
 
         } catch (JdbcCrudFailureException deleteError) {
@@ -228,7 +225,6 @@ public class DatabaseOperator {
     }
 
 
-
     public void createTable(final String name) throws SQLException {
         String sqlCreate = "CREATE TABLE IF NOT EXISTS \"" + name + "\""
                 + "  (key           VARCHAR(10),"
@@ -253,8 +249,6 @@ public class DatabaseOperator {
             preparedStatement.executeUpdate();
         }
     }
-
-
 
 
     public void insertKeyValueTest(Map.Entry<String, String> value) throws SQLException, IllegalArgumentException  {

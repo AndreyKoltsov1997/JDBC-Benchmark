@@ -1,4 +1,4 @@
-package benchmark;
+package benchmark.database;
 
 public enum ColumnType {
     KEY,

@@ -21,36 +21,34 @@ public class Benchmark {
             System.exit(Constants.STATUS_INVALID_ARGUMENT);
         }
 
+        // NOTE: Fetching Database location from CL arguments
+        final String host = commandLineArgsParser.getHost();
+        final String port = commandLineArgsParser.getPort();
+        DatabaseLocation databaseLocation = new DatabaseLocation(host, port);
 
-        final String FILE_NAME_MOCK = commandLineArgsParser.getFileNameForLogs(); // DEBUG: "results.csv";
-
-        final String PASSED_HOST_MOCK = commandLineArgsParser.getHost(); // DEBUG: "localhost";
-        final String PASSED_PORT_MOCK = commandLineArgsParser.getPort(); //"5431";
-        DatabaseLocation databaseLocation = new DatabaseLocation(PASSED_HOST_MOCK, PASSED_PORT_MOCK);
-
-        final String USERNAME_MOCK = commandLineArgsParser.getUserName(); // DEBUG: "Andrey";
-        final String USER_PASSWORD_MOCK = commandLineArgsParser.getUserPassword(); // DEBUG: "qwerty";
+        // NOTE: Fetching Database credentials from CL arguments
+        final String username = commandLineArgsParser.getUserName();
+        final String password = commandLineArgsParser.getUserPassword();
         DatabaseCredentials databaseCredentials = null;
         try {
-            databaseCredentials = new DatabaseCredentials(USERNAME_MOCK, USER_PASSWORD_MOCK);
+            databaseCredentials = new DatabaseCredentials(username, password);
         } catch (IllegalArgumentException error) {
-            System.err.println("An error has occured while parsing user credentials: " + error.getMessage());
+            System.err.println("An error has occurred while parsing user credentials: " + error.getMessage());
             System.exit(Constants.STATUS_INVALID_ARGUMENT);
         }
 
-        final String DATABASE_NAME_MOCK = commandLineArgsParser.getDatabaseName(); // DEBUG: "test";
-        final String TARGET_TABLE_MOCK = commandLineArgsParser.getTableName();
-        DatabaseInfo databaseInfo = new DatabaseInfo(databaseLocation, databaseCredentials, DATABASE_NAME_MOCK, TARGET_TABLE_MOCK);
+        // NOTE: Fetching database info from CL arguments
+        final String databaseName = commandLineArgsParser.getDatabaseName();
+        final String databaseTargetTable = commandLineArgsParser.getTableName();
+        DatabaseInfo databaseInfo = new DatabaseInfo(databaseLocation, databaseCredentials, databaseName, databaseTargetTable);
 
-        System.out.println("Database URL: " + databaseInfo.getDatabaseURL());
-        final int AMOUNT_OF_THREADS_MOCK = commandLineArgsParser.getAmountOfThreads(); // DEBUG: 5;
-        final int PAYLOAD_MOCK = commandLineArgsParser.getPayload(); // DEBUG: 2;
-        final int AMOUNT_OF_INSERTIONS_MOCK = commandLineArgsParser.getAmountOfInsertions(); // DEBUG: 100;
-        DatabaseBenchmark databaseBenchmark = new DatabaseBenchmark(PAYLOAD_MOCK, AMOUNT_OF_THREADS_MOCK, AMOUNT_OF_INSERTIONS_MOCK, databaseInfo, FILE_NAME_MOCK);
+        // NOTE: Fetching benchmark parameters from CL arguments
+        final int amountOfThreads = commandLineArgsParser.getAmountOfThreads();
+        final int payload = commandLineArgsParser.getPayload();
+        final int amountOfInsertions = commandLineArgsParser.getAmountOfInsertions();
+        final String fileName = commandLineArgsParser.getFileNameForLogs();
+        JdbcBenchmark jdbcBenchmark = new JdbcBenchmark(payload, amountOfThreads, amountOfInsertions, databaseInfo, fileName);
 
-
-        databaseBenchmark.performBenchmark();
-
-        System.out.println("benchmark.Benchmark has been created.");
+        jdbcBenchmark.performBenchmark();
     }
 }

@@ -2,8 +2,8 @@ package benchmark;
 
 import benchmark.common.RandomAsciiStringGenerator;
 import benchmark.database.DatabaseInfo;
-import benchmark.files.IInsertionsFileLogger;
 import benchmark.files.InsertionFileLogger;
+import benchmark.database.ColumnType;
 import benchmark.jdbc.DatabaseOperator;
 import benchmark.jdbc.JdbcCrudFailureException;
 
@@ -16,7 +16,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class DatabaseBenchmark {
+public class JdbcBenchmark {
 
     private final int DEFAULT_PAYLOAD = 0;
     private final int DEFAULT_AMOUNT_OF_THREDS = 1;
@@ -37,7 +37,7 @@ public class DatabaseBenchmark {
 
     // MARK: - Constructors
 
-    public DatabaseBenchmark(DatabaseInfo databaseInfo) {
+    public JdbcBenchmark(DatabaseInfo databaseInfo) {
         this.databaseInfo = databaseInfo;
 
         this.totalPayload = new AtomicInteger(this.DEFAULT_PAYLOAD);
@@ -47,7 +47,7 @@ public class DatabaseBenchmark {
         this.minimalPayloadPerInsertion = this.getMinimalPayloadPerInsertion();
     }
 
-    public DatabaseBenchmark(int totalPayload, int amountOfThreads, int amountOfInsertions, DatabaseInfo databaseInfo) {
+    public JdbcBenchmark(int totalPayload, int amountOfThreads, int amountOfInsertions, DatabaseInfo databaseInfo) {
         this.totalPayload = new AtomicInteger(totalPayload);
         this.amountOfThreads = amountOfThreads;
         this.amountOfInsertions = new AtomicInteger(amountOfInsertions);
@@ -57,7 +57,7 @@ public class DatabaseBenchmark {
 
     }
 
-    public DatabaseBenchmark(int totalPayload, int amountOfThreads, int amountOfInsertions, DatabaseInfo databaseInfo, String outputFileName) {
+    public JdbcBenchmark(int totalPayload, int amountOfThreads, int amountOfInsertions, DatabaseInfo databaseInfo, String outputFileName) {
         // NOTE: Random ASCII generator uses UTF-8 encoding, that means we have 1 byte per symbol in a string
         this.totalPayload = new AtomicInteger(totalPayload);
         this.amountOfThreads = amountOfThreads;
@@ -100,7 +100,6 @@ public class DatabaseBenchmark {
             System.err.println(misleadingMsg);
         }
 
-
         try {
             databaseOperator.shutDownConnection();
         } catch (SQLException error) {
@@ -119,7 +118,7 @@ public class DatabaseBenchmark {
         switch (columnType) {
             case KEY:
                 // NOTE: Key has fixed length. So, even if there's not enough payload, it will be inserted.
-                randomString = randomAsciiStringGenerator.getRandomString(DatabaseBenchmark.KEY_LENGTH);
+                randomString = randomAsciiStringGenerator.getRandomString(JdbcBenchmark.KEY_LENGTH);
                 break;
             case VALUE:
                 if (payloadLeft < this.minimalPayloadPerInsertion) {
