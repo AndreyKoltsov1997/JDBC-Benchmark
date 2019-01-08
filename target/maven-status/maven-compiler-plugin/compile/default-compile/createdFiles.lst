@@ -2,7 +2,6 @@ benchmark/database/components/DatabaseLocation.class
 benchmark/jdbc/common/DatabaseElementValidator.class
 benchmark/jdbc/common/DatabaseElementInserter.class
 benchmark/common/RandomAsciiStringGenerator.class
-benchmark/common/AtomicFloat.class
 benchmark/metrics/BenchmarkMetricsCalculator.class
 benchmark/jdbc/common/DatabaseElementCreator.class
 benchmark/database/DatabaseInfo$1.class

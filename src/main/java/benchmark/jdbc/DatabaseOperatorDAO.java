@@ -12,7 +12,6 @@ import benchmark.jdbc.exceptions.JdbcCrudFailureException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 
 // NOTE: A class that provides connection to specified DB via JDBC and performing operations with it.
@@ -82,20 +81,11 @@ public class DatabaseOperatorDAO {
         }
     }
 
-    // NOTE: Parameter "value" - a pair which contains target column name and value of it's row.
-    public void insertSpecifiedValue(Map.Entry<String, String> value) throws SQLException, IllegalArgumentException {
-        if (this.connection == null) {
-            final String misleadingMsg = "Connection to required database hasn't been established.";
-            throw new IllegalArgumentException(misleadingMsg);
-        }
 
-        final String columnName = value.getKey();
-        final String columnValue = value.getValue();
-        this.databaseElementInserter.insertValueIntoColumn(this.databaseInfo.getTargetTable(), columnName, columnValue);
-    }
-
-    // TODO: Refactor duplicate methods
     public void insertValueIntoColumn(final String column, final String value) throws SQLException {
+        if (this.connection == null) {
+            throw new SQLException("Unable to insert \"" + value + "\" into \"" + column + "\'.Connection to database hasn't been established.");
+        }
         this.databaseElementInserter.insertValueIntoColumn(this.databaseInfo.getTargetTable(), column, value);
     }
 

@@ -127,34 +127,35 @@ public class JdbcBenchmark {
             // NOTE: Creating random string generator once so it won't be created each insertion
             // WARNING: Insertions could be infinite
             RandomAsciiStringGenerator randomAsciiStringGenerator = new RandomAsciiStringGenerator();
-            Map<String, String> insertingValues = new HashMap<String, String>();
 
             BenchmarkMetricsCalculator threadBenchmarkMetricsCalculator = new BenchmarkMetricsCalculator();
+
+            // NOTE: Key is generated because we're using it for logging.
+
+            final String key = this.getRandomStringForBenchmark(randomAsciiStringGenerator, ColumnType.KEY);
             // NOTE: Inserting key-value per operation
             while (this.shouldContinueInserting()) {
-
-                final String key = this.getRandomStringForBenchmark(randomAsciiStringGenerator, ColumnType.KEY);
-                insertingValues.put(Constants.KEY_COLUMN_NAME, key);
-                final String value = this.getRandomStringForBenchmark(randomAsciiStringGenerator, ColumnType.VALUE);
-                insertingValues.put(Constants.VALUE_COLUMN_NAME, value);
                 // NOTE: Not using JDBC Batch since we're trying to get average insertion time, ...
                 // ... thus we should calculate each insertion operation.
 
                 try {
                     Long insertionStartTime = System.nanoTime();
+
+                    // NOTE: Inserting key
                     databaseOperatorDAO.insertValueIntoColumn(Constants.KEY_COLUMN_NAME, key);
+
+                    // NOTE: Inserting value
+                    final String value = this.getRandomStringForBenchmark(randomAsciiStringGenerator, ColumnType.VALUE);
                     databaseOperatorDAO.insertValueIntoColumn(Constants.VALUE_COLUMN_NAME, value);
 
                     Long currentInsertionTime = System.nanoTime() - insertionStartTime;
                     currentInsertionTime = TimeUnit.NANOSECONDS.toMicros(currentInsertionTime);
-                    System.out.println("String inserted for: " + currentInsertionTime + " microseconds.");
                     if (insertionFileLogger.isActive()) {
                         // NOTE: With respect to the task, we have to log inserted key
                         insertionFileLogger.logOperation(this.databaseInfo.getTargetDatabaseName(), this.databaseInfo.getTargetTable(), key, String.valueOf(currentInsertionTime));
                     }
                     final int payloadInserted = randomAsciiStringGenerator.getPayloadOfUTF8String(key) + randomAsciiStringGenerator.getPayloadOfUTF8String(value);
                     this.updateMetrics(payloadInserted, currentInsertionTime, threadBenchmarkMetricsCalculator);
-
 
                 } catch (SQLException error) {
                     // NOTE: For each failed operation, the following values should be logged: DB name, target table, key and error cause.
@@ -163,29 +164,6 @@ public class JdbcBenchmark {
                     final String misleadingMsg = "An error has occurred while inserting new value into column: " + error.getMessage();
                     System.err.println(misleadingMsg);
                 }
-//                for (Map.Entry<String, String> insertingRow : insertingValues.entrySet()) {
-//                    // NOTE: Inserting key and value separately. It's 2 different INSERT operations and ...
-//                    // ... should be logged separately.
-//                    try {
-//                        final String insertingString = insertingRow.getValue();
-//                        Long insertionStartTime = System.nanoTime();
-//                        databaseOperatorDAO.insertSpecifiedValue(insertingRow);
-//                        Long currentInsertionTime = System.nanoTime() - insertionStartTime;
-//                        currentInsertionTime = TimeUnit.NANOSECONDS.toMicros(currentInsertionTime);
-//                        System.out.println("String inserted for: " + currentInsertionTime + " microseconds.");
-//                        if (insertionFileLogger.isActive()) {
-//                            insertionFileLogger.logOperation(this.databaseInfo.getTargetDatabaseName(), this.databaseInfo.getTargetTable(), insertingString, String.valueOf(currentInsertionTime));
-//                        }
-//                        final int payloadInserted = randomAsciiStringGenerator.getPayloadOfUTF8String(insertingString);
-//                        this.updateMetrics(payloadInserted, currentInsertionTime, threadBenchmarkMetricsCalculator);
-//
-//                    } catch (SQLException error) {
-//                        this.logFailedOperation(this.databaseInfo.getTargetDatabaseName(), this.databaseInfo.getTargetTable(), insertingRow.getValue(), error.getMessage());
-//                    } catch (Exception error) {
-//                        final String misleadingMsg = "An error has occurred while inserting new value into column: " + error.getMessage();
-//                        System.err.println(misleadingMsg);
-//                    }
-//                }
 
             }
             System.out.println("Thread " + Thread.currentThread().getName() + " av. throughtput: " + threadBenchmarkMetricsCalculator.getAverageThroughput());

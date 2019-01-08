@@ -6,7 +6,6 @@
 /Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/database/BenchmarkSupportingDatabases.java
 /Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/files/IInsertionsFileLogger.java
 /Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/jdbc/DatabaseOperatorDAO.java
-/Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/common/AtomicFloat.java
 /Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/JdbcBenchmark.java
 /Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/jdbc/exceptions/JdbcCrudFailureException.java
 /Users/Andrey/Developer/emc-challenge/jdbc-benchmark/src/main/java/benchmark/database/DatabaseInfo.java
