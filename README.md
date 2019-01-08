@@ -1,8 +1,12 @@
 # JDBC Database Driver benchmark 
 
 The app measures average bandwidth and throughput of JDBC Driver considering specified payload, threads and amount of insertion operations. 
-It takes the following parameters: 
 
+The app provides 2 metrics for JDBC DB driver: 
+* Average bandwidth (payload bytes inserted per second);
+* Average thoughput (insert operations per second);
+
+It takes the following parameters: 
   1. Database credentials: 
     * username (parameter: *-Ddb.username*) - **required**
     * password (parameter:* -Ddb.password*) - **required** 
