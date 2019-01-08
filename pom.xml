@@ -29,6 +29,8 @@
         <!--NOTE: Specifying app description properties (name, etc)-->
         <app.name>jdbc-benchmark</app.name>
         <app.name.with.dependencies>${app.name}-${project.version}-jar-with-dependencies</app.name.with.dependencies>
+
+
     </properties>
 
     <dependencies>
@@ -114,7 +116,7 @@
                 <configuration>
                     <imageName>${app.name}</imageName>
                     <baseImage>java</baseImage>
-                    <entryPoint>["java", "-jar", "/${app.name.with.dependencies}.jar", "postgres", "password", "--host=10.5.0.6", "--port=5432", "--insertions=10", "--threads=1", "--payload=100"]</entryPoint>
+                    <entryPoint>["java", "-jar", "/${app.name.with.dependencies}.jar", "postgres", "password", "--host=10.5.0.6", "--port=5432", "--insertions=", "--threads=", "--payload="]</entryPoint>
                     <!-- copy the service's jar file from target into the root directory of the image -->
                     <resources>
                         <resource>
