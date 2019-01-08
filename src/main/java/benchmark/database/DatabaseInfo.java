@@ -59,7 +59,7 @@ public class DatabaseInfo {
         final String currentDatabaseNameNotation = getJdbcNameNotation(this.benchmarkSupportingDatabases);
         if (currentDatabaseNameNotation == null) {
             System.err.println("Unable to find JDBC notation for " + this.getTargetDatabaseName());
-            System.exit(Constants.STATUS_INVALID_ARGUMENT);
+            System.exit(Constants.EXIT_STATUS_INVALID_ARGUMENT);
         }
         return String.format("%s:%s://%s/", jdbcNotation, currentDatabaseNameNotation, this.location.toString());
     }

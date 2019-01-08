@@ -1,5 +1,6 @@
 package benchmark.jdbc;
 
+import benchmark.JdbcBenchmark;
 import benchmark.common.Constants;
 import benchmark.database.DatabaseInfo;
 import benchmark.jdbc.common.DatabaseElementCreator;
@@ -11,7 +12,6 @@ import benchmark.jdbc.exceptions.JdbcCrudFailureException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 
 // NOTE: A class that provides connection to specified DB via JDBC and performing operations with it.
@@ -28,7 +28,6 @@ public class DatabaseOperatorDAO {
     private final DatabaseInfo databaseInfo;
     private Connection connection;
 
-    private DatabaseElementValidator databaseElementValidator;
     private DatabaseElementCreator databaseElementCreator;
     private DatabaseElementEraser databaseElementEraser;
     private DatabaseElementInserter databaseElementInserter;
@@ -37,7 +36,7 @@ public class DatabaseOperatorDAO {
     private boolean hasCreatedCustomDatabase = false;
 
     // MARK: - Constructor
-    public DatabaseOperatorDAO(DatabaseInfo databaseInfo) throws SQLException {
+    public DatabaseOperatorDAO(DatabaseInfo databaseInfo, final int minimalPayload) throws SQLException {
         this.databaseInfo = databaseInfo;
 
         this.establishConnection();
@@ -46,11 +45,11 @@ public class DatabaseOperatorDAO {
         this.createDatabaseSupportingObjects();
 
         try {
-            this.createMissingDatabaseElements();
+            this.createMissingDatabaseElements(minimalPayload);
 
         } catch (JdbcCrudFailureException error) {
             System.err.println("Unable to create required DB element, reason: " + error.getMessage());
-            System.exit(Constants.CONNECTION_ERROR);
+            System.exit(Constants.EXIT_STATUS_CONNECTION_ERROR);
         }
     }
 
@@ -72,6 +71,7 @@ public class DatabaseOperatorDAO {
 
             // NOTE: Deletion of created columns
             for (String createdColumn : DatabaseOperatorDAO.processingTableColumnNames) {
+                System.out.println("Dropping column: " + createdColumn);
                 this.databaseElementEraser.dropColumnWithinTable(this.databaseInfo.getTargetTable(), createdColumn);
             }
             this.connection.close();
@@ -81,23 +81,19 @@ public class DatabaseOperatorDAO {
         }
     }
 
-    // NOTE: Parameter "value" - a pair which contains target column name and value of it's row.
-    public void insertSpecifiedValue(Map.Entry<String, String> value) throws SQLException, IllegalArgumentException {
-        if (this.connection == null) {
-            final String misleadingMsg = "Connection to required database hasn't been established.";
-            throw new IllegalArgumentException(misleadingMsg);
-        }
 
-        final String columnName = value.getKey();
-        final String columnValue = value.getValue();
-        this.databaseElementInserter.insertValueIntoColumn(this.databaseInfo.getTargetTable(), columnName, columnValue);
+    public void insertValueIntoColumn(final String column, final String value) throws SQLException {
+        if (this.connection == null) {
+            throw new SQLException("Unable to insert \"" + value + "\" into \"" + column + "\'.Connection to database hasn't been established.");
+        }
+        this.databaseElementInserter.insertValueIntoColumn(this.databaseInfo.getTargetTable(), column, value);
     }
 
 
     // MARK: - Private methods
 
     // NOTE: Creating database elements (catalog, table, column) if necessary
-    private void createMissingDatabaseElements() throws JdbcCrudFailureException {
+    private void createMissingDatabaseElements(final int minimalPayload) throws JdbcCrudFailureException {
         final String targetDatabase = this.databaseInfo.getTargetDatabaseName();
         try {
             this.databaseElementCreator.createDatabase(targetDatabase);
@@ -119,27 +115,36 @@ public class DatabaseOperatorDAO {
             System.out.println("Table " + targetTableName + " exists. Using it for benchmark.");
         }
 
-
-        final String varcharType = "VARCHAR(10)";
-        String processingColumnName = "";
+        // NOTE: Creating columns.
         try {
-            for (String columnName : DatabaseOperatorDAO.processingTableColumnNames) {
-                processingColumnName = columnName;
-                this.databaseElementCreator.createColumnIfNotExists(this.databaseInfo.getTargetTable(), columnName, varcharType);
-            }
+            // NOTE: Creating "key" column. Length is static.
+            final String keyColumnTag = Constants.KEY_COLUMN_NAME;
+            this.databaseElementCreator.createEmptyColumn(this.databaseInfo.getTargetTable(), keyColumnTag, getDatabaseChatTypeTag(JdbcBenchmark.KEY_LENGTH));
+
+            // NOTE: Creating "value" column. Length is based on payload.
+            final String valueColumnTag = Constants.VALUE_COLUMN_NAME;
+            this.databaseElementCreator.createEmptyColumn(this.databaseInfo.getTargetTable(), valueColumnTag, getDatabaseChatTypeTag(minimalPayload));
+
         } catch (SQLException error) {
-            System.out.println("Column " + processingColumnName + " exists. Using it for benchmark.");
+            System.out.println("Column  exists. Using it for benchmark. " + error.getMessage());
         } catch (JdbcCrudFailureException error) {
-            System.err.println("Unable to create column \"" + processingColumnName + "\". Reason: " + error.getMessage());
+            System.err.println("Unable to create required column. Reason: " + error.getMessage());
         }
     }
+
+
+    // NOTE: Returns type tag for specified length (amount of characters)
+    private String getDatabaseChatTypeTag(final int length) {
+        return String.format("VARCHAR(%s)", length);
+    }
+
 
     // NOTE: Creating objects for CRUD operations if connection has been established.
     private void createDatabaseSupportingObjects() {
         if (this.connection == null) {
             throw new IllegalArgumentException("Connection hasn't been established. Unable to create supporting objects.");
         }
-        this.databaseElementValidator = new DatabaseElementValidator(this.connection);
+        DatabaseElementValidator databaseElementValidator = new DatabaseElementValidator(this.connection);
         this.databaseElementCreator = new DatabaseElementCreator(this.connection, databaseElementValidator);
         this.databaseElementEraser = new DatabaseElementEraser(this.connection, databaseElementValidator);
         this.databaseElementInserter = new DatabaseElementInserter(this.connection, databaseElementValidator);

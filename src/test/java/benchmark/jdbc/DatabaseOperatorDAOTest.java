@@ -1,5 +1,6 @@
 package benchmark.jdbc;
 
+import benchmark.common.Constants;
 import benchmark.database.BenchmarkSupportingDatabases;
 import benchmark.database.DatabaseInfo;
 import benchmark.database.components.DatabaseCredentials;
@@ -7,32 +8,27 @@ import benchmark.database.components.DatabaseLocation;
 import org.junit.Test;
 
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.junit.Assert.*;
 
 public class DatabaseOperatorDAOTest {
 
 
     @Test(expected = SQLException.class)
     public void testUnreachableConnection() throws SQLException {
-        new DatabaseOperatorDAO(getTestDatabaseInfo());
+        final int testPayload = 1;
+        new DatabaseOperatorDAO(getTestDatabaseInfo(), testPayload);
     }
 
     // WARNING: Test is usable with a valid DB connection. You'd have to create a valid database DAO.
     @Test(expected = SQLException.class)
     public void testInsertOnUnreachableConnection() throws SQLException, IllegalArgumentException {
-        DatabaseOperatorDAO databaseOperatorDAO = new DatabaseOperatorDAO(getTestDatabaseInfo());
+        final int testPayload = 0;
+        DatabaseOperatorDAO databaseOperatorDAO = new DatabaseOperatorDAO(getTestDatabaseInfo(), testPayload);
 
-        Map<String, String> testParameters = new HashMap<>();
         final String testKey = "key";
+        databaseOperatorDAO.insertValueIntoColumn(Constants.KEY_COLUMN_NAME, testKey);
+
         final String testValue = "value";
-        testParameters.put(testKey, testValue);
-
-        Map.Entry<String, String> parametersEntry = testParameters.entrySet().iterator().next();
-        databaseOperatorDAO.insertSpecifiedValue(parametersEntry);
-
+        databaseOperatorDAO.insertValueIntoColumn(Constants.VALUE_COLUMN_NAME, testValue);
     }
 
 

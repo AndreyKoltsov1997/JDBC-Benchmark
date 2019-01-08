@@ -6,7 +6,7 @@ USAGE: ./benchmark.Benchmark *username* *password* --host=*host* --port=*port* .
 $ mvn clean package
 
 # Build docker image with maven:
-$ mvn clean compile assembly:single package docker:build
+$ mvn -s .m2/settings.xml clean compile assembly:single package docker:build
 
 # Run inside docker container: 
 $ docker-compose up  
