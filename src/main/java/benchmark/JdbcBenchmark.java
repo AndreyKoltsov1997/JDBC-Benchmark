@@ -10,8 +10,7 @@ import benchmark.metrics.BenchmarkMetricsCalculator;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -26,28 +25,28 @@ public class JdbcBenchmark {
 
 
     private DatabaseInfo databaseInfo;
-    private final AtomicInteger totalPayload;
+    private final AtomicInteger payloadLeft;
     private final int amountOfThreads;
     private final AtomicInteger amountOfInsertions;
     private final String outputFileName;
-    private final int minimalPayloadPerInsertion;
+    private final int minimalPayloadForValueInsertion;
     private BenchmarkMetricsCalculator benchmarkMetricsCalculator = new BenchmarkMetricsCalculator();
 
 
     // MARK: - Constructor
 
-    public JdbcBenchmark(int totalPayload, int amountOfThreads, int amountOfInsertions, DatabaseInfo databaseInfo, String outputFileName) {
-        if (this.isCreatingBenchmarkPointless(totalPayload, amountOfInsertions)) {
+    public JdbcBenchmark(int PayloadLeft, int amountOfThreads, int amountOfInsertions, DatabaseInfo databaseInfo, String outputFileName) {
+        if (this.isCreatingBenchmarkPointless(PayloadLeft, amountOfInsertions)) {
             System.out.println("Nothing to be inserted in the database since both payload and amount of insertions are equal to zero.");
             System.exit(Constants.EXIT_STATUS_SUCCESS);
         }
-        this.totalPayload = new AtomicInteger(totalPayload);
+        this.payloadLeft = new AtomicInteger(PayloadLeft);
         this.amountOfThreads = amountOfThreads;
         this.amountOfInsertions = new AtomicInteger(amountOfInsertions);
         this.databaseInfo = databaseInfo;
         this.outputFileName = outputFileName;
-        this.minimalPayloadPerInsertion = this.getMinimalPayloadPerInsertion();
-        System.out.println("Minimal payload per insertion: " + this.getMinimalPayloadPerInsertion());
+        this.minimalPayloadForValueInsertion = this.getMinimalPayloadForValue();
+        System.out.println("Minimal payload per insertion: " + this.getMinimalPayloadForValue());
     }
 
 
@@ -62,7 +61,7 @@ public class JdbcBenchmark {
         DatabaseOperatorDAO databaseOperatorDAO = null;
         try {
             // NOTE: Establishing connection inside scope
-            databaseOperatorDAO = new DatabaseOperatorDAO(this.databaseInfo, this.minimalPayloadPerInsertion);
+            databaseOperatorDAO = new DatabaseOperatorDAO(this.databaseInfo, this.minimalPayloadForValueInsertion);
         } catch (SQLException error) {
             System.err.println("Unable to establish connection with the database at " + this.databaseInfo.getDatabaseJdbcUrl() + ", reason: " + error.getMessage());
             System.exit(Constants.EXIT_STATUS_CONNECTION_ERROR);
@@ -87,20 +86,24 @@ public class JdbcBenchmark {
 
     private String getRandomStringForBenchmark(RandomAsciiStringGenerator randomAsciiStringGenerator, ColumnType columnType) {
         String randomString = "";
-        final int payloadLeft = this.totalPayload.get();
+        final int payloadLeft = this.payloadLeft.get();
 
         switch (columnType) {
             case KEY:
                 // NOTE: Key has fixed length. So, even if there's not enough payload, it will be inserted.
-                randomString = randomAsciiStringGenerator.getRandomString(JdbcBenchmark.KEY_LENGTH);
+                if (payloadLeft < JdbcBenchmark.KEY_LENGTH) {
+                    randomString = randomAsciiStringGenerator.getRandomString(this.payloadLeft.get());
+                } else {
+                    randomString = randomAsciiStringGenerator.getRandomString(JdbcBenchmark.KEY_LENGTH);
+                }
                 break;
             case VALUE:
-                if (payloadLeft < this.minimalPayloadPerInsertion) {
+                if (payloadLeft < this.minimalPayloadForValueInsertion) {
                     // NOTE: If the payload left is smaller than the required minimum (e.g.: when ..
                     // ... left payload is equal to reminder of the division
-                    randomString = randomAsciiStringGenerator.getRandomString(this.totalPayload.get());
+                    randomString = randomAsciiStringGenerator.getRandomString(this.payloadLeft.get());
                 } else {
-                    randomString = randomAsciiStringGenerator.getRandomString(this.minimalPayloadPerInsertion);
+                    randomString = randomAsciiStringGenerator.getRandomString(this.minimalPayloadForValueInsertion);
                 }
                 break;
         }
@@ -112,6 +115,11 @@ public class JdbcBenchmark {
     // NOTE: Testing INSERT operations via JDBC connector into the specified database.
     // ... DatabaseOperatorDAO is an object which perform insert operations
     private void performInsertionTest(DatabaseOperatorDAO databaseOperatorDAO) throws IOException {
+        // NOTE: Using thread-safe collection in order to store each thread metrics.
+        // Metrics are stored for each thread since BenchmarkMetricsCalculator uses ...
+        // ... substraction and addittion internally which leads to incorrect results.
+        List<Double> averageThreadsBandwidths = Collections.synchronizedList(new LinkedList<>());
+        List<Double> averageThreadsThroughOutputs = Collections.synchronizedList(new LinkedList<>());
 
         // TODO: Do something with insertion file logger - it shouldn't be created if not needed
         InsertionFileLogger insertionFileLogger = new InsertionFileLogger(this.outputFileName);
@@ -120,42 +128,71 @@ public class JdbcBenchmark {
             // WARNING: Insertions could be infinite
             RandomAsciiStringGenerator randomAsciiStringGenerator = new RandomAsciiStringGenerator();
             Map<String, String> insertingValues = new HashMap<String, String>();
-            final String key = this.getRandomStringForBenchmark(randomAsciiStringGenerator, ColumnType.KEY);
-            insertingValues.put(Constants.KEY_COLUMN_NAME, key);
-            final String value = this.getRandomStringForBenchmark(randomAsciiStringGenerator, ColumnType.VALUE);
-            insertingValues.put(Constants.VALUE_COLUMN_NAME, value);
 
+            BenchmarkMetricsCalculator threadBenchmarkMetricsCalculator = new BenchmarkMetricsCalculator();
             // NOTE: Inserting key-value per operation
-            final int amountOfInsertingValues = 2;
             while (this.shouldContinueInserting()) {
 
+                final String key = this.getRandomStringForBenchmark(randomAsciiStringGenerator, ColumnType.KEY);
+                insertingValues.put(Constants.KEY_COLUMN_NAME, key);
+                final String value = this.getRandomStringForBenchmark(randomAsciiStringGenerator, ColumnType.VALUE);
+                insertingValues.put(Constants.VALUE_COLUMN_NAME, value);
                 // NOTE: Not using JDBC Batch since we're trying to get average insertion time, ...
                 // ... thus we should calculate each insertion operation.
-                for (Map.Entry<String, String> insertingRow : insertingValues.entrySet()) {
-                    // NOTE: Inserting key and value separately. It's 2 different INSERT operations and ...
-                    // ... should be logged separately.
-                    try {
-                        final String insertingString = insertingRow.getValue();
-                        Long insertionStartTime = System.nanoTime();
-                        databaseOperatorDAO.insertSpecifiedValue(insertingRow);
-                        Long currentInsertionTime = System.nanoTime() - insertionStartTime;
-                        currentInsertionTime = TimeUnit.NANOSECONDS.toMicros(currentInsertionTime);
-                        System.out.println("String inserted for: " + currentInsertionTime + " microseconds.");
-                        if (insertionFileLogger.isActive()) {
-                            insertionFileLogger.logOperation(this.databaseInfo.getTargetDatabaseName(), this.databaseInfo.getTargetTable(), insertingString, String.valueOf(currentInsertionTime));
-                        }
-                        final int payloadInserted = randomAsciiStringGenerator.getPayloadOfUTF8String(insertingString);
-                        this.updateMetrics(payloadInserted, currentInsertionTime);
 
-                    } catch (SQLException error) {
-                        this.logFailedOperation(this.databaseInfo.getTargetDatabaseName(), this.databaseInfo.getTargetTable(), insertingRow.getValue(), error.getMessage());
-                    } catch (Exception error) {
-                        final String misleadingMsg = "An error has occurred while inserting new value into column: " + error.getMessage();
-                        System.err.println(misleadingMsg);
+                try {
+                    Long insertionStartTime = System.nanoTime();
+                    databaseOperatorDAO.insertValueIntoColumn(Constants.KEY_COLUMN_NAME, key);
+                    databaseOperatorDAO.insertValueIntoColumn(Constants.VALUE_COLUMN_NAME, value);
+
+                    Long currentInsertionTime = System.nanoTime() - insertionStartTime;
+                    currentInsertionTime = TimeUnit.NANOSECONDS.toMicros(currentInsertionTime);
+                    System.out.println("String inserted for: " + currentInsertionTime + " microseconds.");
+                    if (insertionFileLogger.isActive()) {
+                        // NOTE: With respect to the task, we have to log inserted key
+                        insertionFileLogger.logOperation(this.databaseInfo.getTargetDatabaseName(), this.databaseInfo.getTargetTable(), key, String.valueOf(currentInsertionTime));
                     }
+                    final int payloadInserted = randomAsciiStringGenerator.getPayloadOfUTF8String(key) + randomAsciiStringGenerator.getPayloadOfUTF8String(value);
+                    this.updateMetrics(payloadInserted, currentInsertionTime, threadBenchmarkMetricsCalculator);
+
+
+                } catch (SQLException error) {
+                    // NOTE: For each failed operation, the following values should be logged: DB name, target table, key and error cause.
+                    this.logFailedOperation(this.databaseInfo.getTargetDatabaseName(), this.databaseInfo.getTargetTable(), key, error.getMessage());
+                } catch (Exception error) {
+                    final String misleadingMsg = "An error has occurred while inserting new value into column: " + error.getMessage();
+                    System.err.println(misleadingMsg);
                 }
+//                for (Map.Entry<String, String> insertingRow : insertingValues.entrySet()) {
+//                    // NOTE: Inserting key and value separately. It's 2 different INSERT operations and ...
+//                    // ... should be logged separately.
+//                    try {
+//                        final String insertingString = insertingRow.getValue();
+//                        Long insertionStartTime = System.nanoTime();
+//                        databaseOperatorDAO.insertSpecifiedValue(insertingRow);
+//                        Long currentInsertionTime = System.nanoTime() - insertionStartTime;
+//                        currentInsertionTime = TimeUnit.NANOSECONDS.toMicros(currentInsertionTime);
+//                        System.out.println("String inserted for: " + currentInsertionTime + " microseconds.");
+//                        if (insertionFileLogger.isActive()) {
+//                            insertionFileLogger.logOperation(this.databaseInfo.getTargetDatabaseName(), this.databaseInfo.getTargetTable(), insertingString, String.valueOf(currentInsertionTime));
+//                        }
+//                        final int payloadInserted = randomAsciiStringGenerator.getPayloadOfUTF8String(insertingString);
+//                        this.updateMetrics(payloadInserted, currentInsertionTime, threadBenchmarkMetricsCalculator);
+//
+//                    } catch (SQLException error) {
+//                        this.logFailedOperation(this.databaseInfo.getTargetDatabaseName(), this.databaseInfo.getTargetTable(), insertingRow.getValue(), error.getMessage());
+//                    } catch (Exception error) {
+//                        final String misleadingMsg = "An error has occurred while inserting new value into column: " + error.getMessage();
+//                        System.err.println(misleadingMsg);
+//                    }
+//                }
 
             }
+            System.out.println("Thread " + Thread.currentThread().getName() + " av. throughtput: " + threadBenchmarkMetricsCalculator.getAverageThroughput());
+            averageThreadsBandwidths.add(threadBenchmarkMetricsCalculator.getBandwidth());
+            averageThreadsThroughOutputs.add(threadBenchmarkMetricsCalculator.getAverageThroughput());
+            System.out.println("Thread " + Thread.currentThread().getName() + " av. bandwidth: " + threadBenchmarkMetricsCalculator.getBandwidth());
+
         };
 
         final int amountOfThreads = this.amountOfThreads;
@@ -171,7 +208,10 @@ public class JdbcBenchmark {
             if (hasInsertionFinished) {
                 // TODO: Create a better way to stop writing. Maybe try-with-resources?
                 insertionFileLogger.stopWriting();
-                this.printBenchmarkResults();
+                System.out.println("Average throughtput: " + this.getMeanFromCollection(averageThreadsThroughOutputs));
+                System.out.println("Average bandwidth: " + this.getMeanFromCollection(averageThreadsBandwidths));
+
+//                this.printBenchmarkResults();
             }
         } catch (Exception error) {
             System.err.println("Unable to finish executor service. Reason: " + error.getMessage());
@@ -184,10 +224,25 @@ public class JdbcBenchmark {
     // MARK: - Private methods
 
 
-    private void updateMetrics(final int insertedPayload, final Long microsecondsSpentOnInsertion) throws IllegalArgumentException {
+    private double getMeanFromCollection(List<Double> collection) {
+        if (collection.size() == 0) {
+            return 0;
+        }
+        double sum = 0.0;
+        for (double entry : collection) {
+            sum += entry;
+        }
+        System.out.println("Total amount of collection: " + sum);
+        return sum / collection.size();
+    }
+
+    private void updateMetrics(final int insertedPayload, final Long microsecondsSpentOnInsertion, BenchmarkMetricsCalculator benchmarkMetricsCalculator) throws IllegalArgumentException {
         this.decrementPayload(insertedPayload);
         this.decrementInsertions();
 
+        System.out.println("Insetions left: " + this.amountOfInsertions.get());
+
+        System.out.println("Payload left: " + this.payloadLeft.get());
         if (this.benchmarkMetricsCalculator == null) {
             throw new IllegalArgumentException("Benchmark metrics calculator hasn't been created, unable to update metrics.");
         }
@@ -235,16 +290,22 @@ public class JdbcBenchmark {
         if (this.isInsertionsInfinite()) {
             return false;
         }
-       return (this.amountOfInsertions.get() < 0);
+        return (this.amountOfInsertions.get() < 0);
     }
 
     private boolean hasReachedRequiredPayload() {
-        return (this.totalPayload.get() <= 0);
+        System.out.println("hasReachedRequiredPayload TOTAL PAYLOAD for checking: " + this.payloadLeft.get());
+        return (this.payloadLeft.get() <= 0);
     }
 
     private synchronized int decrementInsertions() throws IllegalArgumentException {
         if (this.isInsertionsInfinite()) {
             return Constants.INFINITE_AMOUNT_OF_INSERTIONS;
+        }
+        if (hasReachedRequiredInsertionAmount()) {
+            final int insertionsLowerBound = 0;
+            this.amountOfInsertions.set(insertionsLowerBound);
+            return this.amountOfInsertions.get();
         }
         // NOTE: It works correctly if .decrementAndGet() and setting a value are different operations
         this.amountOfInsertions.decrementAndGet();
@@ -260,34 +321,43 @@ public class JdbcBenchmark {
     // NOTE: Returning insertion payload, update unsent payload value
     private synchronized int decrementPayload(final int decrementValue) {
         // NOTE: Using UTF-8 ASCII 1-byte characters.
-        int payloadLeft = this.totalPayload.get() - decrementValue;
+        int payloadLeft = this.payloadLeft.get() - decrementValue;
         final int minimalAvailablePayloadValue = 0;
         if (payloadLeft < minimalAvailablePayloadValue) {
             // NOTE: Returning last positive value of payload
-            payloadLeft = this.totalPayload.get();
-            this.totalPayload.set(minimalAvailablePayloadValue);
+            payloadLeft = this.payloadLeft.get();
+            this.payloadLeft.set(minimalAvailablePayloadValue);
             return payloadLeft;
         }
-        this.totalPayload.set(payloadLeft);
+        this.payloadLeft.set(payloadLeft);
 
-        return this.minimalPayloadPerInsertion;
+        return this.minimalPayloadForValueInsertion;
     }
 
 
-    private int getMinimalPayloadPerInsertion() {
+    // NOTE: Key has fixed length, thus we have to calculate minimal payload for value
+    private int getMinimalPayloadForValue() {
         final int oneBytePerInsertion = 1;
         if (this.amountOfInsertions.get() == this.INFINITE_AMOUNT_OF_INSERTIONS) {
             // NOTE: If amount if infinite, inserting 1 byte per operation
             return oneBytePerInsertion;
         }
-        System.out.println("Payload: " + this.totalPayload);
-        System.out.println("amount of insertions: " + this.amountOfInsertions.get());
-        int result = (this.totalPayload.get() / this.amountOfInsertions.get());
+        final int totalPayloadForKeys = this.amountOfInsertions.get() * KEY_LENGTH;
+
+        int payloadLeftForValues = this.payloadLeft.get() - totalPayloadForKeys;
+        if (payloadLeftForValues <= 0) {
+
+            // NOTE: If specified payload is too small event for keys, ...
+            // ... returning minimal available payload length for a value.
+            return oneBytePerInsertion;
+        }
+
+        int result = (payloadLeftForValues / this.amountOfInsertions.get());
         if (result == 0) {
             // NOTE: If amount of insertions is the way bigger than payload, inserting 1 byte per operation
             result = oneBytePerInsertion;
         }
-        System.out.println("MINIMAL AMOUNT OF PAYLOAD IN OPERATION:" + result);
+        System.out.println("MINIMAL AMOUNT OF PAYLOAD FOR VALUE:" + result);
         return result;
     }
 

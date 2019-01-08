@@ -29,7 +29,6 @@ public class DatabaseOperatorDAO {
     private final DatabaseInfo databaseInfo;
     private Connection connection;
 
-    private DatabaseElementValidator databaseElementValidator;
     private DatabaseElementCreator databaseElementCreator;
     private DatabaseElementEraser databaseElementEraser;
     private DatabaseElementInserter databaseElementInserter;
@@ -95,6 +94,11 @@ public class DatabaseOperatorDAO {
         this.databaseElementInserter.insertValueIntoColumn(this.databaseInfo.getTargetTable(), columnName, columnValue);
     }
 
+    // TODO: Refactor duplicate methods
+    public void insertValueIntoColumn(final String column, final String value) throws SQLException {
+        this.databaseElementInserter.insertValueIntoColumn(this.databaseInfo.getTargetTable(), column, value);
+    }
+
 
     // MARK: - Private methods
 
@@ -150,7 +154,7 @@ public class DatabaseOperatorDAO {
         if (this.connection == null) {
             throw new IllegalArgumentException("Connection hasn't been established. Unable to create supporting objects.");
         }
-        this.databaseElementValidator = new DatabaseElementValidator(this.connection);
+        DatabaseElementValidator databaseElementValidator = new DatabaseElementValidator(this.connection);
         this.databaseElementCreator = new DatabaseElementCreator(this.connection, databaseElementValidator);
         this.databaseElementEraser = new DatabaseElementEraser(this.connection, databaseElementValidator);
         this.databaseElementInserter = new DatabaseElementInserter(this.connection, databaseElementValidator);
