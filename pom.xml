@@ -43,9 +43,9 @@
         <db.table></db.table>
 
         <!--NOTE: Required amount of threads-->
-        <benchmark.payload>0</benchmark.payload>
+        <benchmark.payload></benchmark.payload>
         <benchmark.insertions></benchmark.insertions>
-        <benchmark.threads>1</benchmark.threads>
+        <benchmark.threads></benchmark.threads>
 
         <!--NOTE: Logging parameters-->
         <log.file></log.file>
