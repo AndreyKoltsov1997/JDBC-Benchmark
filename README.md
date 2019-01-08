@@ -2,10 +2,7 @@
 
 The app measures average bandwidth and throughput of JDBC Driver considering specified payload, threads and amount of insertion operations. 
 It takes the following parameters: 
-* test dot 1
-* test dot 2
-* test dot 3;
-* test dor **4**; 
+
   1. Database credentials: 
     * username (parameter: *-Ddb.username*) - **required**
     * password (parameter:* -Ddb.password*) - **required** 
