@@ -42,7 +42,7 @@
         <db.name></db.name>
         <db.table></db.table>
 
-        <!--NOTE: Required amount of threads-->
+        <!--NOTE: Benchmark parameters-->
         <benchmark.payload></benchmark.payload>
         <benchmark.insertions></benchmark.insertions>
         <benchmark.threads></benchmark.threads>
