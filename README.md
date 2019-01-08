@@ -1,12 +1,22 @@
 # JDBC Database Driver benchmark 
 
-The app measures average bandwidth and throughput of JDBC Driver considering specified payload, threads and amount of insertion operations. 
+	The app measures average bandwidth and throughput of JDBC Driver considering specified payload, threads and amount of insertion operations. 
 
-The app provides 2 metrics for JDBC DB driver: 
-* Average bandwidth (payload bytes inserted per second);
-* Average thoughput (insert operations per second);
 
-It takes the following parameters: 
+#1. Overview
+
+## 1.1 Supported database.
+The app is able to test the following databases: 
+ * **PostgreSQL**;
+
+## 1.2 Metrics
+The benchmark provides 2 metrics for JDBC DB driver: 
+ * Average bandwidth (payload bytes inserted per second);
+ * Average thoughput (insert operations per second);
+
+# 2. Benchmark configuration.
+
+The app takes the following parameters: 
   1. Database credentials: 
    * username (parameter: *-Ddb.username*) - **required**
    * password (parameter:* -Ddb.password*) - **required** 
@@ -23,19 +33,33 @@ It takes the following parameters:
    5. Logging parameters: 
     * file name for logs (parameter: *-Dlog.file*), if file doesn't exist, it'd be created. If not specified - ** logging into file won't be activated. **
 
-USAGE: ./benchmark.Benchmark *username* *password* --host=*host* --port=*port* ...
-       ... --name=*name* --table=*table name* --payload=*payload* --insertions-=*amount of insertions* --threads=*amount of threads* --file=*name of file for results*
 
+# 3. Build and run. 
 
+ The app uses maven for building. *WARNING*: It's required to use custom Maven settings (stored within .m2/settings.xml), make sure to state them. 
+ Custom settings are used for building docker image and deploying the app to maven repository. 
+ The parameters of the app are specified and described in paragraph 2. 
+In order to build it with default parameters (except database credentials, which are required), use: 
+ > $ mvn clean -Ddb.username=postgres -Ddb.password=password compile assembly:single package
 
-# Build with maven from root folder: 
-$ mvn clean package -Ddb.username=(username here) -Ddb.password=(password here) -Ddb.host=(host here) -Ddb.port=(port here) -Ddb.name=(name here) -Ddb.table=(target table here) -Dbenchmark.payload=(payload here) -Dbenchmark.threads=(amount of threads here) -Dbenchmark.insertions=(amount of insertions here) -Dlog.file=(filename for logs here)
+Benchmark's maven configuration could build docker image. In order to build docker image for the app with default configuration, use "docker:build" command. Example:
 
-# Example: inserting 1000 bytes with 2 threads into PostgreSQL DB hosted on 10.5.0.6:5432, logging onto the file "log.csv" and dockerize it. 
-$ mvn clean -Ddb.username=postgres -Ddb.password=password -Ddb.host=10.5.0.6 -Ddb.port=5432 -Dbenchmark.payload=1000 -Dbenchmark.threads=2 -Dlog.file=log.csv compile assembly:single package docker:build
+> $ mvn -s .m2/settings.xml clean -Ddb.username=postgres -Ddb.password=password compile assembly:single package docker:build
 
-# Build docker image with maven:
-$ mvn -s .m2/settings.xml clean compile assembly:single package docker:build
+# 4. Test run. 
 
-# Run inside docker container: 
-$ docker-compose up  
+In order see how benchmark works, it's possible to launch in with the reference database (**PostgreSQL**) inside docker container. 
+
+## 4.1 Reference DB configuration. 
+ * *database*: PostgreSQL ;
+ * *host*:  10.5.0.6:5432 ;
+ * *username*: postgresql ;
+ * *password*: pasword ;
+
+ ## 4.2 Launching. 
+  *Example*: inserting 1000 bytes with 2 threads into PostgreSQL DB hosted on 10.5.0.6:5432 inside docker container.
+  Firstly, you'll have to build the app: 
+  > $ mvn -s .m2/settings.xml  clean -Ddb.username=postgres -Ddb.password=password -Ddb.host=10.5.0.6 -Ddb.port=5432 -Dbenchmark.payload=1000 -Dbenchmark.threads=2 compile assembly:single package docker:build
+  After that, simply write
+  > $ docker-compose up 
+
