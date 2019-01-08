@@ -2,15 +2,7 @@ version: '3'
 
 
 services:
-  jm-app:
-    image: jdbc-benchmark
-    ports:
-    - "8080:8080"
-    depends_on:
-    - reference-postgres-db
-    networks:
-      vpcbr:
-        ipv4_address: 10.5.0.5
+
   reference-postgres-db:
     image: postgres:10.1
     ports:
@@ -22,6 +14,21 @@ services:
     networks:
       vpcbr:
         ipv4_address: 10.5.0.6
+    healthcheck:
+        test: ["CMD", "curl", "-f", "http://10.5.0.6:5432"]
+        interval: 30s
+        timeout: 10s
+        retries: 5
+
+  jm-app:
+    image: jdbc-benchmark
+    ports:
+    - "8080:8080"
+    depends_on:
+      - reference-postgres-db
+    networks:
+      vpcbr:
+        ipv4_address: 10.5.0.5
 
 
 networks:
