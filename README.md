@@ -3,7 +3,7 @@
 	The app measures average bandwidth and throughput of JDBC Driver considering specified payload, threads and amount of insertion operations. 
 
 
-#1. Overview
+# 1. Overview
 
 ## 1.1 Supported database.
 The app is able to test the following databases: 
@@ -62,4 +62,10 @@ In order see how benchmark works, it's possible to launch in with the reference 
   > $ mvn -s .m2/settings.xml  clean -Ddb.username=postgres -Ddb.password=password -Ddb.host=10.5.0.6 -Ddb.port=5432 -Dbenchmark.payload=1000 -Dbenchmark.threads=2 compile assembly:single package docker:build
   After that, simply write
   > $ docker-compose up 
+
+# 5. Deploying. 
+ The benchmark's artifacts are deploying into a Maven Repo after each CI-confirmed commit to *master*.
+ **Maven Repo Host**: www.myMavenRepo.com - a free and open maven repository host; 
+ ** URL for benchmark's maven repository**: https://mymavenrepo.com/repo/1tBBXJuvm7DxdQvRwi8t
+
 
