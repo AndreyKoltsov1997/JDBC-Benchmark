@@ -36,15 +36,17 @@ The app takes the following parameters:
 
 # 3. Build and run. 
 
- The app uses maven for building. *WARNING*: It's required to use custom Maven settings (stored within .m2/settings.xml), make sure to state them. 
+ The app uses maven for building. 
+ **WARNING**: It's required to use custom Maven settings (stored within .m2/settings.xml), make sure to state them. 
  Custom settings are used for building docker image and deploying the app to maven repository. 
  The parameters of the app are specified and described in paragraph 2. 
 In order to build it with default parameters (except database credentials, which are required), use: 
  > $ mvn clean -Ddb.username=postgres -Ddb.password=password compile assembly:single package
 
-Benchmark's maven configuration could build docker image. In order to build docker image for the app with default configuration, use "docker:build" command. Example:
+Benchmark's maven configuration could build docker image. In order to build docker image for the app with default configuration, use "docker:build" command. 
+**Example**:
 
-> $ mvn -s .m2/settings.xml clean -Ddb.username=postgres -Ddb.password=password compile assembly:single package docker:build
+ > $ mvn -s .m2/settings.xml clean -Ddb.username=postgres -Ddb.password=password compile assembly:single package docker:build
 
 # 4. Test run. 
 
@@ -59,13 +61,13 @@ In order see how benchmark works, it's possible to launch in with the reference 
  ## 4.2 Launching. 
   **Example**: inserting 1000 bytes with 2 threads into PostgreSQL DB hosted on 10.5.0.6:5432 inside docker container.
   Firstly, you'll have to build the app: 
-  > $ mvn -s .m2/settings.xml  clean -Ddb.username=postgres -Ddb.password=password -Ddb.host=10.5.0.6 -Ddb.port=5432 -Dbenchmark.payload=1000 -Dbenchmark.threads=2 compile assembly:single package docker:build
+   > $ mvn -s .m2/settings.xml  clean -Ddb.username=postgres -Ddb.password=password -Ddb.host=10.5.0.6 -Ddb.port=5432 -Dbenchmark.payload=1000 -Dbenchmark.threads=2 compile assembly:single package docker:build
   After that, simply write
-  > $ docker-compose up 
+   > $ docker-compose up 
 
 # 5. Deploying. 
  The benchmark's artifacts are deploying into a Maven Repo after each CI-confirmed commit to *master*.
- **Maven Repo Host**: www.myMavenRepo.com - a free and open maven repository host; 
- ** URL for benchmark's maven repository**: https://mymavenrepo.com/repo/1tBBXJuvm7DxdQvRwi8t
+ **Maven Repo Host**: www.myMavenRepo.com - a free and open maven repository host.
+ **URL for benchmark's maven repository**: https://mymavenrepo.com/repo/1tBBXJuvm7DxdQvRwi8t
 
 
