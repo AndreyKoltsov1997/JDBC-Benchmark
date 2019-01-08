@@ -18,20 +18,20 @@ The benchmark provides 2 metrics for JDBC DB driver:
 
 The app takes the following parameters: 
   1. Database credentials: 
-   * username (parameter: *-Ddb.username*) - **required**
-   * password (parameter:* -Ddb.password*) - **required** 
+   * username (parameter: **-Ddb.username** ) - **required**
+   * password (parameter: **-Ddb.password** ) - **required** 
   2. Database location: 
-   * host (parameter: -Ddb.host), if not specified - **"localhost" by default**; 
-   * port (parameter: -Ddb.port), if not specified - **"8080" by default**;
+   * host (parameter: **-Ddb.host** ), if not specified - **"localhost" by default**; 
+   * port (parameter: **-Ddb.port** ), if not specified - **"8080" by default**;
   3. Target database info: 
-   * database name - a name of target catalog. (parameter: *-Ddb.name*), if not specified - ** "jdbcBenchmarkDb" by default**;
-   * table name - a name of target database. (parameter: **-Ddb.table**), if not specified - ** *current timestamp with respect to SQL available synbols for name* **
+   * database name - a name of target catalog. (parameter: **-Ddb.name** ), if not specified - **"jdbcBenchmarkDb" by default**;
+   * table name - a name of target database. (parameter: **-Ddb.table** ), if not specified - **current timestamp with respect to SQL available synbols for name**;
   4. Benchmark parameters:     
-   * payload (parameter: *-Dbenchmark.payload*), if not specified - ** *"1"* by default since JDBC minimal allowed amount of inserted string is 1. **;
-   * amount of threads which would be performing insert operations concurrently (parameter: *-Dbenchmark.threads*), if not specified - ** *"1"* by defult **;
-   * amount of insertions (parameter: *-Dbenchmark.insertions*), if not specified - ** *infinite* amount of insertions **;
+   * payload (parameter: **-Dbenchmark.payload** ), if not specified - **"1" by default since JDBC minimal allowed amount of inserted string is 1.**;
+   * amount of threads which would be performing insert operations concurrently (parameter: **-Dbenchmark.threads** ), if not specified - **"1" by defult**;
+   * amount of insertions (parameter: **-Dbenchmark.insertions** ), if not specified - **infinite amount of insertions**;
    5. Logging parameters: 
-    * file name for logs (parameter: *-Dlog.file*), if file doesn't exist, it'd be created. If not specified - ** logging into file won't be activated. **
+    * file name for logs (parameter: **-Dlog.file** ), if file doesn't exist, it'd be created. If not specified - **logging into file won't be activated.**
 
 
 # 3. Build and run. 
@@ -51,13 +51,13 @@ Benchmark's maven configuration could build docker image. In order to build dock
 In order see how benchmark works, it's possible to launch in with the reference database (**PostgreSQL**) inside docker container. 
 
 ## 4.1 Reference DB configuration. 
- * *database*: PostgreSQL ;
- * *host*:  10.5.0.6:5432 ;
- * *username*: postgresql ;
- * *password*: pasword ;
+ * **database**: PostgreSQL ;
+ * **host**:  10.5.0.6:5432 ;
+ * **username**: postgresql ;
+ * **password**: pasword ;
 
  ## 4.2 Launching. 
-  *Example*: inserting 1000 bytes with 2 threads into PostgreSQL DB hosted on 10.5.0.6:5432 inside docker container.
+  **Example**: inserting 1000 bytes with 2 threads into PostgreSQL DB hosted on 10.5.0.6:5432 inside docker container.
   Firstly, you'll have to build the app: 
   > $ mvn -s .m2/settings.xml  clean -Ddb.username=postgres -Ddb.password=password -Ddb.host=10.5.0.6 -Ddb.port=5432 -Dbenchmark.payload=1000 -Dbenchmark.threads=2 compile assembly:single package docker:build
   After that, simply write
