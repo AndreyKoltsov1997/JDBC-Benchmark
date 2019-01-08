@@ -63,6 +63,6 @@
     <property name="ftp.nonProxyHosts" value="local|*.local|169.254/16|*.169.254/16"/>
     <property name="sun.cpu.isalist" value=""/>
   </properties>
-  <testcase classname="benchmark.cli.OptionalCommandLineArgumentsTest" name="parseOptionalArguments" time="0.002"/>
-  <testcase classname="benchmark.cli.OptionalCommandLineArgumentsTest" name="isArgumentOptional" time="0"/>
+  <testcase classname="benchmark.cli.OptionalCommandLineArgumentsTest" name="parseOptionalArguments" time="0.001"/>
+  <testcase classname="benchmark.cli.OptionalCommandLineArgumentsTest" name="isArgumentOptional" time="0.001"/>
 </testsuite>

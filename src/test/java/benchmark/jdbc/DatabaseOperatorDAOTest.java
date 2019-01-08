@@ -1,7 +1,6 @@
 package benchmark.jdbc;
 
 import benchmark.common.Constants;
-import benchmark.common.RandomAsciiStringGenerator;
 import benchmark.database.BenchmarkSupportingDatabases;
 import benchmark.database.DatabaseInfo;
 import benchmark.database.components.DatabaseCredentials;
@@ -9,11 +8,6 @@ import benchmark.database.components.DatabaseLocation;
 import org.junit.Test;
 
 import java.sql.SQLException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.junit.Assert.*;
 
 public class DatabaseOperatorDAOTest {
 

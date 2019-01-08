@@ -49,12 +49,7 @@ public class JdbcBenchmark {
         System.out.println("Minimal payload per insertion: " + this.getMinimalPayloadForValue());
     }
 
-
     // MARK: - Public methods
-
-    public Boolean isFileOutputRequired() {
-        return (outputFileName.equals(JdbcBenchmark.NO_OUTPUT_FILE_REQUIRED_FILENAME));
-    }
 
     public void performBenchmark() {
 
@@ -83,6 +78,8 @@ public class JdbcBenchmark {
 
     }
 
+
+    // MARK: - Private methods
 
     private String getRandomStringForBenchmark(RandomAsciiStringGenerator randomAsciiStringGenerator, ColumnType columnType) {
         String randomString = "";
@@ -186,10 +183,7 @@ public class JdbcBenchmark {
             if (hasInsertionFinished) {
                 // TODO: Create a better way to stop writing. Maybe try-with-resources?
                 insertionFileLogger.stopWriting();
-                System.out.println("Average throughtput: " + this.getMeanFromCollection(averageThreadsThroughOutputs));
-                System.out.println("Average bandwidth: " + this.getMeanFromCollection(averageThreadsBandwidths));
-
-//                this.printBenchmarkResults();
+                this.printBenchmarkResults(averageThreadsThroughOutputs, averageThreadsBandwidths);
             }
         } catch (Exception error) {
             System.err.println("Unable to finish executor service. Reason: " + error.getMessage());
@@ -197,9 +191,6 @@ public class JdbcBenchmark {
         }
 
     }
-
-
-    // MARK: - Private methods
 
 
     private double getMeanFromCollection(List<Double> collection) {
@@ -210,7 +201,6 @@ public class JdbcBenchmark {
         for (double entry : collection) {
             sum += entry;
         }
-        System.out.println("Total amount of collection: " + sum);
         return sum / collection.size();
     }
 
@@ -218,23 +208,18 @@ public class JdbcBenchmark {
         this.decrementPayload(insertedPayload);
         this.decrementInsertions();
 
-        System.out.println("Insetions left: " + this.amountOfInsertions.get());
-
-        System.out.println("Payload left: " + this.payloadLeft.get());
         if (this.benchmarkMetricsCalculator == null) {
             throw new IllegalArgumentException("Benchmark metrics calculator hasn't been created, unable to update metrics.");
         }
-        System.out.println("Updating metrics. Bytes inserted: " + insertedPayload + " for " + microsecondsSpentOnInsertion + ". Insertions left " + this.amountOfInsertions.get());
         benchmarkMetricsCalculator.addBytesInserted(insertedPayload);
         benchmarkMetricsCalculator.addMicrosecondsSpentOnInsertion(microsecondsSpentOnInsertion);
         benchmarkMetricsCalculator.incrementSuccessfulInsertions();
 
     }
 
-    private void printBenchmarkResults() {
-        final double averageThroughput = benchmarkMetricsCalculator.getAverageThroughput();
-        final double bandWidth = benchmarkMetricsCalculator.getBandwidth();
-        System.out.println("Average throughput: " + averageThroughput + ", bandwidth: " + bandWidth);
+    private void printBenchmarkResults(final List<Double> threadsThroughputValues, final List<Double> threadsBandwidthValues) {
+        System.out.println("Average throughput: " + this.getMeanFromCollection(threadsThroughputValues));
+        System.out.println("Average bandwidth: " + this.getMeanFromCollection(threadsBandwidthValues));
     }
 
 
@@ -243,25 +228,9 @@ public class JdbcBenchmark {
         System.err.println("Failure: " + dbName + "," + targetTable + "," + insertingKey + "," + failureCause);
     }
 
-    private Long convertNanoSecondToMicroseconds(Long nanoseconds) {
-        final Integer MICRO_FROM_NANO_OFFSET = 1000;
-        return (nanoseconds / MICRO_FROM_NANO_OFFSET);
-    }
 
     private Boolean shouldContinueInserting() {
         return (!this.hasReachedRequiredInsertionAmount() && !this.hasReachedRequiredPayload());
-//        if (this.isInsertionsInfinite()) {
-//            return true;
-//        }
-//        int insertionsLeft = this.amountOfInsertions.get() - amountOfInsertedValues;
-//
-//        final int insertionsLowerBound = 0;
-//        if (insertionsLeft <= insertionsLowerBound) {
-//            this.amountOfInsertions.set(insertionsLowerBound);
-//            return false;
-//        }
-//        this.amountOfInsertions.set(insertionsLeft);
-//        return true;
     }
 
     private boolean hasReachedRequiredInsertionAmount() {
@@ -272,7 +241,6 @@ public class JdbcBenchmark {
     }
 
     private boolean hasReachedRequiredPayload() {
-        System.out.println("hasReachedRequiredPayload TOTAL PAYLOAD for checking: " + this.payloadLeft.get());
         return (this.payloadLeft.get() <= 0);
     }
 
@@ -335,7 +303,6 @@ public class JdbcBenchmark {
             // NOTE: If amount of insertions is the way bigger than payload, inserting 1 byte per operation
             result = oneBytePerInsertion;
         }
-        System.out.println("MINIMAL AMOUNT OF PAYLOAD FOR VALUE:" + result);
         return result;
     }
 
