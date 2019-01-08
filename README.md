@@ -3,8 +3,8 @@
 The app measures average bandwidth and throughput of JDBC Driver considering specified payload, threads and amount of insertion operations. 
 It takes the following parameters: 
   1. Database credentials: 
-    * username (parameter: *-Ddb.username*) - **required**;
-    * password (parameter:* -Ddb.password*) - **required**; 
+    * username (parameter: *-Ddb.username*) - **required**
+    * password (parameter:* -Ddb.password*) - **required** 
   2. Database location: 
     * host (parameter: -Ddb.host), if not specified - **"localhost" by default**; 
     * port (parameter: -Ddb.port), if not specified - **"8080" by default**;
