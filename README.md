@@ -1,6 +1,6 @@
 # JDBC Database Driver benchmark 
 
-	The app measures average bandwidth and throughput of JDBC Driver considering specified payload, threads and amount of insertion operations. 
+ The app measures average bandwidth and throughput of JDBC Driver.
 
 
 # 1. Overview
