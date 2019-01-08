@@ -69,7 +69,9 @@ class OptionalCommandLineArguments {
                     throw new IllegalArgumentException("Argument \"" + argumentName + "\" doesn't exist. ");
                 }
                 final String argumentValue = this.getOptionValue(currentArgument);
-                this.options.put(argumentName, argumentValue);
+                if (!argumentValue.isEmpty()) {
+                    this.options.put(argumentName, argumentValue);
+                }
             }
         }
         System.out.println("Optional arguments: " + this.options.toString());

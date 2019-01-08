@@ -13,6 +13,7 @@ public class Benchmark {
     // MARK: - Program entry point
     public static void main(String[] args) {
 
+
         final CommandLineArgsParser commandLineArgsParser = new CommandLineArgsParser();
 
         try {
