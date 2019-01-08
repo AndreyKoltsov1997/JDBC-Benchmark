@@ -30,6 +30,25 @@
         <app.name>jdbc-benchmark</app.name>
         <app.name.with.dependencies>${app.name}-${project.version}-jar-with-dependencies</app.name.with.dependencies>
 
+        <!--NOTE: Database credentials-->
+        <db.username>postgres</db.username>
+        <db.password>password</db.password>
+
+        <!--NOTE: Database location-->
+        <db.host>10.5.0.6</db.host>
+        <db.port>5432</db.port>
+
+        <!--NOTE: Database info-->
+        <db.name></db.name>
+        <db.table></db.table>
+
+        <!--NOTE: Required amount of threads-->
+        <benchmark.payload>0</benchmark.payload>
+        <benchmark.insertions></benchmark.insertions>
+        <benchmark.threads>1</benchmark.threads>
+
+        <!--NOTE: Logging parameters-->
+        <log.file></log.file>
 
     </properties>
 
@@ -116,7 +135,7 @@
                 <configuration>
                     <imageName>${app.name}</imageName>
                     <baseImage>java</baseImage>
-                    <entryPoint>["java", "-jar", "/${app.name.with.dependencies}.jar", "postgres", "password", "--host=10.5.0.6", "--port=5432", "--insertions=", "--threads=", "--payload="]</entryPoint>
+                    <entryPoint>["java", "-jar", "/${app.name.with.dependencies}.jar", "${db.username}", "${db.password}", "--name=${db.name}", "--table=${db.table}", "--host=${db.host}", "--port=${db.port}", "--payload=${benchmark.payload}", "--insertions=${benchmark.insertions}", "--threads=${benchmark.threads}", "--file=${log.file}"]</entryPoint>
                     <!-- copy the service's jar file from target into the root directory of the image -->
                     <resources>
                         <resource>
