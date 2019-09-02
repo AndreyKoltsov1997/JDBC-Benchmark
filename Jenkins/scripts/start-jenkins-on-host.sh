@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# WARNING: Some systems could protect docker.sock file from binding. Consider ...
+# ... running this script in root mode to exclude it from happening.
+
 # NOTE: User homepath should be configured with respect to the host.
 USER_HOME=/Users/Andrey/
 
