@@ -25,12 +25,12 @@ pipeline {
                 always {
                     junit 'target/surefire-reports/*.xml'
                 }
-            }
-            success {
-                echo '${SUCCESS_MESSAGE_OUTPUT_COLOR} Tests have successfully passed.'
-            }
-            failure {
-                echo '${FAILURE_MESSAGE_OUTPUT_COLOR} Tests have failed.'
+                success {
+                    echo '${SUCCESS_MESSAGE_OUTPUT_COLOR} Tests have successfully passed.'
+                }
+                failure {
+                    echo '${FAILURE_MESSAGE_OUTPUT_COLOR} Tests have failed.'
+                }
             }
         }
         stage('Deploy') {
