@@ -12,8 +12,11 @@ pipeline {
         }
     }
     stages {
+        def tag = sh(returnsStdout: true, script: "git tag -- contains | head -1").trim()
         stage('Build') {
             steps {
+                echo "tag is $tag"
+                echo "Change ID is $env.CHANGE_ID"
                 sh 'mvn clean compile -DskipTests  assembly:single package'
             }
         }
@@ -34,9 +37,9 @@ pipeline {
             }
         }
         stage('Deploy') {
-        when {
-            branch 'master'
-        }
+            when {
+                branch 'master'
+            }
             steps {
                 sh 'mvn -s .m2/settings.xml --batch-mode deploy'
             }
