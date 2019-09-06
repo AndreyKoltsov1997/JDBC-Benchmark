@@ -1,3 +1,5 @@
+#!groovy
+
 def SUCCESS_MESSAGE_OUTPUT_COLOR='\033[1;32m'
 def FAILURE_MESSAGE_OUTPUT_COLOR='\033[0;31m'
 pipeline {
@@ -15,6 +17,7 @@ pipeline {
         stage('Build') {
             steps {
                 script { 
+                    sh "git tag -- contains | head -1""
                     def tag = sh(returnsStdout: true, script: "git tag -- contains | head -1").trim()
                     echo "tag is $tag"
                     echo "Change ID is $env.CHANGE_ID"
