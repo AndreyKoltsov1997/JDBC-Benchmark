@@ -17,7 +17,7 @@ pipeline {
         stage('Build') {
             steps {
                 script { 
-                    sh "git tag -- contains | head -1""
+                    sh "git tag -- contains | head -1"
                     def tag = sh(returnsStdout: true, script: "git tag -- contains | head -1").trim()
                     echo "tag is $tag"
                     echo "Change ID is $env.CHANGE_ID"
