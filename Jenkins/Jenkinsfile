@@ -47,6 +47,7 @@ pipeline {
                         params.isImageExistInRegistry = false;
                         // NOTE: Setting build as success in order to continue the step.
                         currentBuild.result = 'SUCCESS'
+                        echo "currentBuild.result $currentBuild.result"
                     } finally { 
                         echo "Finally"
                     }
