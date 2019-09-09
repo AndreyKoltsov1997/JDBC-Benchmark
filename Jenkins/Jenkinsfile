@@ -23,8 +23,8 @@ pipeline {
                 script {
 
 
-            docker.image('emcmongoose/darzee:latest').withRun("-p 8880:8880") { test ->
-             echo "Running darzee inside node."
+            docker.image('emcmongoose/darzee:latest').withRun("") { test ->
+             echo "Running darzee inside node with empty withRun(...)."
             }
 
             try {
