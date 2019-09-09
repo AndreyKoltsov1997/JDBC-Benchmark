@@ -15,7 +15,7 @@ pipeline {
                 docker { 
                     image 'maven:3.6.1-jdk-8' 
                     args '-v /root/.m2:/root/.m2'
-                    }
+                }
             }
             steps {
                 script {
@@ -31,11 +31,19 @@ pipeline {
                     // NOTE: Requires 'Docker' Jenkins plugin. DOcumentation: https://go.cloudbees.com/docs/plugins/docker-workflow/
 
                     try { 
-                        docker.image('emcmongoose/darzee:latest').withRun('') { test ->
-                            echo "Test: $test"
-                            echo "inside 'with image'"
+
+                        agent {
+                            docker { 
+                                image 'emcmongoose/darzee:latest' 
+                                args '-p 8080:8080'
+                            }
                         }
-                        echo "dockerImageInstance: $dockerImageInstance exist."
+
+                        // docker.image('emcmongoose/darzee:latest').withRun('') { test ->
+                        //     echo "Test: $test"
+                        //     echo "inside 'with image'"
+                        // }
+                        echo "dockerImageInstance exist."
                     } catch (Exception e) { 
                         echo "Docker image doesn't exist."
                     }
