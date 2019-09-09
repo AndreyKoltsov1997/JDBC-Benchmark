@@ -13,7 +13,7 @@ pipeline {
             // NOTE: Checking registry for existing image
             agent {
                 docker { 
-                    image 'maven:3.6.1-jdk-11' 
+                    image 'docker:dind' 
                     args '-v /root/.m2:/root/.m2'
                     }
             }
