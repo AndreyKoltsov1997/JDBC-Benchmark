@@ -48,8 +48,8 @@ pipeline {
         stage('Build') {
             agent {
                 docker {
-                        
-                        
+                    image 'maven:3-alpine'
+                    
                     /* creates a reciprocal mapping between the /root/.m2 (i.e. Maven repository) directories in the ...
                     ... short-lived Maven Docker container and that of your Docker host’s filesystem */
                     /* As far as I understand, this is something like cache in docker multistage building. */
