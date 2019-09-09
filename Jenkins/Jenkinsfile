@@ -20,12 +20,15 @@ pipeline {
             }
             steps {
 
+                script {
+
+
             docker.image('emcmongoose/darzee:latest').withRun("-p 8080:8080") { test ->
              echo "Running darzee inside node."
             }
 
             try {
-                docker.image("emcmongoose/darzee:nonexist").withRUn("-p 8080:8080") {
+                docker.image("emcmongoose/darzee:nonexist").withRun("-p 8080:8080") {
                 c ->
                     echo "running non-existing darzee container"
                 }
@@ -33,7 +36,6 @@ pipeline {
                 echo "caught exception with trying to run non-existing darzee container."
             }
     
-                script {
                     /* 
                    NOTE: Make sure you have the following plugins installed: 
                    * GitHub Branch Source: https://github.com/jenkinsci/github-branch-source-plugin
