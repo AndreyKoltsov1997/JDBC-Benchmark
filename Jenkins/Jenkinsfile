@@ -31,7 +31,7 @@ pipeline {
                     // NOTE: Requires 'Docker' Jenkins plugin. DOcumentation: https://go.cloudbees.com/docs/plugins/docker-workflow/
 
                     try { 
-                        def dokerImageInstance = docker.image('emcmongoose/darzee:latest').withRun('') { test ->
+                        docker.image('emcmongoose/darzee:latest').withRun('') { test ->
                             echo "Test: $test"
                             echo "inside 'with image'"
                         }
