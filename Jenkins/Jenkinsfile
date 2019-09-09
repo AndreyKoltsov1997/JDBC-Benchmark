@@ -3,10 +3,25 @@
 def SUCCESS_MESSAGE_OUTPUT_COLOR = '\033[1;32m'
 def FAILURE_MESSAGE_OUTPUT_COLOR = '\033[0;31m'
 
+final EMPTY_COMMIT_TAG = "empty_commit_tag"
+final DEFAULT_IMAGE_TAG = "latest"
+
+/**
+* @returns current commit tag, empty string if latest tag is null.
+*/
 def getCommitTag() { 
-    def tag = sh(script: "git log --pretty=format:'%h' -n 1", returnStdout: true)
+    /* 
+    * NOTE: Make sure you have the following plugins installed: 
+    * GitHub Branch Source: https://github.com/jenkinsci/github-branch-source-plugin
+    * and "Branch Build" Jenkins plugins installed.
+    */
+    def tag = sh(script: "git log --pretty=format:'%h' -n 1", returnStdout: true).trim()
+    if (tag == null) { 
+        tag = EMPTY_COMMIT_TAG;
+    }
     return tag 
 }
+
 isImageExistInRegistry = false; 
 
 pipeline {
@@ -28,17 +43,18 @@ pipeline {
             steps {
 
                 script {
-                    /* 
-                   * NOTE: Make sure you have the following plugins installed: 
-                   * GitHub Branch Source: https://github.com/jenkinsci/github-branch-source-plugin
-                   * and "Branch Build" Jenkins plugins installed.
-                   */
+                    
                     // NOTE: Getting short hash of the commit. Use %H (capital) for full hash.
                     // def tag = sh(script: "git log --pretty=format:'%h' -n 1", returnStdout: true)
-                    def tag = getCommitTag()
+                    def tag = getCommitTag();
+                    if (tag == EMPTY_COMMIT_TAG) { 
+                        final latestTag = "latest";
+                        tag = DEFAULT_IMAGE_TAG;
+                    }
                     try {
+                        final darzeeImageName = "emcmongoose/darzee";
                         // NOTE: Requires 'Docker' Jenkins plugin. DOcumentation: https://go.cloudbees.com/docs/plugins/docker-workflow/
-                        docker.image("emcmongoose/darzee:$tag").withRun("") { test ->
+                        docker.image("$darzeeImageName:$tag").withRun("") { test ->
                             params.isImageExistInRegistry = true;
                         }
                     } catch (ex) {
