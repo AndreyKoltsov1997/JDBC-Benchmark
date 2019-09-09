@@ -3,6 +3,10 @@
 def SUCCESS_MESSAGE_OUTPUT_COLOR = '\033[1;32m'
 def FAILURE_MESSAGE_OUTPUT_COLOR = '\033[0;31m'
 
+def getCommitTag() { 
+    def tag = sh(script: "git log --pretty=format:'%h' -n 1", returnStdout: true)
+    return tag 
+}
 isImageExistInRegistry = false; 
 
 pipeline {
@@ -24,32 +28,22 @@ pipeline {
             steps {
 
                 script {
-
                     /* 
-                   NOTE: Make sure you have the following plugins installed: 
+                   * NOTE: Make sure you have the following plugins installed: 
                    * GitHub Branch Source: https://github.com/jenkinsci/github-branch-source-plugin
                    * and "Branch Build" Jenkins plugins installed.
                    */
-
-                    //    NOTE: Getting short hash of the commit. Use %H (capital) for full hash.
-                    def tag = sh(script: "git log --pretty=format:'%h' -n 1", returnStdout: true)
-
-
+                    // NOTE: Getting short hash of the commit. Use %H (capital) for full hash.
+                    // def tag = sh(script: "git log --pretty=format:'%h' -n 1", returnStdout: true)
+                    def tag = getCommitTag()
                     try {
                         // NOTE: Requires 'Docker' Jenkins plugin. DOcumentation: https://go.cloudbees.com/docs/plugins/docker-workflow/
                         docker.image("emcmongoose/darzee:$tag").withRun("") { test ->
                             params.isImageExistInRegistry = true;
                         }
                     } catch (ex) {
-                        echo "currentBuild.result $currentBuild.result"
                         isImageExistInRegistry = false;
-                        // NOTE: Setting build as success in order to continue the step.
-                        currentBuild.result = 'SUCCESS'
-                    } finally { 
-                        echo "Finally"
-                        echo "[Fianlly block] Is image exist in registry? $isImageExistInRegistry"
-
-                    }
+                    } 
                     echo "Is image exist in registry? $isImageExistInRegistry"
                 }
             }
