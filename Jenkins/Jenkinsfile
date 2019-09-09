@@ -23,12 +23,12 @@ pipeline {
                 script {
 
 
-            docker.image('emcmongoose/darzee:latest').withRun("-p 8080:8080") { test ->
+            docker.image('emcmongoose/darzee:latest').withRun("-p 8880:8880") { test ->
              echo "Running darzee inside node."
             }
 
             try {
-                docker.image("emcmongoose/darzee:nonexist").withRun("-p 8080:8080") {
+                docker.image("emcmongoose/darzee:nonexist").withRun("-p 8881:8881") {
                 c ->
                     echo "running non-existing darzee container"
                 }
@@ -50,7 +50,7 @@ pipeline {
                     try {
 
                         
-                        docker.image('emcmongoose/darzee:latest').withRun('-p 8080:8080') { test ->
+                        docker.image('emcmongoose/darzee:latest').withRun('-p 8888:8888') { test ->
                             echo "Running Darzee container inside a pipeline."
                         }
                     } catch (Exception e) {
