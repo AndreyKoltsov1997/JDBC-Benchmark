@@ -31,8 +31,8 @@ pipeline {
                     // NOTE: Requires 'Docker' Jenkins plugin. DOcumentation: https://go.cloudbees.com/docs/plugins/docker-workflow/
 
                     try { 
-                        dokerImageInstance = docker.image('emcmongoose/darzee:imnotexisting')
-                        echo "dockerImageInstance: $dockerImageInstance"
+                        dokerImageInstance = docker.image('emcmongoose/darzee')
+                        echo "dockerImageInstance: $dockerImageInstance exist."
                     } catch (Exception e) { 
                         echo "Docker image doesn't exist."
                     }
