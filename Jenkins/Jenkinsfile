@@ -28,11 +28,15 @@ pipeline {
                 //    NOTE: Getting short hash of the commit. Use %H (capital) for full hash.
                     sh "git log --pretty=format:'%h' -n 1"
                     def tag = sh(script: "git log --pretty=format:'%h' -n 1", returnStdout: true)
-                    def existingImageTag = sh(script: "docker images -q emcmongoose/darzee:latest", returnStdout: true)
-                    echo "existingImageTag ${existingImageTag}"
-                    def isImageExistInRegistry = (existingImageTag == '')
-                    echo "tag is $tag"
-                    echo "Is Darzee image exist? $isImageExistInRegistry"
+                    // NOTE: Requires 'Docker' Jenkins plugin 
+                    
+                    def dockerImageInstance = docker.image('emcmongoose/darzee')
+                    echo "dockerImageInstance: $dockerImageInstance"
+                    // def existingImageTag = sh(script: "docker images -q emcmongoose/darzee:latest", returnStdout: true)
+                    // echo "existingImageTag ${existingImageTag}"
+                    // def isImageExistInRegistry = (existingImageTag == '')
+                    // echo "tag is $tag"
+                    // echo "Is Darzee image exist? $isImageExistInRegistry"
                 }
             }
         }
