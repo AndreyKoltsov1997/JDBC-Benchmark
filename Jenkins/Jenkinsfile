@@ -24,8 +24,10 @@ pipeline {
                    * GitHub Branch Source: https://github.com/jenkinsci/github-branch-source-plugin
                    * and "Branch Build" Jenkins plugins installed.
                    */
-                    sh "git tag -- contains | head -1"
-                    def tag = sh(returnsStdout: true, script: "git tag -- contains | head -1").trim()
+
+                //    NOTE: Getting short hash of the commit. Use %H (capital) for full hash.
+                    sh "git log --pretty=format:'%h' -n 1"
+                    def tag = sh(returnsStdout: true, script: "git log --pretty=format:'%h' -n 1")
                     echo "tag is $tag"
                     echo "Change ID is $env.CHANGE_ID"
                 }
