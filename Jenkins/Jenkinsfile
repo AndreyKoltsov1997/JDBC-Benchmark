@@ -13,7 +13,7 @@ pipeline {
             // NOTE: Checking registry for existing image
             agent {
                 docker { 
-                    image 'docker:dind' 
+                    image 'maven:jdk-8' 
                     args '-v /root/.m2:/root/.m2'
                     }
             }
@@ -30,11 +30,13 @@ pipeline {
                     def tag = sh(script: "git log --pretty=format:'%h' -n 1", returnStdout: true)
                     // NOTE: Requires 'Docker' Jenkins plugin. DOcumentation: https://go.cloudbees.com/docs/plugins/docker-workflow/
 
-                    docker.withTool("default") { 
-                        sh "docker images" 
+                    try { 
+                        dokerImageInstance = docker.image('emcmongoose/darzee:imnotexisting')
+                        echo "dockerImageInstance: $dockerImageInstance"
+                    } catch (Exception e) { 
+                        echo "Docker image doesn't exist."
                     }
-                    def dockerImageInstance = docker.image('emcmongoose/darzee:imnotexisting')
-                    echo "dockerImageInstance: $dockerImageInstance"
+                   
                     // def existingImageTag = sh(script: "docker images -q emcmongoose/darzee:latest", returnStdout: true)
                     // echo "existingImageTag ${existingImageTag}"
                     // def isImageExistInRegistry = (existingImageTag == '')
