@@ -45,6 +45,8 @@ pipeline {
                     } catch (ex) {
                         echo "test"
                         params.isImageExistInRegistry = false;
+                        // NOTE: Setting build as success in order to continue the step.
+                        currentBuild.result = 'SUCCESS'
                     } finally { 
                         echo "Finally"
                     }
