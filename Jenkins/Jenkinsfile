@@ -2,6 +2,21 @@
 
 def SUCCESS_MESSAGE_OUTPUT_COLOR = '\033[1;32m'
 def FAILURE_MESSAGE_OUTPUT_COLOR = '\033[0;31m'
+node {
+    docker.image('emcmongoose/darzee:latest').withRun("-p 8080:8080") {
+    test ->
+        echo "Running darzee inside node."
+    }
+
+    try {
+        docker.image("emcmongoose/darzee:nonexist").withRUn("-p 8080:8080") {
+        c ->
+            echo "running non-existing darzee container"
+        }
+    } catch (Exception ex) {
+        echo "caught exception with trying to run non-existing darzee container."
+    }
+}
 pipeline {
     /* The agent directive, which is required, instructs Jenkins to allocate an executor and workspace for the Pipeline */
 
@@ -12,8 +27,8 @@ pipeline {
         stage('Registry check') {
             // NOTE: Checking registry for existing image
             agent {
-                docker { 
-                    image 'maven:3.6.1-jdk-8' 
+                docker {
+                    image 'maven:3.6.1-jdk-8'
                     args '-v /root/.m2:/root/.m2'
                 }
             }
@@ -25,29 +40,20 @@ pipeline {
                    * and "Branch Build" Jenkins plugins installed.
                    */
 
-                //    NOTE: Getting short hash of the commit. Use %H (capital) for full hash.
+                    //    NOTE: Getting short hash of the commit. Use %H (capital) for full hash.
                     sh "git log --pretty=format:'%h' -n 1"
                     def tag = sh(script: "git log --pretty=format:'%h' -n 1", returnStdout: true)
                     // NOTE: Requires 'Docker' Jenkins plugin. DOcumentation: https://go.cloudbees.com/docs/plugins/docker-workflow/
 
-                    try { 
+                    try {
 
-                        agent {
-                            docker { 
-                                image 'emcmongoose/darzee:latest' 
-                                args '-p 8080:8080'
-                            }
+                        docker.image('emcmongoose/darzee:latest').withRun('-p 8080:8080') { test ->
+                            echo "Running Darzee container inside a pipeline."
                         }
-
-                        // docker.image('emcmongoose/darzee:latest').withRun('') { test ->
-                        //     echo "Test: $test"
-                        //     echo "inside 'with image'"
-                        // }
-                        echo "dockerImageInstance exist."
-                    } catch (Exception e) { 
-                        echo "Docker image doesn't exist."
+                    } catch (Exception e) {
+                        echo "Launching  Darzee container inside a pipeline has failed."
                     }
-                   
+
                     // def existingImageTag = sh(script: "docker images -q emcmongoose/darzee:latest", returnStdout: true)
                     // echo "existingImageTag ${existingImageTag}"
                     // def isImageExistInRegistry = (existingImageTag == '')
