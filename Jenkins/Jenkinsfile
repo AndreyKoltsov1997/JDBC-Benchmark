@@ -17,6 +17,9 @@ pipeline {
         stage('Build') {
             steps {
                 script { 
+                    /* 
+                    NOTE: Make sure you have "GitHub Branch" and "Branch Build" Jenkins plugins installed.
+                    */
                     sh "git tag -- contains | head -1"
                     def tag = sh(returnsStdout: true, script: "git tag -- contains | head -1").trim()
                     echo "tag is $tag"
