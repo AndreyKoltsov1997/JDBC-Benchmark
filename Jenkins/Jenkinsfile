@@ -22,20 +22,6 @@ pipeline {
 
                 script {
 
-
-            docker.image('emcmongoose/darzee:latest').withRun("") { test ->
-             echo "Running darzee inside node with empty withRun(...)."
-            }
-
-            try {
-                docker.image("emcmongoose/darzee:nonexist").withRun("-p 8881:8881") {
-                c ->
-                    echo "running non-existing darzee container"
-                }
-            } catch (Exception ex) {
-                echo "caught exception with trying to run non-existing darzee container."
-            }
-    
                     /* 
                    NOTE: Make sure you have the following plugins installed: 
                    * GitHub Branch Source: https://github.com/jenkinsci/github-branch-source-plugin
@@ -43,25 +29,18 @@ pipeline {
                    */
 
                     //    NOTE: Getting short hash of the commit. Use %H (capital) for full hash.
-                    sh "git log --pretty=format:'%h' -n 1"
                     def tag = sh(script: "git log --pretty=format:'%h' -n 1", returnStdout: true)
-                    // NOTE: Requires 'Docker' Jenkins plugin. DOcumentation: https://go.cloudbees.com/docs/plugins/docker-workflow/
 
-                    try {
 
-                        
-                        docker.image('emcmongoose/darzee:latest').withRun('-p 8888:8888') { test ->
-                            echo "Running Darzee container inside a pipeline."
-                        }
-                    } catch (Exception e) {
-                        echo "Launching  Darzee container inside a pipeline has failed."
-                    }
+            try {
+                // NOTE: Requires 'Docker' Jenkins plugin. DOcumentation: https://go.cloudbees.com/docs/plugins/docker-workflow/
 
-                    // def existingImageTag = sh(script: "docker images -q emcmongoose/darzee:latest", returnStdout: true)
-                    // echo "existingImageTag ${existingImageTag}"
-                    // def isImageExistInRegistry = (existingImageTag == '')
-                    // echo "tag is $tag"
-                    // echo "Is Darzee image exist? $isImageExistInRegistry"
+                docker.image("emcmongoose/darzee:$tag").withRun("") { test ->
+                    echo "Running darzee inside node with empty withRun(...)."
+                 }
+            } catch (Exception ex) {
+                echo "caught exception with trying to run non-existing darzee container."
+            }
                 }
             }
         }
@@ -69,7 +48,8 @@ pipeline {
         stage('Build') {
             agent {
                 docker {
-                    image 'maven:3-alpine'
+                        
+                        
                     /* creates a reciprocal mapping between the /root/.m2 (i.e. Maven repository) directories in the ...
                     ... short-lived Maven Docker container and that of your Docker host’s filesystem */
                     /* As far as I understand, this is something like cache in docker multistage building. */
