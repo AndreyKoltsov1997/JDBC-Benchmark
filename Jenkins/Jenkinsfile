@@ -42,7 +42,7 @@ pipeline {
                         docker.image("emcmongoose/darzee:$tag").withRun("") { test ->
                             params.isImageExistInRegistry = true;
                         }
-                    } catch (Exception ex) {
+                    } catch (ex) {
                         echo "test"
                         params.isImageExistInRegistry = false;
                     } finally { 
