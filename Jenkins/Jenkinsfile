@@ -49,6 +49,8 @@ pipeline {
                         currentBuild.result = 'SUCCESS'
                     } finally { 
                         echo "Finally"
+                        echo "[Fianlly block] Is image exist in registry? $isImageExistInRegistry"
+
                     }
                     echo "Is image exist in registry? $isImageExistInRegistry"
                 }
