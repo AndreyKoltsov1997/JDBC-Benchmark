@@ -3,15 +3,13 @@
 def SUCCESS_MESSAGE_OUTPUT_COLOR = '\033[1;32m'
 def FAILURE_MESSAGE_OUTPUT_COLOR = '\033[0;31m'
 
+isImageExistInRegistry = false; 
+
 pipeline {
         /* The agent directive, which is required, instructs Jenkins to allocate an executor and workspace for the Pipeline */
             
     // NOTE: Using different agent on different jobs 
     agent none
-
-    parameters {
-        booleanParam(name: 'isImageExistInRegistry', defaultValue: true, description: 'Toggle this value')
-    }
 
     stages {
 
@@ -44,15 +42,15 @@ pipeline {
                         }
                     } catch (ex) {
                         echo "currentBuild.result $currentBuild.result"
-                        params.isImageExistInRegistry = false;
+                        isImageExistInRegistry = false;
                         // NOTE: Setting build as success in order to continue the step.
                         currentBuild.result = 'SUCCESS'
                     } finally { 
                         echo "Finally"
-                        echo "[Fianlly block] Is image exist in registry? $params.isImageExistInRegistry"
+                        echo "[Fianlly block] Is image exist in registry? $isImageExistInRegistry"
 
                     }
-                    echo "Is image exist in registry? $params.isImageExistInRegistry"
+                    echo "Is image exist in registry? $isImageExistInRegistry"
                 }
             }
         }
