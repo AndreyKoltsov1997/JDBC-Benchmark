@@ -39,11 +39,11 @@ pipeline {
 
                     try {
                         // NOTE: Requires 'Docker' Jenkins plugin. DOcumentation: https://go.cloudbees.com/docs/plugins/docker-workflow/
-
                         docker.image("emcmongoose/darzee:$tag").withRun("") { test ->
                             params.isImageExistInRegistry = true;
                         }
                     } catch (Exception ex) {
+                        echo "test"
                         params.isImageExistInRegistry = false;
                     }
                     echo "Is image exist in registry? $isImageExistInRegistry"
