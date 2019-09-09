@@ -1,34 +1,61 @@
 #!groovy
 
-def SUCCESS_MESSAGE_OUTPUT_COLOR='\033[1;32m'
-def FAILURE_MESSAGE_OUTPUT_COLOR='\033[0;31m'
+def SUCCESS_MESSAGE_OUTPUT_COLOR = '\033[1;32m'
+def FAILURE_MESSAGE_OUTPUT_COLOR = '\033[0;31m'
 pipeline {
     /* The agent directive, which is required, instructs Jenkins to allocate an executor and workspace for the Pipeline */
-    agent {
-        docker {
-            image 'maven:3-alpine'
-            /* creates a reciprocal mapping between the /root/.m2 (i.e. Maven repository) directories in the ...
-             ... short-lived Maven Docker container and that of your Docker host’s filesystem */
-             /* As far as I understand, this is something like cache in docker multistage building. */
-            args '-v /root/.m2:/root/.m2'
-        }
-    }
+
+    // NOTE: Using different agent on different jobs 
+    agent none
     stages {
-        stage('Build') {
+
+        stage('Registry check') {
+            // NOTE: Checking registry for existing image
+            agent {
+                docker {
+                    image 'alpine/git:latest'
+                    // TODO: Set image here
+                }
+            }
             steps {
-                script { 
+                script {
                     /* 
-                    NOTE: Make sure you have "GitHub Branch" and "Branch Build" Jenkins plugins installed.
-                    */
+                   NOTE: Make sure you have the following plugins installed: 
+                   * GitHub Branch Source: https://github.com/jenkinsci/github-branch-source-plugin
+                   * and "Branch Build" Jenkins plugins installed.
+                   */
                     sh "git tag -- contains | head -1"
                     def tag = sh(returnsStdout: true, script: "git tag -- contains | head -1").trim()
                     echo "tag is $tag"
                     echo "Change ID is $env.CHANGE_ID"
                 }
+            }
+        }
+
+        stage('Build') {
+            agent {
+                docker {
+                    image 'maven:3-alpine'
+                    /* creates a reciprocal mapping between the /root/.m2 (i.e. Maven repository) directories in the ...
+                    ... short-lived Maven Docker container and that of your Docker host’s filesystem */
+                    /* As far as I understand, this is something like cache in docker multistage building. */
+                    args '-v /root/.m2:/root/.m2'
+                }
+            }
+            steps {
                 sh 'mvn clean compile -DskipTests  assembly:single package'
             }
         }
         stage('Test') {
+            agent {
+                docker {
+                    image 'maven:3-alpine'
+                    /* creates a reciprocal mapping between the /root/.m2 (i.e. Maven repository) directories in the ...
+                    ... short-lived Maven Docker container and that of your Docker host’s filesystem */
+                    /* As far as I understand, this is something like cache in docker multistage building. */
+                    args '-v /root/.m2:/root/.m2'
+                }
+            }
             steps {
                 sh 'mvn test'
             }
