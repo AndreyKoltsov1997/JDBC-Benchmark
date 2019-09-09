@@ -28,8 +28,11 @@ pipeline {
                 //    NOTE: Getting short hash of the commit. Use %H (capital) for full hash.
                     sh "git log --pretty=format:'%h' -n 1"
                     def tag = sh(script: "git log --pretty=format:'%h' -n 1", returnStdout: true)
-                    // NOTE: Requires 'Docker' Jenkins plugin 
+                    // NOTE: Requires 'Docker' Jenkins plugin. DOcumentation: https://go.cloudbees.com/docs/plugins/docker-workflow/
 
+                    docker.withTool("default") { 
+                        sh "docker images" 
+                    }
                     def dockerImageInstance = docker.image('emcmongoose/darzee:imnotexisting')
                     echo "dockerImageInstance: $dockerImageInstance"
                     // def existingImageTag = sh(script: "docker images -q emcmongoose/darzee:latest", returnStdout: true)
