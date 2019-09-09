@@ -23,8 +23,8 @@ pipeline {
                 script {
 
 
-            docker.image('emcmongoose/darzee:latest') { test ->
-             echo "Running darzee inside node WITHOUT withRun(...)."
+            docker.image('emcmongoose/darzee:latest').withRun("-p 8880:8880") { test ->
+             echo "Running darzee inside node."
             }
 
             try {
@@ -48,6 +48,7 @@ pipeline {
                     // NOTE: Requires 'Docker' Jenkins plugin. DOcumentation: https://go.cloudbees.com/docs/plugins/docker-workflow/
 
                     try {
+
                         
                         docker.image('emcmongoose/darzee:latest').withRun('-p 8888:8888') { test ->
                             echo "Running Darzee container inside a pipeline."
