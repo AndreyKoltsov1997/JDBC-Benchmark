@@ -28,7 +28,7 @@ pipeline {
                 //    NOTE: Getting short hash of the commit. Use %H (capital) for full hash.
                     sh "git log --pretty=format:'%h' -n 1"
                     def tag = sh(script: "git log --pretty=format:'%h' -n 1", returnStdout: true)
-                    def isImageExist = sh(script: "$(docker images -q emcmongoose/darzee:latest 2> /dev/null) == ''", returnStdout: true)
+                    def isImageExist = sh(script: "docker images -q emcmongoose/darzee:latest 2> /dev/null", returnStdout: true)
                     echo "tag is $tag"
                     echo "Is Darzee image exist? $isImageExist"
                 }
