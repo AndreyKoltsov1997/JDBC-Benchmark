@@ -12,10 +12,7 @@ pipeline {
         stage('Registry check') {
             // NOTE: Checking registry for existing image
             agent {
-                docker {
-                    image 'alpine/git:latest'
-                    // TODO: Set image here
-                }
+                docker { image 'alpine/git' }
             }
             steps {
                 script {
@@ -72,6 +69,15 @@ pipeline {
             }
         }
         stage('Deploy') {
+            agent {
+                docker {
+                    image 'maven:3-alpine'
+                    /* creates a reciprocal mapping between the /root/.m2 (i.e. Maven repository) directories in the ...
+                    ... short-lived Maven Docker container and that of your Docker host’s filesystem */
+                    /* As far as I understand, this is something like cache in docker multistage building. */
+                    args '-v /root/.m2:/root/.m2'
+                }
+            }
             when {
                 branch 'master'
             }
