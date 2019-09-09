@@ -8,6 +8,11 @@ pipeline {
             
     // NOTE: Using different agent on different jobs 
     agent none
+
+    parameters {
+        booleanParam(name: 'isImageExistInRegistry', defaultValue: true, description: 'Toggle this value')
+    }
+
     stages {
 
             stage('Registry check') {
@@ -32,15 +37,16 @@ pipeline {
                     def tag = sh(script: "git log --pretty=format:'%h' -n 1", returnStdout: true)
 
 
-            try {
-                // NOTE: Requires 'Docker' Jenkins plugin. DOcumentation: https://go.cloudbees.com/docs/plugins/docker-workflow/
+                    try {
+                        // NOTE: Requires 'Docker' Jenkins plugin. DOcumentation: https://go.cloudbees.com/docs/plugins/docker-workflow/
 
-                docker.image("emcmongoose/darzee:$tag").withRun("") { test ->
-                    echo "Running darzee inside node with empty withRun(...)."
-                 }
-            } catch (Exception ex) {
-                echo "caught exception with trying to run non-existing darzee container."
-            }
+                        docker.image("emcmongoose/darzee:$tag").withRun("") { test ->
+                            params.isImageExistInRegistry = true;
+                        }
+                    } catch (Exception ex) {
+                        params.isImageExistInRegistry = false;
+                    }
+                    echo "Is image exist in registry? $isImageExistInRegistry"
                 }
             }
         }
