@@ -70,4 +70,3 @@ In order see how benchmark works, it's possible to launch in with the reference 
  **Maven Repo Host**: www.myMavenRepo.com - a free and open maven repository host.  
  **URL for benchmark's maven repository**: https://mymavenrepo.com/repo/1tBBXJuvm7DxdQvRwi8t  
 
-
