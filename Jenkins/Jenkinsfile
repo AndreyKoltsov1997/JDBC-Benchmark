@@ -45,6 +45,8 @@ pipeline {
                     } catch (Exception ex) {
                         echo "test"
                         params.isImageExistInRegistry = false;
+                    } finally { 
+                        echo "Finally"
                     }
                     echo "Is image exist in registry? $isImageExistInRegistry"
                 }
