@@ -27,7 +27,7 @@ def getCommitTag() {
 
 def isImageWithTagExistInRegistry(imageName="", imageTag="") { 
     isExist = false;
-    echo "Checking $imageTag:$imageTag in the registry..."
+    echo "Checking $imageName:$imageTag in the registry..."
      try {
          // NOTE: Requires 'Docker' Jenkins plugin. Documentation: https://go.cloudbees.com/docs/plugins/docker-workflow/
         docker.image("$imageName:$imageTag").withRun("") { test ->
