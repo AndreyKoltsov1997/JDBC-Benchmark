@@ -15,11 +15,28 @@ def getCommitTag() {
     * GitHub Branch Source: https://github.com/jenkinsci/github-branch-source-plugin
     * and "Branch Build" Jenkins plugins installed.
     */
-    def tag = sh(script: "git log --pretty=format:'%h' -n 1", returnStdout: true).trim()
+
+     // NOTE: Getting short hash of the commit. Use %H (capital) for full hash.
+
+    def tag = sh(script: "git log --pretty=format:'%h' -n 1", returnStdout: true).trim();
     if (tag == null) { 
         tag = EMPTY_COMMIT_TAG;
     }
     return tag 
+}
+
+def isImageWithTagExistInRegistry(imageName="", imageTag="") { 
+    isExist = false;
+    echo "Checking $imageTag:$imageTag in the registry..."
+     try {
+         // NOTE: Requires 'Docker' Jenkins plugin. Documentation: https://go.cloudbees.com/docs/plugins/docker-workflow/
+        docker.image("$imageName:$imageTag").withRun("") { test ->
+            isExist = true;
+        }
+    } catch (ex) {
+        isExist = false;
+    } 
+    return isExist;
 }
 
 isImageExistInRegistry = false; 
@@ -43,23 +60,23 @@ pipeline {
             steps {
 
                 script {
-                    
-                    // NOTE: Getting short hash of the commit. Use %H (capital) for full hash.
-                    // def tag = sh(script: "git log --pretty=format:'%h' -n 1", returnStdout: true)
                     def tag = getCommitTag();
                     if (tag == EMPTY_COMMIT_TAG) { 
                         final latestTag = "latest";
                         tag = DEFAULT_IMAGE_TAG;
                     }
-                    try {
-                        final darzeeImageName = "emcmongoose/darzee";
-                        // NOTE: Requires 'Docker' Jenkins plugin. DOcumentation: https://go.cloudbees.com/docs/plugins/docker-workflow/
-                        docker.image("$darzeeImageName:$tag").withRun("") { test ->
-                            params.isImageExistInRegistry = true;
-                        }
-                    } catch (ex) {
-                        isImageExistInRegistry = false;
-                    } 
+                    final darzeeImageName = "emcmongoose/darzee";
+                    def isImageExistInRegistry = isImageWithTagExistInRegistry(darzeeImageName, tag)
+                    echo "Is Darzee exist in registry? $isImageExistInRegistry"
+                    // try {
+                    //     final darzeeImageName = "emcmongoose/darzee";
+                    //     // NOTE: Requires 'Docker' Jenkins plugin. DOcumentation: https://go.cloudbees.com/docs/plugins/docker-workflow/
+                    //     docker.image("$darzeeImageName:$tag").withRun("") { test ->
+                    //         params.isImageExistInRegistry = true;
+                    //     }
+                    // } catch (ex) {
+                    //     isImageExistInRegistry = false;
+                    // } 
                     echo "Is image exist in registry? $isImageExistInRegistry"
                 }
             }
