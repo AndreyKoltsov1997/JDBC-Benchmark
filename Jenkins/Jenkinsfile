@@ -54,7 +54,7 @@ pipeline {
             agent {
                 docker {
                     image 'alpine/git'
-                    args '-v ${HOME}:/root -v $(pwd):/git alpine/git'
+                    args ''
                 }
             }
             steps {
