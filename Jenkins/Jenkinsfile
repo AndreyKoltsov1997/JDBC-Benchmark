@@ -73,6 +73,8 @@ pipeline {
                     //     isImageExistInRegistry = false;
                     // } 
                     echo "Is image exist in registry? $isImageExistInRegistry"
+                    echo "Docker check.."
+                    sh(script: "docker ps", returnStdout: true);
                 }
             }
         }
