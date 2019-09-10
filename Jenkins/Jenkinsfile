@@ -51,12 +51,7 @@ pipeline {
 
             stage('Registry check') {
                 // NOTE: Checking registry for existing image
-            agent {
-                docker {
-                    image 'alpine/git:latest'
-                    args '-v $HOME:/root -v $pwd:/git alpine/git'
-                }
-            }
+            agent any
             steps {
 
                 script {
