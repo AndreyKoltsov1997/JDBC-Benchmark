@@ -56,7 +56,10 @@ pipeline {
                     steps {
                         script {
                             echo "Job 1 is executing. Throwing exception..."
-                            throw new Exception("Job 1 exception")
+                            catchError {
+                                throw new Exception("Job 1 exception")
+                            }
+
                         }
                     }
                 }
@@ -168,7 +171,7 @@ pipeline {
 
         failure {
             script {
-                scho "Caught failure."
+                echo "Caught failure."
             }
         }
     }

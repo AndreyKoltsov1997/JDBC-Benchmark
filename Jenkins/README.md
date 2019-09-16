@@ -27,6 +27,8 @@ stage('Potentially Error Stage') {
 }
 post { 
     failure { 
+    // NOTE: Pipeline status' is set to FAILED, thus ...
+    // ... at least one step has failed.
         script { 
             echo "Exception has been caught."
         }
