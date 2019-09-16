@@ -171,6 +171,7 @@ pipeline {
 
         failure {
             script {
+                // NOTE: In case job in step 1 has failed, it executes AFTER all the other jobs.
                 echo "Caught failure."
             }
         }
