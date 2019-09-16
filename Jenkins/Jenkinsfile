@@ -62,14 +62,15 @@ pipeline {
 
                         }
                     }
-                }
-                post {
-                    failure {
-                        script {
-                           echo "[POST-stage1 block] Stage 1 has failed."
+                    post {
+                        failure {
+                            script {
+                                echo "[POST-stage1 block] Stage 1 has failed."
+                            }
                         }
                     }
                 }
+
                 stage("Job 2") {
                     steps {
                         script {
