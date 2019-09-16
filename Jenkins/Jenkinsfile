@@ -163,13 +163,12 @@ pipeline {
                 sh 'mvn -s .m2/settings.xml --batch-mode deploy'
             }
         }
+    }
+    post {
 
-        post {
-
-            failure {
-                script {
-                    scho "Caught failure."
-                }
+        failure {
+            script {
+                scho "Caught failure."
             }
         }
     }
