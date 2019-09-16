@@ -53,20 +53,26 @@ pipeline {
         stage('Test Parallel Work') {
             parallel {
                 stage("Job 1") {
-                    script {
-                        echo "Job 1 is executing. Throwing exception..."
-                        throw new Exception("Job 1 exception")
+                    steps {
+                        script {
+                            echo "Job 1 is executing. Throwing exception..."
+                            throw new Exception("Job 1 exception")
+                        }
                     }
                 }
                 stage("Job 2") {
-                    script {
-                        echo "Job 2 is executing."
+                    steps {
+                        script {
+                            echo "Job 2 is executing."
+                        }
                     }
                 }
                 stage("Job 3") {
-                    script {
-                        echo "Job 3 is executing."
-                    }
+                   steps {
+                       script {
+                           echo "Job 3 is executing."
+                       }
+                   }
                 }
             }
         }
