@@ -25,7 +25,10 @@ def getCommitTag() {
     return tag 
 }
 
-def isImageWithTagExistInRegistry(imageName="", imageTag="") { 
+def isImageWithTagExistInRegistry(imageName, imageTag="") {
+    if (imageTag = "") {
+        imageTag = DEFAULT_IMAGE_TAG;
+    }
     isExist = false;
     echo "Checking $imageName:$imageTag in the registry..."
      try {
@@ -42,74 +45,24 @@ def isImageWithTagExistInRegistry(imageName="", imageTag="") {
 isImageExistInRegistry = false; 
 
 pipeline {
-        /* The agent directive, which is required, instructs Jenkins to allocate an executor and workspace for the Pipeline */
-            
+    /* The agent directive, which is required, instructs Jenkins to allocate an executor and workspace for the Pipeline */        
     // NOTE: Using different agent on different jobs 
     agent none
 
     stages {
-
-
-        stage('Test Parallel Work') {
-            parallel {
-                stage("Job 1") {
-                    steps {
-                        script {
-                            echo "Job 1 is executing. Throwing exception..."
-                            catchError {
-                                throw new Exception("Job 1 exception")
-                            }
-
-                        }
-                    }
-                    post {
-                        failure {
-                            script {
-                                echo "[POST-stage1 block] Stage 1 has failed."
-                            }
-                        }
-                    }
-                }
-
-                stage("Job 2") {
-                    steps {
-                        script {
-                            echo "Job 2 is executing."
-                        }
-                    }
-                }
-                stage("Job 3") {
-                   steps {
-                       script {
-                           echo "Job 3 is executing."
-                       }
-                   }
-                }
-            }
-        }
-            stage('Registry check') {
-                // NOTE: Checking registry for existing image
-            agent any
-            steps {
-
-                script {
-                    def tag = getCommitTag();
-                    if (tag == EMPTY_COMMIT_TAG) { 
-                        final latestTag = "latest";
-                        tag = DEFAULT_IMAGE_TAG;
+        stage('Registry check') {
+            // NOTE: Checking registry for existing image
+           agent any
+           steps {
+               script {
+                   def tag = getCommitTag();
+                   if (tag == EMPTY_COMMIT_TAG) { 
+                       final latestTag = "latest";
+                       tag = DEFAULT_IMAGE_TAG;
                     }
                     final darzeeImageName = "emcmongoose/darzee";
                     def isImageExistInRegistry = isImageWithTagExistInRegistry(darzeeImageName, tag)
                     echo "Is Darzee exist in registry? $isImageExistInRegistry"
-                    // try {
-                    //     final darzeeImageName = "emcmongoose/darzee";
-                    //     // NOTE: Requires 'Docker' Jenkins plugin. DOcumentation: https://go.cloudbees.com/docs/plugins/docker-workflow/
-                    //     docker.image("$darzeeImageName:$tag").withRun("") { test ->
-                    //         params.isImageExistInRegistry = true;
-                    //     }
-                    // } catch (ex) {
-                    //     isImageExistInRegistry = false;
-                    // } 
                     echo "Is image exist in registry? $isImageExistInRegistry"
                     echo "Docker check.."
                     sh(script: "docker ps", returnStdout: true);
@@ -121,7 +74,6 @@ pipeline {
             agent {
                 docker {
                     image 'maven:3-alpine'
-                    
                     /* creates a reciprocal mapping between the /root/.m2 (i.e. Maven repository) directories in the ...
                     ... short-lived Maven Docker container and that of your Docker host’s filesystem */
                     /* As far as I understand, this is something like cache in docker multistage building. */
@@ -129,7 +81,9 @@ pipeline {
                 }
             }
             steps {
-                sh 'mvn clean compile -DskipTests  assembly:single package'
+                script {
+                    sh 'mvn clean compile -DskipTests  assembly:single package'
+                }
             }
         }
         stage('Test') {
@@ -171,12 +125,13 @@ pipeline {
                 branch 'master'
             }
             steps {
-                sh 'mvn -s .m2/settings.xml --batch-mode deploy'
+                script { 
+                    sh 'mvn -s .m2/settings.xml --batch-mode deploy'
+                }
             }
         }
     }
     post {
-
         failure {
             script {
                 // NOTE: In case job in step 1 has failed, it executes AFTER all the other jobs.
