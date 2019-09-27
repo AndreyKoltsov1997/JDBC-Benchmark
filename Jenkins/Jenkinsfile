@@ -30,6 +30,7 @@ pipeline {
                     echo "testFileInfo.nonExistingField: $testFileInfo.nonExistingField"
 
                     fileDeleteOperation(includes: "${env.WORKSPACE}/test.yaml", excludes: '')
+                    sh "ls"
                     echo "File has been deleted."
                     writeYaml(file: "${env.WORKSPACE}/test.yaml", data: testFileInfo)
 
