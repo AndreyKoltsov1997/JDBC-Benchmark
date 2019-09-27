@@ -15,7 +15,7 @@ pipeline {
         stage("YAML file tests") {
             steps {
                 script {
-                    File yaml = new File("src/test/resources/version.yaml")
+                    File yaml = new File("test.yaml")
                     echo "Current YAML file: $yaml.text";
 
                     def newCountry = "USA";
