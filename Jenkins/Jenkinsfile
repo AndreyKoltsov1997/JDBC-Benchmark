@@ -16,12 +16,9 @@ pipeline {
             steps {
                 script {
                     sh "ls"
-                    Path currentRelativePath = Paths.get("");
-                    String s = currentRelativePath.toAbsolutePath().toString();
-                    echo "Current relative path is $s"
-                    String currentDirectory = new File(".").getAbsolutePath();
-                    echo "Current directory: $currentDirectory"
-                    File yaml = new File("/test.yaml")
+                    def scriptDir = getClass().protectionDomain.codeSource.location.path
+                    echo "Current relative path is $scriptDir"
+                    File yaml = new File("$scriptDir/test.yaml")
                     echo "Current YAML file: $yaml.text";
 
                     def newCountry = "USA";
