@@ -15,6 +15,7 @@ pipeline {
         stage("YAML file tests") {
             steps {
                 script {
+                    sh "ls"
                     File yaml = new File("../test.yaml")
                     echo "Current YAML file: $yaml.text";
 
