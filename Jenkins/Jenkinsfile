@@ -31,8 +31,9 @@ pipeline {
                     echo "Updated YAML file: $testFile"
                     def testParam = params.test ? "test param exist" : "test param doesnt exist";
                     echo "testParam: $testParam"
+                    def testFileInfo = null;
                     try {
-                        def testFileInfo = readYaml(file: "${env.WORKSPACE}/test.yaml")
+                        testFileInfo = readYaml(file: "${env.WORKSPACE}/test.yaml")
                     } catch (ScannerException error) {
                         echo "Unable to parse invalid yaml."
                     } catch (FileNotFoundException error) {
