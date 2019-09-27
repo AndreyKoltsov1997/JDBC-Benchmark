@@ -6,44 +6,6 @@ def FAILURE_MESSAGE_OUTPUT_COLOR = '\033[0;31m'
 final EMPTY_COMMIT_TAG = "empty_commit_tag"
 final DEFAULT_IMAGE_TAG = "latest"
 
-/**
-* @returns current commit tag, empty string if latest tag is null.
-*/
-def getCommitTag() { 
-    /* 
-    * NOTE: Make sure you have the following plugins installed: 
-    * GitHub Branch Source: https://github.com/jenkinsci/github-branch-source-plugin
-    * and "Branch Build" Jenkins plugins installed.
-    */
-
-     // NOTE: Getting short hash of the commit. Use %H (capital) for full hash.
-
-    def tag = sh(script: "git log --pretty=format:'%h' -n 1", returnStdout: true).trim();
-    if (tag == null) { 
-        tag = EMPTY_COMMIT_TAG;
-    }
-    return tag 
-}
-
-def isImageWithTagExistInRegistry(imageName, imageTag="") {
-    if (imageTag = "") {
-        imageTag = DEFAULT_IMAGE_TAG;
-    }
-    isExist = false;
-    echo "Checking $imageName:$imageTag in the registry..."
-     try {
-         // NOTE: Requires 'Docker' Jenkins plugin. Documentation: https://go.cloudbees.com/docs/plugins/docker-workflow/
-        docker.image("$imageName:$imageTag").withRun("") { test ->
-            isExist = true;
-        }
-    } catch (ex) {
-        isExist = false;
-    } 
-    return isExist;
-}
-
-isImageExistInRegistry = false; 
-
 pipeline {
     /* The agent directive, which is required, instructs Jenkins to allocate an executor and workspace for the Pipeline */        
     // NOTE: Using different agent on different jobs 
