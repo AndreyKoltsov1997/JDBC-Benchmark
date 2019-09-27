@@ -9,7 +9,7 @@ final DEFAULT_IMAGE_TAG = "latest"
 pipeline {
     /* The agent directive, which is required, instructs Jenkins to allocate an executor and workspace for the Pipeline */        
     // NOTE: Using different agent on different jobs 
-    agent none
+    agent any
 
     stages {
         stage("YAML file tests") {
