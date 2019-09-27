@@ -39,7 +39,7 @@ pipeline {
                     } catch (FileNotFoundException error) {
                         echo "File not found exception."
                     }
-                    testFileInfo.name = setParameter(testFileInfo.name, $param.nonexistingvalue)
+                    testFileInfo.name = setParameter(testFileInfo.name, $params.nonexistingvalue)
                     echo "testFileInfo.name: $testFileInfo.name"
 
                     fileOperations([fileDeleteOperation(excludes: "", includes: 'test.yaml')])
