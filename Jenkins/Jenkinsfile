@@ -31,10 +31,11 @@ pipeline {
 
                     fileDeleteOperation(includes: "${env.WORKSPACE}/test.yaml", excludes: '')
                     echo "File has been deleted."
-                    writeYaml(file: "test.yaml", data: testFileInfo)
+                    writeYaml(file: "${env.WORKSPACE}/test.yaml", data: testFileInfo)
 
                     def updatedFile = readFile("${env.WORKSPACE}/test.yaml")
                     echo "Updated file content: $updatedFile"
+                    sh "cat test.yaml"
 
 
                 }
