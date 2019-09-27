@@ -30,7 +30,8 @@ pipeline {
                     echo "testFileInfo.nonExistingField: $testFileInfo.nonExistingField"
 
                     fileDeleteOperation("${env.WORKSPACE}/test.yaml", '')
-                    writeYaml(file: "${env.WORKSPACE}/test.yaml", data: testFileInfo)
+                    echo "File has been deleted."
+                    writeYaml(file: "test.yaml", data: testFileInfo)
 
                     def updatedFile = readFile("${env.WORKSPACE}/test.yaml")
                     echo "Updated file content: $updatedFile"
