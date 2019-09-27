@@ -23,9 +23,8 @@ pipeline {
 
                     try {
                         def testFileInfo = readYaml(file: "${env.WORKSPACE}/test.yaml")
-                    } catch (Exception error) {
-                        println error.getClass()
-                        echo "File not found exception."
+                    } catch (org.jenkinsci.plugins.pipeline.utility.steps.shaded.org.yaml.snakeyaml.scanner.ScannerException error) {
+                        echo "Unable to parse invalid yaml."
                     }
                     echo "Test file info: $testFileInfo"
                     echo "testFileInfo.country: $testFileInfo.country"
