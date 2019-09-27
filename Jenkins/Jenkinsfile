@@ -21,7 +21,8 @@ pipeline {
                     def newCountry = "USA"
                     testFile = testFile.replaceFirst(/country: '.*'/, "country: '${newCountry}'")
                     echo "Updated YAML file: $testFile"
-
+                    def testParam = params.test ? "test param exist" : "test param doesnt exist";
+                    echo "testParam: $testParam"
                     try {
                         def testFileInfo = readYaml(file: "${env.WORKSPACE}/test.yaml")
                     } catch (ScannerException error) {
