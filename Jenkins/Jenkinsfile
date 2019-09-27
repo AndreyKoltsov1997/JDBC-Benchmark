@@ -20,6 +20,16 @@ pipeline {
                     def newCountry = "USA"
                     testFile = testFile.replaceFirst(/country: '.*'/, "country: '${newCountry}'")
                     echo "Updated YAML file: $testFile"
+
+                    def testFileInfo = readYaml(file: "${env.WORKSPACE}/test.yaml")
+                    echo "Test file info: $testFileInfo"
+                    echo "testFileInfo.country: $testFileInfo.country"
+                    testFileInfo.country = "Canada"
+                    echo "Updated testFileInfo.country: $testFileInfo.country"
+                    testFileInfo.nonExistingField = "I do not exist."
+                    echo "testFileInfo.nonExistingField: $testFileInfo.nonExistingField"
+
+
                 }
             }
         }
