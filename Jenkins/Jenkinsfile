@@ -20,7 +20,7 @@ pipeline {
                     echo "current file's dir: $dir"
                     String currentDirectory = new File(".").getAbsolutePath();
                     echo "Current directory: $currentDirectory"
-                    File yaml = new File("test.yaml")
+                    File yaml = new File("/test.yaml")
                     echo "Current YAML file: $yaml.text";
 
                     def newCountry = "USA";
