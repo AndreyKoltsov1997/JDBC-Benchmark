@@ -15,8 +15,6 @@ pipeline {
         stage("YAML file tests") {
             steps {
                 script {
-                    def workspace = pwd()
-                    echo "Workspace: $pwd"
                     def testFile = readFile("${env.WORKSPACE}/test.yaml")
                     echo "testFile: $testFile"
                     def newCountry = "USA"
