@@ -17,6 +17,8 @@ pipeline {
                 script {
                     def workspace = pwd()
                     echo "Workspace: $pwd"
+                    def testFile = readFile("${env.WORKSPACE}/test.yaml")
+                    echo "testFile: $testFile"
                     sh "ls"
                     def scriptDir = getClass().protectionDomain.codeSource.location.path
                     echo "Current relative path is $scriptDir"
