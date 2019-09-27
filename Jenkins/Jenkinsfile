@@ -29,7 +29,7 @@ pipeline {
                     testFileInfo.nonExistingField = "I do not exist."
                     echo "testFileInfo.nonExistingField: $testFileInfo.nonExistingField"
 
-                    fileOperations([fileDeleteOperation(excludes: "", includes: "${env.WORKSPACE}/test.yaml")])
+                    fileOperations([fileDeleteOperation(excludes: "", includes: "*.yaml")])
 
                     sh "ls"
                     echo "File has been deleted."
