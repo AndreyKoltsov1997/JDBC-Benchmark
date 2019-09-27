@@ -21,7 +21,12 @@ pipeline {
                     testFile = testFile.replaceFirst(/country: '.*'/, "country: '${newCountry}'")
                     echo "Updated YAML file: $testFile"
 
-                    def testFileInfo = readYaml(file: "${env.WORKSPACE}/test.yaml")
+                    try {
+                        def testFileInfo = readYaml(file: "${env.WORKSPACE}/test.yaml")
+                    } catch (Exception error) {
+                        echo "Error class: $error.getClass()"
+                        echo "Found error: $error"
+                    }
                     echo "Test file info: $testFileInfo"
                     echo "testFileInfo.country: $testFileInfo.country"
                     testFileInfo.country = "Canada"
