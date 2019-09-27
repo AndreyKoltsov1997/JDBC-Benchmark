@@ -29,6 +29,7 @@ pipeline {
                     testFileInfo.nonExistingField = "I do not exist."
                     echo "testFileInfo.nonExistingField: $testFileInfo.nonExistingField"
 
+                    fileDeleteOperation("${env.WORKSPACE}/test.yaml", '')
                     writeYaml(file: "${env.WORKSPACE}/test.yaml", data: testFileInfo)
 
                     def updatedFile = readFile("${env.WORKSPACE}/test.yaml")
