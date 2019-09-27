@@ -50,6 +50,18 @@ pipeline {
     agent none
 
     stages {
+        stage("YAML file tests") {
+            steps {
+                script {
+                    File yaml = new File("src/test/resources/version.yaml")
+                    echo "Current YAML file: $yaml.text";
+
+                    def newCountry = "USA";
+                    yaml.text = yaml.text.replaceFirst(/country: '.*'/, "country: '${newCountry}'")
+                    echo "Updated YAML file: $yaml.text"
+                }
+            }
+        }
         stage('Registry check') {
             // NOTE: Checking registry for existing image
            agent any
