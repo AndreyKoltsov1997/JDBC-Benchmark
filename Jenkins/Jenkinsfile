@@ -16,7 +16,7 @@ pipeline {
             steps {
                 script {
                     sh "ls"
-                    File yaml = new File("../test.yaml")
+                    File yaml = new File("test.yaml")
                     echo "Current YAML file: $yaml.text";
 
                     def newCountry = "USA";
