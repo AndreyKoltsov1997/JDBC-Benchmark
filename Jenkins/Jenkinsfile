@@ -1,4 +1,5 @@
 #!groovy
+import org.jenkinsci.plugins.pipeline.utility.steps.shaded.org.yaml.snakeyaml.scanner.ScannerException
 
 def SUCCESS_MESSAGE_OUTPUT_COLOR = '\033[1;32m'
 def FAILURE_MESSAGE_OUTPUT_COLOR = '\033[0;31m'
@@ -23,7 +24,7 @@ pipeline {
 
                     try {
                         def testFileInfo = readYaml(file: "${env.WORKSPACE}/test1.yaml")
-                    } catch (org.jenkinsci.plugins.pipeline.utility.steps.shaded.org.yaml.snakeyaml.scanner.ScannerException error) {
+                    } catch (ScannerException error) {
                         echo "Unable to parse invalid yaml."
                     } catch (FileNotFoundException error) {
                         echo "File not found exception."
