@@ -29,7 +29,7 @@ pipeline {
                     testFileInfo.nonExistingField = "I do not exist."
                     echo "testFileInfo.nonExistingField: $testFileInfo.nonExistingField"
 
-                    fileDeleteOperation("${env.WORKSPACE}/test.yaml", '')
+                    fileDeleteOperation(includes: "${env.WORKSPACE}/test.yaml", excludes: '')
                     echo "File has been deleted."
                     writeYaml(file: "test.yaml", data: testFileInfo)
 
