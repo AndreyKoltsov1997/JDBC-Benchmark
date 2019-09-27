@@ -20,7 +20,7 @@ pipeline {
                     def testFile = readFile("${env.WORKSPACE}/test.yaml")
                     echo "testFile: $testFile"
                     def newCountry = "USA"
-                    testFile.text = testFile.text.replaceFirst(/country: '.*'/, "country: '${newCountry}'")
+                    testFile = testFile.replaceFirst(/country: '.*'/, "country: '${newCountry}'")
                     echo "Updated YAML file: $testFile"
                 }
             }
