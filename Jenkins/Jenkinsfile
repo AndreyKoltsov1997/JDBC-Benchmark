@@ -22,9 +22,11 @@ pipeline {
                     echo "Updated YAML file: $testFile"
 
                     try {
-                        def testFileInfo = readYaml(file: "${env.WORKSPACE}/test.yaml")
+                        def testFileInfo = readYaml(file: "${env.WORKSPACE}/test1.yaml")
                     } catch (org.jenkinsci.plugins.pipeline.utility.steps.shaded.org.yaml.snakeyaml.scanner.ScannerException error) {
                         echo "Unable to parse invalid yaml."
+                    } catch (FileNotFoundException error) {
+                        echo "File not found exception."
                     }
                     echo "Test file info: $testFileInfo"
                     echo "testFileInfo.country: $testFileInfo.country"
