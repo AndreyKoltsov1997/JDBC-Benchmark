@@ -23,9 +23,10 @@ pipeline {
 
                     try {
                         def testFileInfo = readYaml(file: "${env.WORKSPACE}/test.yaml")
-                    } catch (Exception error) {
-                        echo "Error class: $error.getClass()"
-                        echo "Found error: $error"
+                    } catch (ScannerException error) {
+                        echo "Invalid YAML exception.s"
+                    } catch (FileNotFoundException error) {
+                        echo "File not found exception."
                     }
                     echo "Test file info: $testFileInfo"
                     echo "testFileInfo.country: $testFileInfo.country"
