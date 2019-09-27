@@ -16,8 +16,9 @@ pipeline {
             steps {
                 script {
                     sh "ls"
-                    final String dir = System.getProperty("user.dir");
-                    echo "current file's dir: $dir"
+                    Path currentRelativePath = Paths.get("");
+                    String s = currentRelativePath.toAbsolutePath().toString();
+                    echo "Current relative path is $s"
                     String currentDirectory = new File(".").getAbsolutePath();
                     echo "Current directory: $currentDirectory"
                     File yaml = new File("/test.yaml")
