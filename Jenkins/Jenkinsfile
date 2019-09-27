@@ -23,7 +23,7 @@ pipeline {
                     echo "Updated YAML file: $testFile"
 
                     try {
-                        def testFileInfo = readYaml(file: "${env.WORKSPACE}/test1.yaml")
+                        def testFileInfo = readYaml(file: "${env.WORKSPACE}/test.yaml")
                     } catch (ScannerException error) {
                         echo "Unable to parse invalid yaml."
                     } catch (FileNotFoundException error) {
