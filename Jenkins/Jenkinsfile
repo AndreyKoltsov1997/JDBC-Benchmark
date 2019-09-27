@@ -19,15 +19,9 @@ pipeline {
                     echo "Workspace: $pwd"
                     def testFile = readFile("${env.WORKSPACE}/test.yaml")
                     echo "testFile: $testFile"
-                    sh "ls"
-                    def scriptDir = getClass().protectionDomain.codeSource.location.path
-                    echo "Current relative path is $scriptDir"
-                    File yaml = new File("$scriptDir/test.yaml")
-                    echo "Current YAML file: $yaml.text";
-
-                    def newCountry = "USA";
-                    yaml.text = yaml.text.replaceFirst(/country: '.*'/, "country: '${newCountry}'")
-                    echo "Updated YAML file: $yaml.text"
+                    def newCountry = "USA"
+                    testFile.text = testFile.text.replaceFirst(/country: '.*'/, "country: '${newCountry}'")
+                    echo "Updated YAML file: $testFile"
                 }
             }
         }
