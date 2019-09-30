@@ -1,0 +1,32 @@
+enkins:
+  systemMessage: "AutomatingGuy demo: configured automatically with JCasC plugin\n\n"
+tool:
+  git:
+    installations:
+    - home: "git"
+      name: "Default"
+  maven:
+    installations:
+    - name: "Maven 3"
+      properties:
+      - installSource:
+          installers:
+            - maven:
+                id: "3.5.4"
+jobs:
+  - script: >
+      pipelineJob('JDBC-Benchmark') {
+          definition {
+              cpsScm {
+                  scriptPath 'Jenkins/Jenkinsfile'
+                  scm {
+                    git {
+                        remote { url 'https://github.com/AndreyKoltsov1997/JDBC-Benchmark.git' }
+                        branch '*/master'
+                        extensions {}
+                    }
+                  }
+              }
+          }
+      }
+
