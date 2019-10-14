@@ -7,8 +7,8 @@ pipeline {
         stage("Pipeline Configuration") {
             steps {
                 script {
-                    sh "ls ${env.WORKSPACE}/Jenkins"
-                    def commonTools = evaluate readTrusted("${env.WORKSPACE}/Jenkins/common.groovy")
+                    sh "cat ${env.WORKSPACE}/Jenkins/common.groovy"
+                    def commonTools = load "${env.WORKSPACE}/Jenkins/common.groovy"
 
                     currentBuild.rawBuild.project.displayName = "${commonTools.SECONDARY_JOB_NAME}"
                 }
