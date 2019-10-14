@@ -42,6 +42,7 @@ def isImageWithTagExistInRegistry(imageName, imageTag="") {
     return isExist;
 }
 
+def commonTools = evaluate readTrusted("common.groovy")
 isImageExistInRegistry = false; 
 
 pipeline {
@@ -55,6 +56,7 @@ pipeline {
            agent any
            steps {
                script {
+
                    final ANOTHER_PIPELINE_NAME_MOCK = "test-pipeline";
                    build "${ANOTHER_PIPELINE_NAME_MOCK}" // TODO: try to invoke other pipeline from the current one.
                    throw new Exception("Pipeline termiantion exception. TODO: Remove it.");

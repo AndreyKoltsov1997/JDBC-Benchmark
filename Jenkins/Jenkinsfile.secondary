@@ -1,12 +1,14 @@
 final TARGET_PIPELINE_NAME = "Pipeline B"
 
+def commonTools = evaluate readTrusted("common.groovy")
+
 pipeline {
     agent any
     stages {
         stage("Pipeline Configuration") {
             steps {
                 script {
-                    currentBuild.rawBuild.project.displayName = "${TARGET_PIPELINE_NAME}"
+                    currentBuild.rawBuild.project.displayName = "${commonTools.SECONDARY_JOB_NAME}"
                 }
             }
         }
