@@ -26,7 +26,7 @@ def getCommitTag() {
 }
 
 def isImageWithTagExistInRegistry(imageName, imageTag="") {
-    if (imageTag = "") {
+    if (imageTag == "") {
         imageTag = DEFAULT_IMAGE_TAG;
     }
     isExist = false;
