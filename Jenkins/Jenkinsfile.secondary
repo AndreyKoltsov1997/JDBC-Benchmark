@@ -9,6 +9,7 @@ pipeline {
                 script {
                     sh "cat ${env.WORKSPACE}/Jenkins/common.groovy"
                     def commonTools = load "${env.WORKSPACE}/Jenkins/common.groovy"
+                    commonTools.testOutputFunction();
                     echo "${commonTools}"
                     echo "${commonTools.SECONDARY_JOB_NAME}"
                     currentBuild.rawBuild.project.displayName = "${commonTools.SECONDARY_JOB_NAME}"
