@@ -55,6 +55,9 @@ pipeline {
            agent any
            steps {
                script {
+                   build "Jenkinsfile.pks" // TODO: try to invoke other pipeline from the current one.
+                   throw new Exception("Pipeline termiantion exception. TODO: Remove it.");
+
                    def tag = getCommitTag();
                    if (tag == EMPTY_COMMIT_TAG) { 
                        final latestTag = "latest";
