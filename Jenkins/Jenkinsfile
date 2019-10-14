@@ -55,7 +55,8 @@ pipeline {
            agent any
            steps {
                script {
-                   build "Jenkinsfile.pks" // TODO: try to invoke other pipeline from the current one.
+                   final ANOTHER_PIPELINE_NAME_MOCK = "test-pipeline";
+                   build "${ANOTHER_PIPELINE_NAME_MOCK}" // TODO: try to invoke other pipeline from the current one.
                    throw new Exception("Pipeline termiantion exception. TODO: Remove it.");
 
                    def tag = getCommitTag();
