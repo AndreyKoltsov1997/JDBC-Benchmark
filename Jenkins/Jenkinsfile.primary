@@ -56,7 +56,6 @@ pipeline {
            steps {
                script {
 
-                   def commonTools = evaluate readTrusted("${env.WORKSPACE}/Jenkins/common.groovy")
 
                    final ANOTHER_PIPELINE_NAME_MOCK = "test-pipeline";
                    build "${ANOTHER_PIPELINE_NAME_MOCK}" // TODO: try to invoke other pipeline from the current one.
