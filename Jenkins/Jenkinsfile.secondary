@@ -1,6 +1,6 @@
 final TARGET_PIPELINE_NAME = "Pipeline B"
 
-def commonTools = evaluate readTrusted("common.groovy")
+def commonTools = evaluate readTrusted("${env.WORKSPACE}/Jenkins/common.groovy")
 
 pipeline {
     agent any
