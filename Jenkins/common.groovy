@@ -1,3 +1,6 @@
+import groovy.transform.Field
+
+
 @Field
 final PRIMARY_JOB_NAME = "Primary Job";
 
