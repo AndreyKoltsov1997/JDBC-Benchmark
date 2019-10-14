@@ -15,10 +15,10 @@ tool:
                 id: "3.5.4"
 jobs:
   - script: >
-      pipelineJob('JDBC-Benchmark') {
+      pipelineJob('JDBC-Benchmark-primary') {
           definition {
               cpsScm {
-                  scriptPath 'Jenkins/Jenkinsfile'
+                  scriptPath 'Jenkins/Jenkinsfile.primary'
                   scm {
                     git {
                         remote { url 'https://github.com/AndreyKoltsov1997/JDBC-Benchmark.git' }
@@ -29,4 +29,18 @@ jobs:
               }
           }
       }
+      pipelineJob('JDBC-Benchmark-secondary') {
+                definition {
+                    cpsScm {
+                        scriptPath 'Jenkins/Jenkinsfile.secondary'
+                        scm {
+                          git {
+                              remote { url 'https://github.com/AndreyKoltsov1997/JDBC-Benchmark.git' }
+                              branch '*/master'
+                              extensions {}
+                          }
+                        }
+                    }
+                }
+            }
 
