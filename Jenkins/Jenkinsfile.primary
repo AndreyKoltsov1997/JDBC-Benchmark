@@ -61,7 +61,7 @@ pipeline {
                             ]
                     ]
 
-                    slackSend(teamDomain: "koltsovandrey", channel: '#testing-jenkins-ci-with-slack.', attachments: attachments)
+                    slackSend(teamDomain: "koltsovandrey", channel: '#testing-jenkins-ci-with-slack', attachments: attachments)
                     throw new Exception("Pipeline termination test.")
 
                 }
