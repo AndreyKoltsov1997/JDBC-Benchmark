@@ -53,8 +53,8 @@ pipeline {
         stage("Test Slack Notifications Send") {
             steps {
                 script {
-                    slackSend (color: '#FFFF00', message: "STARTED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
-
+                    slackSend (color: '#FFFF00', message: "STARTED a job.")
+                    sleep(100)
 //                    def attachments = [
 //                            [
 //                                    text: 'I find your lack of faith disturbing!',
