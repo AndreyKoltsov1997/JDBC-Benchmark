@@ -50,6 +50,22 @@ pipeline {
     agent none
 
     stages {
+        stage("Test Slack Notifications Send") {
+            steps {
+                script {
+                    def attachments = [
+                            [
+                                    text: 'I find your lack of faith disturbing!',
+                                    fallback: 'Hey, Vader seems to be mad at you.',
+                                    color: '#ff0000'
+                            ]
+                    ]
+
+                    slackSend(channel: '#testing-jenkins-ci-with-slack.', attachments: attachments)
+                }
+                throw new Exception("Pipeline termination test.")
+            }
+        }
         stage('Registry check') {
             // NOTE: Checking registry for existing image
            agent any
