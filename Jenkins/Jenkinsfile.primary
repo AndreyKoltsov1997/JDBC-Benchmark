@@ -55,15 +55,15 @@ pipeline {
                 script {
                     slackSend(teamDomain: "koltsovandrey", channel: '#testing-jenkins-ci-with-slack', color: '#FFFF00', message: "STARTED a job.")
                     sleep(100)
-//                    def attachments = [
-//                            [
-//                                    text: 'I find your lack of faith disturbing!',
-//                                    fallback: 'Hey, Vader seems to be mad at you.',
-//                                    color: '#ff0000'
-//                            ]
-//                    ]
-//
-//                    slackSend(teamDomain: "koltsovandrey", channel: '#testing-jenkins-ci-with-slack', attachments: attachments)
+                    def attachments = [
+                            [
+                                    text: 'I find your lack of faith disturbing!',
+                                    fallback: 'Hey, Vader seems to be mad at you.',
+                                    color: '#ff0000'
+                            ]
+                    ]
+
+                    slackSend(teamDomain: "koltsovandrey", channel: '#testing-jenkins-ci-with-slack', attachments: attachments)
                     throw new Exception("Pipeline termination test.")
 
                 }
