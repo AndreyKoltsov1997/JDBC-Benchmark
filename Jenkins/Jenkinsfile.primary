@@ -53,15 +53,17 @@ pipeline {
         stage("Test Slack Notifications Send") {
             steps {
                 script {
-                    def attachments = [
-                            [
-                                    text: 'I find your lack of faith disturbing!',
-                                    fallback: 'Hey, Vader seems to be mad at you.',
-                                    color: '#ff0000'
-                            ]
-                    ]
+                    slackSend (color: '#FFFF00', message: "STARTED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
 
-                    slackSend(teamDomain: "koltsovandrey", channel: '#testing-jenkins-ci-with-slack', attachments: attachments)
+//                    def attachments = [
+//                            [
+//                                    text: 'I find your lack of faith disturbing!',
+//                                    fallback: 'Hey, Vader seems to be mad at you.',
+//                                    color: '#ff0000'
+//                            ]
+//                    ]
+//
+//                    slackSend(teamDomain: "koltsovandrey", channel: '#testing-jenkins-ci-with-slack', attachments: attachments)
                     throw new Exception("Pipeline termination test.")
 
                 }
