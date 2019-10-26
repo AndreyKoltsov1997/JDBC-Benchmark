@@ -53,7 +53,7 @@ pipeline {
         stage("Test Slack Notifications Send") {
             steps {
                 script {
-                    slackSend (color: '#FFFF00', message: "STARTED a job.")
+                    slackSend(teamDomain: "koltsovandrey", channel: '#testing-jenkins-ci-with-slack', color: '#FFFF00', message: "STARTED a job.")
                     sleep(100)
 //                    def attachments = [
 //                            [
